@@ -1,7 +1,9 @@
 @charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Iceberg&display=swap');
 
 :root{
     --fonte01: Arial, Helvetica, sans-serif;
+    --fonte02: "Iceberg", sans-serif;
     --cor00: #000;
     --cor1: #009DF0;
     --cor2: #218CC5;
@@ -47,6 +49,7 @@ main{
 a{
     color: var(--cor00);
     text-decoration: none;
+    font-family: var(--fonte02);
 }
 
 a:hover{
