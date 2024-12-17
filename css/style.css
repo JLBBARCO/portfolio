@@ -80,6 +80,10 @@ main{
   font-family: var(--font1);
 }
 
+.container{
+  overflow-x: auto;
+}
+
 /*home*/
 
 .hero {
