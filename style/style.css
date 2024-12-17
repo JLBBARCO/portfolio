@@ -3,7 +3,11 @@
 :root{
     --fonte01: Arial, Helvetica, sans-serif;
     --cor00: #000;
-    --cor01: ;
+    --cor1: #009DF0;
+    --cor2: #218CC5;
+    --cor3: #385D70;
+    --cor4: #2E3E46;
+    --cor5: #2B3033;
     --sombra: #0000005e;
 }
 
@@ -19,6 +23,7 @@ header{
     box-shadow: 0px 7px 7px var(--sombra);
     display: flex;
     justify-content: space-between;
+    background-color: var(--cor3);
 }
 
 header img{
@@ -35,6 +40,8 @@ main{
     max-width: 1000px;
     margin: auto;
     padding: 10px;
+    background-color: var(--cor1);
+    box-shadow: inset 0px 7px 7px var(--cor00);
 }
 
 a{
@@ -46,15 +53,38 @@ a:hover{
     text-decoration: underline;
 }
 
-footer{
-    box-shadow: 0px -7px 7px var(--sombra);
+a.externo::after{
+    content: '\00A0\1F517';
+}
+
+li{
+    margin: 10px;
 }
 
 footer{
+    box-shadow: 0px -7px 7px var(--sombra);
     padding: 25px;
+    background-color: var(--cor4);
+    color: #FFF;
+}
+
+p.social{
+    margin: 0 15%;
+    display: flex;
+    justify-content: space-between;
 }
 
 p.social img{
     width: 50px;
     margin: auto;
+}
+
+p.social a{
+    padding: 10px;
+    transition-duration: 0.5s;
+}
+
+p.social a:hover{
+    border-radius: 10px;
+    border: 1px solid;
 }
