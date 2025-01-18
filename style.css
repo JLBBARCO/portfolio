@@ -6,12 +6,13 @@
 :root{
     --fonte01: Arial, Helvetica, sans-serif;
     --fonte02: "Iceberg", sans-serif;
-    --cor00: #000;
-    --cor1: #009DF0;
-    --cor2: #218CC5;
-    --cor3: #385D70;
-    --cor4: #2E3E46;
-    --cor5: #2B3033;
+    --cor0: #fff;
+    --cor1: #cacaca;
+    --cor2: #808080;
+    --cor3: #494949;
+    --cor4: #353535;
+    --cor5: #1f1f1f;
+    --cor6: #000;
     --sombra: #0000005e;
 }
 
@@ -19,7 +20,7 @@ body{
     font-family: var(--fonte01);
     margin: 0;
     padding: 0;
-    color: var(--cor00);
+    color: var(--cor6);
 }
 
 /* Cabeçalho */
@@ -49,11 +50,11 @@ main{
     max-width: 1000px;
     padding: 10px;
     background-color: var(--cor1);
-    box-shadow: inset 0px 7px 7px var(--cor00);
+    box-shadow: inset 0px 7px 7px var(--cor6);
 }
 
 header a, main a{
-    color: var(--cor00);
+    color: var(--cor6);
     text-decoration: none;
     font-family: var(--fonte02);
 }
@@ -74,13 +75,13 @@ main li{
 
 footer{
     background-color: var(--cor4);
-    color: #FFF;
+    color: var(--cor0);
     padding: 2px;
     text-align: center;
 }
 
 footer a{
-    color: white;
+    color: var(--cor0);
     text-decoration: none;
 }
 
