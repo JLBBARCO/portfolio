@@ -138,6 +138,10 @@ main{
   box-shadow: 0 5px 15px rgba(124, 77, 255, 0.2);
 }
 
+.card p {
+  text-align: justify;
+}
+
 /*contact*/
 
 .botoes>a>img{
