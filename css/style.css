@@ -141,14 +141,3 @@ main{
 .card p {
   text-align: justify;
 }
-
-/*contact*/
-
-.botoes>a>img{
-  padding: 5%;
-}
-
-.botoes{
-  display: block;
-  margin: 0 37%;
-}
