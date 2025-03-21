@@ -1,3 +1,3 @@
 # Portfolio
 
-![site](img-readme/site.jpeg)
+![site](img/readme/page.png)
