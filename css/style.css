@@ -141,3 +141,15 @@ main{
 .card p {
   text-align: justify;
 }
+
+.languages-grid {
+  min-width: 100px;
+  max-width: 500px;
+  margin: auto;
+}
+
+.github_stats {
+  display: block;
+  margin: 1%;
+  width: 100%;
+}
