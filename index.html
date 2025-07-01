@@ -5,42 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JLBBARCO</title>
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="shortcut icon" href="https://th.bing.com/th?id=OIP.tHtJ4T6wu4vXj2TRC9k2jgAAAA&w=80&h=80&c=7&qlt=80&o=6&pid=13.1" type="image/x-icon">
+    <link
+      rel="shortcut icon"
+      href="https://th.bing.com/th?id=OIP.tHtJ4T6wu4vXj2TRC9k2jgAAAA&w=80&h=80&c=7&qlt=80&o=6&pid=13.1"
+      type="image/x-icon"
+    />
   </head>
-  <body>
+  <body onresize="resize()">
     <header>
       <nav class="container">
         <div class="photo-perfil">
-          <img src="https://avatars.githubusercontent.com/u/159829462?v=4" alt="Photo of perfil">
+          <img
+            src="https://avatars.githubusercontent.com/u/159829462?v=4"
+            alt="Photo of perfil"
+            class="photo"
+          />
         </div>
-        <div class="nav-links">
-          <a href="#home" class="links">Home</a>
-          <a href="#portfolio" class="links">Portfolio</a>
-          <a href="#languages" class="links">Languages</a>
-          <a href="https://jlbbarco.github.io/contact/" class="links">Contact</a>
-        </div>
+        <menu>
+          <button onclick="toggleMenu()" id="menu-button">
+            <img
+              src="assets/icons/menu.svg"
+              alt="Menu"
+              class="icon"
+              id="menu-icon"
+            />
+          </button>
+          <div class="nav-links">
+            <a href="#home" class="links">Home</a>
+            <a href="#portfolio" class="links">Portfolio</a>
+            <a href="https://jlbbarco.github.io/contact/" class="links">
+              Contact
+            </a>
+          </div>
+        </menu>
       </nav>
     </header>
     <main>
       <section id="home" class="hero">
         <div>
-            <h1>Welcome to my Portfolio</h1>
-            <p>Developer FullStack & Designer UI/UX</p>
+          <h1>Welcome to my Portfolio</h1>
+          <p>Developer FullStack & Designer UI/UX</p>
         </div>
-    </section>
+      </section>
       <section id="portfolio" class="portifolio">
         <h2>Portfolio</h2>
         <div class="portifolio-grid">
           <div class="card">
-            <a href="https://github.com/JLBBARCO/study/">
+            <a href="https://jlbbarco.github.io/study">
               <h3>Study Project</h3>
-              <p>Study project with all files under study,location and description in HTML.</p>
+              <p>
+                Study project with all files under study,location and
+                description in HTML.
+              </p>
             </a>
           </div>
           <div class="card">
-            <a href="https://github.com/JLBBARCO/study/tree/main/meus_projetos/sistema_py/">
+            <a href="https://jlbbarco.github.io/python_system/">
               <h3>Python Program</h3>
-              <p>Python Program of create of password numerics, alphanumerics and alphanumerics with special caracteres.</p>
+              <p>
+                Python Program of create of password numerics, alphanumerics and
+                alphanumerics with special caracteres.
+              </p>
             </a>
           </div>
           <div class="card">
@@ -49,13 +74,6 @@
               <p>Description of the project with relevant details.</p>
             </a>
           </div>
-        </div>
-      </section>
-      <section id="languages">
-        <h2>GitHub Stats</h2>
-        <div class="languages-grid">
-          <img src="https://github-readme-stats.vercel.app/api/top-langs?username=JLBBARCO&locale=en&hide_title=false&layout=compact&langs_count=5&theme=dracula&hide_border=false&order=2" id="mostlangs" class="github_stats" alt="Most Used Languages">
-          <img src="https://github-readme-stats.vercel.app/api?username=JLBBARCO&hide_title=false&hide_rank=false&show_icons=true&include_all_commits=true&count_private=true&disable_animations=false&theme=dracula&locale=en&hide_border=false" alt="Stats Graphic of GitHub" id="github_stats" class="github_stats">
         </div>
       </section>
     </main>
