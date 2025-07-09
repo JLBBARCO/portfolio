@@ -16,6 +16,7 @@
   --transition: all 0.3s ease;
   --font1: Arial, Helvetica, sans-serif;
   --font2: "Caveat", sans-serif;
+  --shadow: 0 5px 15px rgba(124, 77, 255, 0.2);
 }
 
 body {
@@ -95,8 +96,13 @@ menu button {
 
 /* Conteúdo */
 main {
-  margin: 100px;
+  margin: 50px;
   font-family: var(--font1);
+}
+
+section {
+  min-height: 75vh;
+  width: 100%;
 }
 
 .container {
@@ -106,7 +112,6 @@ main {
 /*home*/
 
 .hero {
-  height: 90vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -144,7 +149,7 @@ main {
   padding: 1.5rem;
   margin: 10px;
   transition: var(--transition);
-  cursor: poin ter;
+  cursor: pointer;
 }
 
 .card > a {
@@ -154,34 +159,54 @@ main {
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(124, 77, 255, 0.2);
+  box-shadow: var(--shadow);
 }
 
 .card p {
   text-align: justify;
 }
 
-.languages-grid {
+.tech-container {
   display: flex;
-  max-width: 500px;
-  margin: auto;
-  text-align: center;
-  justify-content: center;
+  flex-direction: row;
   flex-wrap: wrap;
-  align-items: center;
 }
 
-.languages-grid img {
-  display: flex;
+.tech-cards {
+  padding: 25px;
+  transition: var(--transition);
+  text-align: center;
+  margin: auto;
+}
+
+.tech-cards:hover {
+  border: 2px solid var(--accent);
   border-radius: 10px;
+  box-shadow: var(--shadow);
 }
 
-.GitHub_stats {
-  display: block;
-  margin: 1%;
+.tech-cards img {
+  width: 48px;
+  height: 48px;
+}
+
+.tech-cards p {
+  text-align: center;
 }
 
 @media (min-width: 990px) {
+  body {
+    font-size: 1.15em;
+  }
+
+  section {
+    padding: 50px;
+  }
+
+  main {
+    margin: 100px;
+  }
+
   #menu-button {
     display: none;
   }
@@ -195,10 +220,6 @@ main {
     flex-direction: row;
   }
 
-  body {
-    font-size: 1.15em;
-  }
-
   .hero h1 {
     font-size: 6rem;
   }
@@ -209,18 +230,6 @@ main {
 
   .portfolio-grid {
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  }
-
-  .languages-grid {
-    display: flex;
-    justify-content: center;
-    flex-wrap: nowrap;
-    max-width: 75vw;
-  }
-
-  .languages-grid img {
-    width: 100%;
-    margin: 5px;
   }
 
   menu button {
