@@ -179,16 +179,20 @@ section {
 }
 
 .tech-cards {
-  padding: 25px;
+  display: grid;
+  place-items: center;
   text-align: center;
-  margin: 10px auto;
   border-radius: 10px;
-  transition: var(--transition);
-  box-shadow: var(--shadow);
   border: 2px solid var(--accent);
   cursor: pointer;
   text-decoration: none;
   color: var(--text-primary);
+  width: auto;
+  height: auto;
+  margin: 10px auto;
+  padding: 10px 25px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
 }
 
 .tech-cards:hover {
@@ -256,6 +260,7 @@ section {
 
   .tech-cards {
     margin: 10px auto;
+    padding: 25px;
   }
 
   menu button {
