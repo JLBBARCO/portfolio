@@ -14,8 +14,8 @@
   --hover-accent: #9670ff;
   --card-bg: #252525;
   --transition: all 0.3s ease;
-  --font1: Arial, Helvetica, sans-serif;
-  --font2: "Caveat", sans-serif;
+  --font1: "Caveat", sans-serif;
+  --font2: Arial, Helvetica, sans-serif;
   --shadow: 0 5px 15px rgba(124, 77, 255, 0.2);
 }
 
@@ -98,37 +98,24 @@ menu button {
 /* Conteúdo */
 main {
   margin: 50px;
+  font-family: var(--font2);
+}
+
+h1 {
   font-family: var(--font1);
+  font-size: 5em;
 }
 
 section {
+  display: grid;
+  place-items: center;
+  text-align: center;
   width: 100%;
   min-height: 75vh;
 }
 
 .container {
   overflow-x: auto;
-}
-
-/*home*/
-
-.hero {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  animation: fadeIn 1s ease-in;
-}
-
-.hero h1 {
-  font-size: 5rem;
-  margin-bottom: 1rem;
-  font-family: var(--font2);
-}
-
-.hero p {
-  font-size: 1.2rem;
-  color: var(--text-secondary);
 }
 
 /*portfolio*/
@@ -144,6 +131,7 @@ section {
   margin: 10px;
   transition: var(--transition);
   cursor: pointer;
+  text-align: justify;
 }
 
 .card > a {
@@ -234,14 +222,6 @@ section {
     border: none;
     padding: 0;
     flex-direction: row;
-  }
-
-  .hero h1 {
-    font-size: 6rem;
-  }
-
-  .hero p {
-    font-size: 1.5rem;
   }
 
   .technologies {
