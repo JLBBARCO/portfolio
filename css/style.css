@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: "Caveat";
-  src: url(../assets/fonts/Caveat.ttf) format("truetype");
+  src: url(../assets/fonts/Caveat/Caveat.ttf) format("truetype");
 }
 
 :root {
@@ -25,6 +25,7 @@ body {
   margin: 0;
   padding: 0;
   font-size: 1em;
+  line-height: 1.5;
 }
 
 header {
@@ -101,8 +102,8 @@ main {
 }
 
 section {
-  min-height: 75vh;
   width: 100%;
+  min-height: 75vh;
 }
 
 .container {
@@ -136,13 +137,6 @@ section {
   padding: 4rem 0;
 }
 
-.portfolio-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 2rem 0;
-}
-
 .card {
   background: var(--card-bg);
   border-radius: 10px;
@@ -166,6 +160,18 @@ section {
   text-align: justify;
 }
 
+.technologies {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.techFrame {
+  width: 100%;
+  min-height: 50vh;
+  margin: 25px;
+}
+
 .tech-container {
   display: flex;
   flex-direction: row;
@@ -174,15 +180,21 @@ section {
 
 .tech-cards {
   padding: 25px;
-  transition: var(--transition);
   text-align: center;
-  margin: auto;
+  margin: 10px auto;
+  border-radius: 10px;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+  border: 2px solid var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-primary);
 }
 
 .tech-cards:hover {
-  border: 2px solid var(--accent);
-  border-radius: 10px;
-  box-shadow: var(--shadow);
+  box-shadow: none;
+  transform: translateY(-10px);
+  border: 2px solid var(--text-secondary);
 }
 
 .tech-cards img {
@@ -228,8 +240,22 @@ section {
     font-size: 1.5rem;
   }
 
-  .portfolio-grid {
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  .technologies {
+    flex: auto;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .techFrame {
+    width: 45%;
+  }
+
+  .tech-container {
+    width: 45%;
+  }
+
+  .tech-cards {
+    margin: 10px auto;
   }
 
   menu button {

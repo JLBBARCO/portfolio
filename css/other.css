@@ -1,0 +1,36 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: "Bitcount Grid Double";
+  src: url(../assets/fonts/Bitcount_Grid_Double/BitcountGridDouble.ttf)
+    format("truetype");
+}
+
+:root {
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --transition: all 0.3s ease;
+  --font1: "Bitcount Grid Double", system-ui;
+  --font2: Arial, Helvetica, sans-serif;
+  --shadow: 0 5px 15px rgba(124, 77, 255, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+h1 {
+  font-family: var(--font1);
+  font-size: 2.5em;
+  text-align: center;
+}
+
+p {
+  font-family: var(--font2);
+  padding: 25px;
+  text-align: justify;
+}
