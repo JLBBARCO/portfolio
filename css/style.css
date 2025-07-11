@@ -289,6 +289,13 @@ section {
   text-align: justify;
 }
 
+.container-participation {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+}
+
 @media (min-width: 990px) {
   body {
     font-size: 1.15em;
@@ -323,10 +330,11 @@ section {
     width: 95%;
     flex-direction: row;
     overflow-x: scroll;
+    justify-content: space-around;
   }
 
   .card-portfolio {
-    min-width: 500px;
+    min-width: 400px;
   }
 
   .container-technologies {
@@ -366,5 +374,15 @@ section {
   .text {
     width: 60%;
     margin: 25px;
+  }
+
+  .container-participation {
+    flex-direction: row;
+    overflow-x: scroll;
+    justify-content: space-around;
+  }
+
+  .card-participation {
+    min-width: 400px;
   }
 }
