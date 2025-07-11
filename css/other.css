@@ -23,6 +23,10 @@
   line-height: 1.5;
 }
 
+body {
+  font-size: 0.8em;
+}
+
 h1 {
   font-family: var(--font1);
   font-size: 2.5em;
@@ -33,4 +37,10 @@ p {
   font-family: var(--font2);
   padding: 25px;
   text-align: justify;
+}
+
+@media (min-width: 990px) {
+  body {
+    font-size: 1em;
+  }
 }

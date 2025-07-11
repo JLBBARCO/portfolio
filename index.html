@@ -8,35 +8,36 @@
   </head>
   <body onresize="resize()">
     <header>
-      <nav class="container">
+      <nav>
         <div class="photo-perfil">
-          <a href="https://github.com/jlbbarco">
+          <a href="https://github.com/jlbbarco" class="perfil">
             <img
               src="https://avatars.githubusercontent.com/u/159829462?v=4"
               alt="Avatar"
               class="photo"
             />
+            <h1>Jose Luiz Bruiani Barco</h1>
           </a>
         </div>
-        <menu>
-          <button onclick="toggleMenu()" id="menu-button">
-            <img
-              src="assets/icons/menu.svg"
-              alt="Menu"
-              class="icon"
-              id="menu-icon"
-            />
-          </button>
-          <div class="nav-links">
-            <a href="#home" class="links">Home</a>
-            <a href="#portfolio" class="links">Portfolio</a>
-            <a href="#technologies" class="links">Technologies</a>
-            <a href="https://jlbbarco.github.io/contact/" class="links">
-              Contact
-            </a>
-          </div>
-        </menu>
       </nav>
+      <menu>
+        <button onclick="toggleMenu()" id="menu-button">
+          <img
+            src="assets/icons/menu.svg"
+            alt="Menu"
+            class="icon"
+            id="menu-icon"
+          />
+        </button>
+        <div class="nav-links">
+          <a href="#home" class="links">Home</a>
+          <a href="#portfolio" class="links">Portfolio</a>
+          <a href="#technologies" class="links">Technologies</a>
+          <a href="https://jlbbarco.github.io/contact/" class="links">
+            Contact
+          </a>
+        </div>
+      </menu>
     </header>
     <main>
       <section id="home">
@@ -45,38 +46,68 @@
           <p>Developer FullStack & Designer UI/UX</p>
         </div>
       </section>
-      <section id="portfolio" class="portifolio">
+      <section id="portfolio" class="portfolio">
         <h2>Portfolio</h2>
-        <div class="portifolio-grid">
-          <div class="card">
-            <a href="https://jlbbarco.github.io/study">
-              <h3>Study Project</h3>
+        <article class="container container-portfolio">
+          <div class="card-portfolio card">
+            <img
+              src="assets/images/study_page.jpeg"
+              alt="Image of site Study"
+              class="img-card"
+            />
+            <h3>Study Project</h3>
+            <p>
+              Study projects with localizations of the files and description in
+              HTML.
+            </p>
+            <div class="button button-link">
               <p>
-                Study projects with localizations of the files and description
-                in HTML.
+                <a
+                  href="http://github.com/jlbbarco/study/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Repository
+                </a>
               </p>
-            </a>
-          </div>
-          <div class="card">
-            <a href="https://github.com/jlbbarco/python_system/">
-              <h3>Python Program</h3>
               <p>
-                Python System of create password numerics, alphanumerics and
-                alphanumerics with special caracteres.
+                <a
+                  href="http://jlbbarco.github.io/study/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Site
+                </a>
               </p>
-            </a>
+            </div>
           </div>
-          <div class="card">
-            <a href="">
-              <h3>Project 3</h3>
-              <p>Description of the project with relevant details.</p>
-            </a>
+          <div class="card-portfolio card">
+            <img
+              src="assets/images/system_python-ui.png"
+              alt="Image of Python System UI"
+              class="img-card"
+            />
+            <h3>Python Program</h3>
+            <p>
+              Python System of create password numerics, alphanumerics and
+              alphanumerics with special caracteres.
+            </p>
+            <p>This Program is developed in Brazilian Portuguese</p>
+            <div class="button button-link">
+              <a
+                href="http://github.com/jlbbarco/python_system/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Repository
+              </a>
+            </div>
           </div>
-        </div>
+        </article>
       </section>
       <section id="technologies">
         <h2>Technologies</h2>
-        <article class="technologies">
+        <article class="container container-technologies">
           <iframe
             src="other/init.html"
             frameborder="0"
@@ -84,51 +115,135 @@
             class="techFrame"
           >
           </iframe>
-          <div class="tech-container">
-            <a href="other/arduino.html" class="tech-cards" target="techFrame">
-              <img src="assets/icons/arduino.svg" alt="Arduino SVG Icon" />
+          <div class="container tech-container">
+            <a
+              href="other/arduino.html"
+              class="tech-cards card"
+              target="techFrame"
+            >
+              <img
+                src="assets/icons/arduino.svg"
+                alt="Arduino SVG Icon"
+                class="icon"
+              />
               <p>Arduino</p>
             </a>
-            <a href="other/html5.html" class="tech-cards" target="techFrame">
-              <img src="assets/icons/html5.svg" alt="HTML5 SVG Icon" />
+            <a
+              href="other/html5.html"
+              class="tech-cards card"
+              target="techFrame"
+            >
+              <img
+                src="assets/icons/html5.svg"
+                alt="HTML5 SVG Icon"
+                class="icon"
+              />
               <p>HTML5</p>
             </a>
-            <a href="other/css3.html" class="tech-cards" target="techFrame">
-              <img src="assets/icons/css3.svg" alt="CSS3 SVG Icon" />
+            <a
+              href="other/css3.html"
+              class="tech-cards card"
+              target="techFrame"
+            >
+              <img
+                src="assets/icons/css3.svg"
+                alt="CSS3 SVG Icon"
+                class="icon"
+              />
               <p>CSS3</p>
             </a>
-            <a href="other/markdown.html" class="tech-cards" target="techFrame">
-              <img src="assets/icons/markdown.svg" alt="Markdown SVG Icon" />
+            <a
+              href="other/markdown.html"
+              class="tech-cards card"
+              target="techFrame"
+            >
+              <img
+                src="assets/icons/markdown.svg"
+                alt="Markdown SVG Icon"
+                class="icon"
+              />
               <p>Markdown</p>
             </a>
             <a
               href="other/javascript.html"
-              class="tech-cards"
+              class="tech-cards card"
               target="techFrame"
             >
               <img
                 src="assets/icons/javascript.svg"
                 alt="JavaScript SVG Icon"
+                class="icon"
               />
               <p>JavaScript</p>
             </a>
-            <a href="other/git.html" class="tech-cards" target="techFrame">
-              <img src="assets/icons/git.svg" alt="Git SVG Icon" />
+            <a href="other/git.html" class="tech-cards card" target="techFrame">
+              <img src="assets/icons/git.svg" alt="Git SVG Icon" class="icon" />
               <p>Git</p>
             </a>
-            <a href="other/github.html" class="tech-cards" target="techFrame">
-              <img src="assets/icons/github.svg" alt="GitHub SVG Icon" />
+            <a
+              href="other/github.html"
+              class="tech-cards card"
+              target="techFrame"
+            >
+              <img
+                src="assets/icons/github.svg"
+                alt="GitHub SVG Icon"
+                class="icon"
+              />
               <p>GitHub</p>
             </a>
-            <a href="other/python.html" class="tech-cards" target="techFrame">
-              <img src="assets/icons/python.svg" alt="Python SVG Icon" />
+            <a
+              href="other/python.html"
+              class="tech-cards card"
+              target="techFrame"
+            >
+              <img
+                src="assets/icons/python.svg"
+                alt="Python SVG Icon"
+                class="icon"
+              />
               <p>Python</p>
             </a>
-            <a href="other/php.html" class="tech-cards" target="techFrame">
-              <img src="assets/icons/php.svg" alt="PHP SVG Icon" />
-              <p>PHP</p>
-            </a>
           </div>
+        </article>
+      </section>
+      <section>
+        <h2>About me</h2>
+        <article class="container container-about-me">
+          <img
+            src="https://avatars.githubusercontent.com/u/159829462?v=4"
+            alt="Avatar of GitHub"
+            class="person"
+          />
+          <div class="text">
+            <p>
+              I'm a Brazilian developer. I like play video games and developer
+              web systems.
+            </p>
+            <p>
+              I'm quite studious, I always like to learn new things, and I'm
+              always willing to help people.
+            </p>
+            <p>
+              At work, I like to get to the root of the problem so that it
+              doesn't fail again.
+            </p>
+          </div>
+        </article>
+      </section>
+      <section>
+        <h2>Technologies of this Site</h2>
+        <article class="techs-this-site container">
+          <p>This site is developed in</p>
+          <img src="assets/icons/html5.svg" alt="HTML5" class="icon" />
+          <img src="assets/icons/css3.svg" alt="CSS3" class="icon" />
+          <img
+            src="assets/icons/javascript.svg"
+            alt="JavaScript"
+            class="icon"
+          />
+          <img src="assets/icons/git.svg" alt="Git" class="icon" />
+          <img src="assets/icons/github.svg" alt="GitHub" class="icon" />
         </article>
       </section>
     </main>
