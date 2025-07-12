@@ -42,6 +42,15 @@ body {
   line-height: 1.5;
 }
 
+a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 .icon {
   width: 24px;
   height: auto;
@@ -105,8 +114,6 @@ nav h1 {
 }
 
 .nav-links a {
-  color: var(--text-primary);
-  text-decoration: none;
   position: relative;
   padding: 0.5rem;
 }
