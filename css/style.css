@@ -118,6 +118,10 @@ nav h1 {
   padding: 0.5rem;
 }
 
+.nav-links a:hover {
+  text-decoration: none;
+}
+
 .nav-links a::after {
   content: "";
   position: absolute;
@@ -301,6 +305,32 @@ section {
   flex-direction: column;
   width: 100%;
   height: auto;
+}
+
+footer section {
+  text-align: center;
+  padding: 50px;
+  margin: 0;
+  min-height: auto;
+}
+
+footer h2 {
+  margin: 50px;
+}
+
+footer a:hover {
+  text-decoration: none;
+}
+
+footer .container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+footer .icon {
+  width: 48px;
 }
 
 @media (min-width: 990px) {
