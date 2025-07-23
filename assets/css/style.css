@@ -2,15 +2,15 @@
 
 @font-face {
   font-family: "Caveat";
-  src: url(../assets/fonts/Caveat/Caveat.ttf) format("truetype");
+  src: url(../fonts/Caveat/Caveat.ttf) format("truetype");
 }
 @font-face {
   font-family: "Knewave";
-  src: url(../assets/fonts/Knewave/Knewave.ttf) format("truetype");
+  src: url(../fonts/Knewave/Knewave.ttf) format("truetype");
 }
 @font-face {
   font-family: "Henny Penny";
-  src: url(../assets/fonts/Henny_Penny/HennyPenny.ttf) format("truetype");
+  src: url(../fonts/Henny_Penny/HennyPenny.ttf) format("truetype");
 }
 
 :root {
@@ -233,7 +233,7 @@ section {
 
 .techFrame {
   width: 100%;
-  min-height: 50vh;
+  height: auto;
   margin: 25px;
 }
 
@@ -363,15 +363,19 @@ footer .icon {
     flex-direction: row;
   }
 
+  main .container {
+    overflow: auto;
+  }
+
   .container-portfolio {
     width: 95%;
     flex-direction: row;
-    overflow-x: scroll;
     justify-content: space-around;
   }
 
   .card-portfolio {
     min-width: 400px;
+    max-width: 500px;
   }
 
   .container-technologies {
@@ -415,7 +419,6 @@ footer .icon {
 
   .container-participation {
     flex-direction: row;
-    overflow-x: scroll;
     justify-content: space-around;
   }
 

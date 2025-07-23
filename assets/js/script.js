@@ -21,3 +21,12 @@ function toggleMenu() {
     menuIcon.src = "assets/icons/close.svg";
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Developer age
+  const date = new Date();
+  const year = date.getFullYear();
+  const devYear = 2008;
+  const age = document.getElementById("age");
+  age.innerHTML = `${year - devYear}`;
+});
