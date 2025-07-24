@@ -334,6 +334,11 @@ footer .icon {
   width: 48px;
 }
 
+.container-contact {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 @media (min-width: 990px) {
   body {
     font-size: 1.15em;
