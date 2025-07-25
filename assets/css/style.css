@@ -341,11 +341,11 @@ footer .icon {
   flex-wrap: wrap;
 }
 
-.contactFrame {
+footer iframe.contactFrame {
   width: 100%;
   height: 75vh;
   margin: 25px;
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: var(--shadow);
 }
 
