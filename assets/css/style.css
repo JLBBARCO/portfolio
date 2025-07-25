@@ -26,7 +26,7 @@
   --font2: Arial, Helvetica, sans-serif;
   --font3: "Knewave", system-ui;
   --font4: "Henny Penny", system-ui;
-  --shadow: 0 5px 15px rgba(124, 77, 255, 0.2);
+  --shadow: 0 0 25px rgba(124, 77, 255, 0.2);
 }
 
 * {
