@@ -197,7 +197,7 @@ section {
   padding: 4rem 0;
 }
 
-.container-projects {
+.container-portfolio {
   display: flex;
   flex-direction: column;
 }
@@ -219,7 +219,7 @@ section {
   box-shadow: var(--shadow);
 }
 
-.card-projects {
+.card-portfolio {
   width: 100%;
   height: auto;
   margin: 25px;
@@ -383,13 +383,13 @@ footer .icon {
     overflow: auto;
   }
 
-  .container-projects {
+  .container-portfolio {
     width: 95%;
     flex-direction: row;
     justify-content: space-around;
   }
 
-  .card-projects {
+  .card-portfolio {
     min-width: 500px;
     max-width: 750px;
   }
