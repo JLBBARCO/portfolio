@@ -17,12 +17,7 @@
       </nav>
       <menu>
         <button onclick="toggleMenu()" id="menu-button">
-          <img
-            src="assets/icons/menu.svg"
-            alt="Menu"
-            class="icon"
-            id="menu-icon"
-          />
+          <span id="menu-icon" class="menu"></span>
         </button>
         <div class="nav-links">
           <a href="#Projects" class="links">Projects</a>
@@ -65,13 +60,9 @@
               </p>
               <h4>Technologies</h4>
               <div class="technologies-portfolio">
-                <img src="assets/icons/html5.svg" alt="HTML5" class="icon" />
-                <img src="assets/icons/css3.svg" alt="CSS3" class="icon" />
-                <img
-                  src="assets/icons/javascript.svg"
-                  alt="JavaScript"
-                  class="icon"
-                />
+                <span class="html5"></span>
+                <span class="css3"></span>
+                <span class="javascript"></span>
               </div>
             </article>
             <article class="article-card">
@@ -116,7 +107,7 @@
               <p>This Program is developed in Brazilian Portuguese</p>
               <h4>Technologies</h4>
               <div class="technologies-portfolio">
-                <img src="assets/icons/python.svg" alt="Python" class="icon" />
+                <span class="python"></span>
               </div>
             </article>
             <article class="article-card">
@@ -158,7 +149,7 @@
               <p>This Program is developed in Brazilian Portuguese</p>
               <h4>Technologies</h4>
               <div class="technologies-portfolio">
-                <img src="assets/icons/python.svg" alt="Python" class="icon" />
+                <span class="python"></span>
               </div>
             </article>
             <article class="article-card">
@@ -186,104 +177,52 @@
         <h2>Technologies</h2>
         <p>Technologies I use in my daily.</p>
         <article class="container container-technologies">
-          <iframe
-            src="other/init.html"
-            frameborder="0"
-            name="techFrame"
-            class="techFrame"
-            title="Technology Frame"
-          >
-          </iframe>
-          <div class="container tech-container">
-            <a
-              href="other/arduino.html"
-              class="tech-cards card"
-              target="techFrame"
-            >
-              <img
-                src="assets/icons/arduino.svg"
-                alt="Arduino SVG Icon"
-                class="icon"
-              />
-              <p>Arduino</p>
-            </a>
-            <a
-              href="other/html5.html"
-              class="tech-cards card"
-              target="techFrame"
-            >
-              <img
-                src="assets/icons/html5.svg"
-                alt="HTML5 SVG Icon"
-                class="icon"
-              />
-              <p>HTML5</p>
-            </a>
-            <a
-              href="other/css3.html"
-              class="tech-cards card"
-              target="techFrame"
-            >
-              <img
-                src="assets/icons/css3.svg"
-                alt="CSS3 SVG Icon"
-                class="icon"
-              />
-              <p>CSS3</p>
-            </a>
-            <a
-              href="other/javascript.html"
-              class="tech-cards card"
-              target="techFrame"
-            >
-              <img
-                src="assets/icons/javascript.svg"
-                alt="JavaScript SVG Icon"
-                class="icon"
-              />
-              <p>JavaScript</p>
-            </a>
-            <a
-              href="other/markdown.html"
-              class="tech-cards card"
-              target="techFrame"
-            >
-              <img
-                src="assets/icons/markdown.svg"
-                alt="Markdown SVG Icon"
-                class="icon"
-              />
-              <p>Markdown</p>
-            </a>
-            <a href="other/git.html" class="tech-cards card" target="techFrame">
-              <img src="assets/icons/git.svg" alt="Git SVG Icon" class="icon" />
-              <p>Git</p>
-            </a>
-            <a
-              href="other/github.html"
-              class="tech-cards card"
-              target="techFrame"
-            >
-              <img
-                src="assets/icons/github.svg"
-                alt="GitHub SVG Icon"
-                class="icon"
-              />
-              <p>GitHub</p>
-            </a>
-            <a
-              href="other/python.html"
-              class="tech-cards card"
-              target="techFrame"
-            >
-              <img
-                src="assets/icons/python.svg"
-                alt="Python SVG Icon"
-                class="icon"
-              />
-              <p>Python</p>
-            </a>
-          </div>
+          <section class="container containerTechLanguages">
+            <h3>Languages</h3>
+            <div class="container tech-container">
+              <div class="tech-cards card">
+                <span class="arduino"></span>
+                <p>Arduino</p>
+              </div>
+              <div class="tech-cards card">
+                <span class="html5"></span>
+                <p>HTML5</p>
+              </div>
+              <div class="tech-cards card">
+                <span class="css3"></span>
+                <p>CSS3</p>
+              </div>
+              <div class="tech-cards card">
+                <span class="javascript"></span>
+                <p>JavaScript</p>
+              </div>
+              <div class="tech-cards card">
+                <span class="markdown"></span>
+                <p>Markdown</p>
+              </div>
+              <div class="tech-cards card">
+                <span class="python"></span>
+                <p>Python</p>
+              </div>
+            </div>
+          </section>
+          <section class="container containerTechPrograms">
+            <h3>Programs I Use</h3>
+            <div class="container tech-container">
+              <div class="tech-cards card">
+                <span class="github"></span>
+                <p>GitHub</p>
+              </div>
+              <div class="tech-cards card">
+                <span class="git"></span>
+                <p>Git</p>
+              </div>
+              <div class="tech-cards card">
+                <span class="vscode"></span>
+                <p>VS Code</p>
+              </div>
+            </div>
+          </section>
         </article>
       </section>
       <section id="AboutMe">
@@ -317,31 +256,118 @@
         <h2>Technologies of this Site</h2>
         <h3>This site is developed in</h3>
         <article class="techs-this-site container">
-          <img src="assets/icons/html5.svg" alt="HTML5" class="icon" />
-          <img src="assets/icons/css3.svg" alt="CSS3" class="icon" />
-          <img
-            src="assets/icons/javascript.svg"
-            alt="JavaScript"
-            class="icon"
-          />
-          <img src="assets/icons/git.svg" alt="Git" class="icon" />
-          <img src="assets/icons/github.svg" alt="GitHub" class="icon" />
+          <span class="html5"></span>
+          <span class="css3"></span>
+          <span class="javascript"></span>
+          <span class="markdown"></span>
+          <span class="git"></span>
+          <span class="github"></span>
         </article>
       </section>
       <section id="Contact">
         <h2>Contact-me</h2>
         <div class="container container-contact">
-          <iframe
-            src="https://jlbbarco.github.io/contact/iframe.html"
-            frameborder="0"
-            class="contactFrame"
-            title="Contact Form"
-            allowfullscreen
-          >
-          </iframe>
+          <section class="contact-options">
+            <div class="contact-card">
+              <span class="mail"></span>
+              <p>
+                <a href="mailto:jbruianibarco@gmail.com" target="_blank">
+                  jbruianibarco@gmail.com
+                </a>
+              </p>
+            </div>
+            <div class="contact-card">
+              <span class="linkedin"></span>
+              <p>
+                <a
+                  href="https://linkedin.com/in/joseluizbbarco"
+                  target="_blank"
+                >
+                  LinkedIn.com/in/joseluizbbarco
+                </a>
+              </p>
+            </div>
+            <div class="contact-card">
+              <span class="github"></span>
+              <p>
+                <a
+                  href="http://github.com/JLBBARCO"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  github.com/JLBBARCO
+                </a>
+              </p>
+            </div>
+            <div class="contact-card">
+              <span class="facebook"></span>
+              <p>
+                <a
+                  href="http://facebook.com/joseluizbrubarco"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  facebook.com/joseluizbrubarco
+                </a>
+              </p>
+            </div>
+            <div class="contact-card">
+              <span class="instagram"></span>
+              <p>
+                <a
+                  href="http://instagram.com/joseluizbbarco"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  instagram.com/joseluizbbarco
+                </a>
+              </p>
+            </div>
+            <div class="contact-card">
+              <span class="youtube"></span>
+              <p>
+                <a
+                  href="http://youtube.com/@joseluizbbarco"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  youtube.com/@joseluizbbarco
+                </a>
+              </p>
+            </div>
+            <div class="contact-card">
+              <div class="resume">
+                <span class="book"></span>
+                <p>Curriculum</p>
+              </div>
+              <div class="resume">
+                <div class="resumes resume-en">
+                  <a
+                    href="assets/documents/Resume_Jose_Luiz_Bruiani_Barco_English.pdf"
+                    download="Resume_Jose_Luiz_Bruiani_Barco_English.pdf"
+                    type="application/pdf"
+                    >
+                    <span class="uk"></span
+                      >
+                    </a>
+                    </div>
+                    <div class="resumes resume-br">
+                      <a
+                      href="assets/documents/Curriculo_Jose_Luiz_Bruiani_Barco_Portugues.pdf"
+                      download="Curriculo_Jose_Luiz_Bruiani_Barco_Portugues.pdf"
+                      type="application/pdf"
+                      >
+                      <span class="br"></span>
+                    </a>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
         </div>
       </section>
     </footer>
     <script src="assets/js/script.js"></script>
+    <script src="assets/js/svg.js"></script>
   </body>
 </html>

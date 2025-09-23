@@ -53,9 +53,11 @@ a:hover {
 
 .icon {
   width: 24px;
-  height: 24px;
+  height: auto;
+  margin: 1rem;
 }
 
+/* Header  */
 header {
   background-color: var(--secondary-bg);
   padding: 1rem;
@@ -158,11 +160,6 @@ main {
   font-family: var(--font2);
 }
 
-main .icon {
-  width: 48px;
-  height: 48px;
-}
-
 h1,
 h2,
 h3,
@@ -183,6 +180,7 @@ h2 {
 }
 
 h3 {
+  font-family: var(--font1);
   font-size: 1.5em;
 }
 
@@ -209,7 +207,6 @@ section {
   padding: 1.5rem;
   margin: 10px auto;
   transition: var(--transition);
-  cursor: pointer;
   text-align: justify;
   text-decoration: none;
   color: var(--text-primary);
@@ -232,8 +229,7 @@ section {
 
 .container-technologies {
   display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
+  flex-flow: column wrap;
 }
 
 .techFrame {
@@ -244,14 +240,14 @@ section {
 
 .tech-container {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
+  justify-content: space-between;
 }
 
 .tech-cards {
   text-align: center;
-  width: 125px;
-  height: 125px;
+  width: 150px;
+  height: 150px;
 }
 
 .tech-cards p {
@@ -320,10 +316,6 @@ footer section {
   min-height: auto;
 }
 
-footer h2 {
-  margin: 50px;
-}
-
 footer a:hover {
   text-decoration: none;
 }
@@ -336,25 +328,73 @@ footer .container {
   width: 100%;
 }
 
-footer .icon {
-  width: 48px;
-  height: 48px;
-}
-
 .container-contact {
   display: flex;
   flex-wrap: wrap;
+  max-height: 75vh;
 }
 
-footer iframe.contactFrame {
-  width: 100%;
-  height: 75vh;
-  margin: 25px;
+.contact-options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  width: 90%;
+  height: auto;
+  margin: 50px auto;
+}
+
+.contact-card {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  flex: 1;
+  min-width: 250px;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  background-color: var(--secondary-bg);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.contact-card:hover {
+  color: var(--text-color);
+  background-color: var(--background-color);
+  transform: translateY(-5px);
+}
+
+.contact-card h3 {
+  margin-bottom: 0.5rem;
+}
+
+.contact-card a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.contact-card a:hover {
+  color: var(--secondary-color);
+  text-decoration: underline;
+}
+
+.resume {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (min-width: 990px) {
   body {
     font-size: 1.15em;
+  }
+
+  .icon {
+    width: 48px;
+    height: auto;
   }
 
   section {
@@ -399,15 +439,11 @@ footer iframe.contactFrame {
 
   .container-technologies {
     flex: auto;
-    flex-direction: row;
+    flex-flow: row nowrap;
     justify-content: space-between;
   }
 
   .techFrame {
-    width: 45%;
-  }
-
-  .tech-container {
     width: 45%;
   }
 
@@ -438,5 +474,9 @@ footer iframe.contactFrame {
 
   .card-participation {
     min-width: 400px;
+  }
+
+  .container-contact {
+    max-height: none;
   }
 }

@@ -1,5 +1,4 @@
 const windowWidth = 990;
-const windowWidthPX = `${windowWidth}px`;
 
 function resize() {
   const navLinks = document.querySelector(".nav-links");
@@ -13,20 +12,30 @@ function resize() {
 function toggleMenu() {
   const navLinks = document.querySelector(".nav-links");
   const menuIcon = document.getElementById("menu-icon");
+
   if (navLinks.style.display === "grid") {
     navLinks.style.display = "none";
-    menuIcon.src = "assets/icons/menu.svg";
+    menuIcon.classList.remove("close");
+    menuIcon.classList.add("menu");
   } else {
     navLinks.style.display = "grid";
-    menuIcon.src = "assets/icons/close.svg";
+    menuIcon.classList.remove("menu");
+    menuIcon.classList.add("close");
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Developer age
+  // Calcula a idade do desenvolvedor
   const date = new Date();
   const year = date.getFullYear();
   const devYear = 2008;
   const age = document.getElementById("age");
-  age.innerHTML = `${year - devYear}`;
+
+  if (age) {
+    age.innerHTML = `${year - devYear}`;
+  }
+
+  // Garante que o menu esteja no estado correto ao carregar
+  resize();
+  window.addEventListener("resize", resize);
 });
