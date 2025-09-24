@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
       alt: "JavaScript Icon",
     },
     { className: "php", src: "assets/icons/php.svg", alt: "PHP Icon" },
-    { className: "mysql", src: "assets/icons/mysql.svg", alt: "MySQL Icon" },
+    { className: "sql", src: "assets/icons/sql.svg", alt: "SQL Icon" },
     { className: "python", src: "assets/icons/python.svg", alt: "Python Icon" },
     { className: "csharp", src: "assets/icons/csharp.svg", alt: "C# Icon" },
     { className: "java", src: "assets/icons/java.svg", alt: "Java Icon" },
@@ -52,6 +52,11 @@ document.addEventListener("DOMContentLoaded", function () {
       className: "wordpress",
       src: "assets/icons/wordpress.svg",
       alt: "WordPress Icon",
+    },
+    {
+      className: "mysql",
+      src: "assets/icons/mysql.svg",
+      alt: "MySQL Icon",
     },
     // Social Media Icons
     {

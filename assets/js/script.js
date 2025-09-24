@@ -15,12 +15,10 @@ function toggleMenu() {
 
   if (navLinks.style.display === "grid") {
     navLinks.style.display = "none";
-    menuIcon.classList.remove("close");
-    menuIcon.classList.add("menu");
+    menuIcon.innerHTML = `<img src="assets/icons/menu.svg" alt="Menu Icon" class="icon" />`;
   } else {
     navLinks.style.display = "grid";
-    menuIcon.classList.remove("menu");
-    menuIcon.classList.add("close");
+    menuIcon.innerHTML = `<img src="assets/icons/close.svg" alt="Close Icon" class="icon" />`;
   }
 }
 
@@ -38,4 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Garante que o menu esteja no estado correto ao carregar
   resize();
   window.addEventListener("resize", resize);
+
+  // Define o ícone inicial do menu
+  const menuIcon = document.getElementById("menu-icon");
+  menuIcon.innerHTML = `<img src="assets/icons/menu.svg" alt="Menu Icon" class="icon" />`;
 });
