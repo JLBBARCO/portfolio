@@ -1,8 +1,8 @@
 @charset "UTF-8";
 
 @font-face {
-  font-family: "Overclock";
-  src: url(../fonts/Overclock/Overclock-Regular.ttf) format("truetype");
+  font-family: "Overlock";
+  src: url(../fonts/Overlock/Overlock-Regular.ttf) format("truetype");
 }
 @font-face {
   font-family: "Caveat";
@@ -26,10 +26,10 @@
   --hover-accent: #9670ff;
   --card-bg: #252525;
   --transition: all 0.3s ease;
-  --font0: "Overclock", sans-serif;
+  --font0: "Overlock", sans-serif;
   --font1: "Caveat", sans-serif;
-  --font2: "MedievalSharp", sans-serif;
-  --font3: "Audiowide", sans-serif;
+  --font2: "Audiowide", sans-serif;
+  --font3: "MedievalSharp", sans-serif;
   --shadow: 0 0 25px rgba(124, 77, 255, 0.2);
 }
 
@@ -224,7 +224,7 @@ section {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
+  width: auto;
   height: auto;
   margin: 25px;
 }
@@ -248,8 +248,8 @@ section {
 
 .tech-cards {
   text-align: center;
-  width: 150px;
-  height: 150px;
+  width: 125px;
+  height: 125px;
 }
 
 .tech-cards p {
@@ -386,102 +386,4 @@ footer .container {
   flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
-}
-
-@media (min-width: 990px) {
-  body {
-    font-size: 1.15em;
-  }
-
-  .icon {
-    width: 48px;
-    height: auto;
-  }
-
-  section {
-    padding: 50px;
-  }
-
-  main {
-    margin: 100px;
-  }
-
-  #menu-button {
-    display: none;
-  }
-
-  nav h1 {
-    font-size: 1.5em;
-  }
-
-  .nav-links {
-    display: flex;
-    position: static;
-    background: none;
-    border: none;
-    padding: 0;
-    flex-direction: row;
-  }
-
-  main .container {
-    overflow: auto;
-  }
-
-  .container-portfolio {
-    width: 95%;
-    flex-direction: row;
-    justify-content: space-around;
-  }
-
-  .card-portfolio {
-    min-width: 500px;
-    max-width: 750px;
-  }
-
-  .container-technologies {
-    flex: auto;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-  }
-
-  .techFrame {
-    width: 45%;
-  }
-
-  .tech-cards {
-    margin: 10px auto;
-    padding: 25px;
-  }
-
-  menu button {
-    display: none;
-  }
-
-  .container-about-me {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-
-  .person {
-    width: 20%;
-    margin: 25px;
-  }
-
-  .text {
-    width: 60%;
-    margin: 25px;
-  }
-
-  .card-participation {
-    min-width: 400px;
-  }
-
-  .container-contact {
-    max-height: none;
-  }
-
-  footer section {
-    padding: 50px;
-  }
 }

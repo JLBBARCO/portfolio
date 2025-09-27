@@ -88,8 +88,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Country Flags
     { className: "br", src: "assets/icons/br.svg", alt: "Brazil Flag" },
     { className: "uk", src: "assets/icons/uk.svg", alt: "UK Flag" },
-    // Other Icons
-    { className: "book", src: "assets/icons/book.svg", alt: "Book" },
   ];
 
   icons.forEach(({ className, src, alt }) => {
