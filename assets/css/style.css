@@ -60,6 +60,7 @@ a:hover {
   width: 24px;
   height: auto;
   margin: 1rem;
+  color: var(--text-primary);
 }
 
 h1,
@@ -131,7 +132,7 @@ nav h1 {
 }
 
 .nav-links {
-  display: none;
+  display: none; /* Menu oculto por padrão */
   flex-direction: column;
   position: absolute;
   top: 100%;
@@ -141,6 +142,10 @@ nav h1 {
   border-top: 1px solid var(--accent);
   text-align: center;
   padding: 1rem;
+}
+
+.nav-links a {
+  padding: 0.5rem;
 }
 
 .nav-links a {
@@ -321,24 +326,6 @@ section {
   text-align: justify;
 }
 
-footer section {
-  text-align: center;
-  padding: 50px 0;
-  margin: 0;
-}
-
-footer a:hover {
-  text-decoration: none;
-}
-
-footer .container {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: space-evenly;
-  width: 100%;
-}
-
 .container-contact {
   display: flex;
   flex-wrap: wrap;
@@ -389,4 +376,49 @@ footer .container {
 .contact-card a:hover {
   color: var(--secondary-color);
   text-decoration: underline;
+}
+
+#menu-button {
+  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+#accessibility {
+  display: flex;
+  flex-direction: row-reverse;
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#accessibility button {
+  margin: 10px;
+  border: none;
+  border-radius: 10px;
+  background: var(--secondary-bg);
+  transition: var(--transition);
+}
+
+#accessibility button:hover {
+  box-shadow: var(--shadow);
+}
+
+#accessibility button:active {
+  background-color: var(--primary-bg);
+}
+
+#accessibility button .icon {
+  width: 24px;
+}
+
+#accessibility-button {
+  border-radius: 10px 0 0 10px;
+}
+
+#accessibility-menu {
+  display: none;
+  flex-flow: column wrap;
 }

@@ -3,6 +3,26 @@ document.addEventListener("DOMContentLoaded", function () {
     // Normal Icons
     { className: "menu", src: "assets/icons/menu.svg", alt: "Menu Icon" },
     { className: "close", src: "assets/icons/close.svg", alt: "Close Icon" },
+    {
+      className: "accessibility",
+      src: "assets/icons/accessibility.svg",
+      alt: "Accessibility Icon",
+    },
+    {
+      className: "increase-font",
+      src: "assets/icons/increase-font.svg",
+      alt: "Increase Font Icon",
+    },
+    {
+      className: "decrease-font",
+      src: "assets/icons/decrease-font.svg",
+      alt: "Decrease Font Icon",
+    },
+    {
+      className: "reset-font",
+      src: "assets/icons/reset-font.svg",
+      alt: "Reset Font Icon",
+    },
     // Tech Icons
     { className: "html5", src: "assets/icons/html5.svg", alt: "HTML5 Icon" },
     { className: "css3", src: "assets/icons/css3.svg", alt: "CSS3 Icon" },
