@@ -34,7 +34,6 @@
 }
 
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
@@ -257,6 +256,8 @@ section {
 }
 
 .tech-cards {
+  display: auto;
+  flex-direction: column;
   text-align: center;
   width: 125px;
   height: 125px;
@@ -376,6 +377,16 @@ section {
 .contact-card a:hover {
   color: var(--secondary-color);
   text-decoration: underline;
+}
+
+main .icon {
+  padding: 10px;
+  border-radius: 50%;
+}
+
+main .icon:hover {
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 15px var(--accent);
 }
 
 #menu-button {
