@@ -19,13 +19,13 @@
         </a>
       </nav>
       <menu>
-        <button onclick="toggleMenu()" id="menu-button">
+        <button id="menu-button" aria-label="Toggle navigation menu">
           <span id="menu-icon" class="menu"></span>
         </button>
         <div class="nav-links">
           <a href="#Projects" class="links">Projects</a>
           <a href="#Technologies" class="links">Technologies</a>
-          <a href="#AboutMe" class="links">About-me</a>
+          <a href="#AboutMe" class="links">About Me</a>
           <a href="#More" class="links">More</a>
           <a href="#Contact" class="links">Contact</a>
         </div>
@@ -281,8 +281,6 @@
           </div>
         </article>
       </section>
-    </main>
-    <footer>
       <section id="More">
         <h2>This site is developed in</h2>
         <article class="techs-this-site container">
@@ -332,6 +330,24 @@
           </section>
         </div>
       </section>
+    </main>
+    <footer>
+      <article id="accessibility">
+        <button id="accessibility-button">
+          <span class="accessibility"></span>
+        </button>
+        <div id="accessibility-menu">
+          <button id="increase-font">
+            <span class="increase-font"></span>
+          </button>
+          <button id="decrease-font">
+            <span class="decrease-font"></span>
+          </button>
+          <button id="reset-font">
+            <span class="reset-font"></span>
+          </button>
+        </div>
+      </article>
     </footer>
     <script src="assets/js/script.js"></script>
     <script src="assets/js/svg.js"></script>
