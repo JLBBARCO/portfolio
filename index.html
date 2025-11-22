@@ -3,69 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JLBBARCO</title>
+    <title id="webTitle">JLBBARCO's Portfolio</title>
     <link rel="stylesheet" href="assets/css/style.css" media="screen" />
-    <link
-      rel="stylesheet"
-      href="assets/css/pc.css"
-      media="(min-width: 990px)"
-    />
   </head>
   <body>
     <header>
       <nav>
-        <a href="#Home" class="perfil">
+        <a href="#Home">
           <h1>JLBBARCO</h1>
         </a>
       </nav>
       <menu>
         <button id="menu-button" aria-label="Toggle navigation menu">
-          <span id="menu-icon" class="menu"></span>
+          <span id="menu-icon" class="menu">Menu</span>
         </button>
         <div class="nav-links">
-          <a href="#Projects" class="links">Projects</a>
-          <a href="#Technologies" class="links">Technologies</a>
-          <a href="#AboutMe" class="links">About Me</a>
-          <a href="#More" class="links">More</a>
-          <a href="#Contact" class="links">Contact</a>
+          <a href="#Projects" class="links" id="link1">Projects</a>
+          <a href="#Technologies" class="links" id="link2">Technologies</a>
+          <a href="#AboutMe" class="links" id="link3">About Me</a>
+          <a href="#More" class="links" id="link4">More</a>
+          <a href="#Contact" class="links" id="link5">Contact</a>
         </div>
       </menu>
+      <select name="language" id="language-menu" onclick="language()">
+        <option value="en-US" id="lang1">En <span class="uk"></span></option>
+        <option value="pt-BR" id="lang2">Pt <span class="br"></span></option>
+      </select>
     </header>
     <main>
       <section id="Home">
         <div>
-          <h1>Welcome to my Portfolio</h1>
-          <p>Developer Front-end & Designer UI/UX</p>
+          <h1 id="welcome_title">Welcome to my Portfolio</h1>
+          <p id="welcome_message">Developer Front-end & Designer UI/UX</p>
         </div>
       </section>
       <section id="Projects" class="portfolio">
-        <h2>Projects</h2>
+        <h2 id="projectsTitle">Projects</h2>
         <article class="container container-portfolio">
           <div class="card card-portfolio">
             <article class="article-card">
               <picture class="img-card">
                 <source
                   media="(max-width: 990px)"
-                  srcset="assets/images/receipt_generator240p.webp"
-                  type="image/webp"
+                  srcset="assets/img/receipt_generator240p.png"
+                  type="image/png"
                 />
                 <img
-                  src="assets/images/receipt_generator.webp"
+                  src="assets/img/receipt_generator.png"
                   alt="Image of Receipt Generator UI"
                 />
               </picture>
             </article>
             <article class="article-card">
-              <h3>Receipt Generator</h3>
-              <p>
+              <h3 id="project1Title">Receipt Generator</h3>
+              <p id="project1Description">
                 Generates receipts using JavaScript, allowing you to print the
-                receipt.
+                receipt
               </p>
-              <h4>Technologies</h4>
+              <h4 id="project1TechnologiesTitle">Technologies</h4>
               <div class="technologies-portfolio">
-                <span class="html5"></span>
-                <span class="css3"></span>
-                <span class="javascript"></span>
+                <span class="html5">HTML5</span>
+                <span class="css3">CSS3</span>
+                <span class="javascript">JavaScript</span>
               </div>
             </article>
             <article class="article-card">
@@ -74,6 +73,7 @@
                   href="http://github.com/jlbbarco/receipt-generator/"
                   target="_blank"
                   rel="noopener noreferrer"
+                  id="project1Link1"
                 >
                   View Code
                 </a>
@@ -81,6 +81,7 @@
                   href="http://jlbbarco.github.io/receipt-generator/"
                   target="_blank"
                   rel="noopener noreferrer"
+                  id="project1Link2"
                 >
                   Live Demo
                 </a>
@@ -92,25 +93,25 @@
               <picture class="img-card">
                 <source
                   media="(max-width: 990px)"
-                  srcset="assets/images/passwords_generator_ui240p.webp"
-                  type="image/webp"
+                  srcset="assets/img/passwords_generator_ui240p.png"
+                  type="image/png"
                 />
                 <img
-                  src="assets/images/passwords_generator_ui.webp"
+                  src="assets/img/passwords_generator_ui.png"
                   alt="Image of Passwords Generator UI"
                 />
               </picture>
             </article>
             <article class="article-card">
-              <h3>Passwords Generator</h3>
-              <p>
-                Create a alphanumeric passwords and alphanumeric with special
-                caracteres.
+              <h3 id="project2Title">Passwords Generator</h3>
+              <p id="project2Description">
+                A Python application that stores and manager user passwords in
+                .csv files. Recommended to use only storage your non-critical
+                passwords
               </p>
-              <p>This Program is developed in Brazilian Portuguese</p>
-              <h4>Technologies</h4>
+              <h4 id="project2TechnologiesTitle">Technologies</h4>
               <div class="technologies-portfolio">
-                <span class="python"></span>
+                <span class="python">Python</span>
               </div>
             </article>
             <article class="article-card">
@@ -119,15 +120,9 @@
                   href="http://github.com/jlbbarco/passwords_generator/"
                   target="_blank"
                   rel="noopener noreferrer"
+                  id="project2Link1"
                 >
                   View Code
-                </a>
-                <a
-                  href="http://jlbbarco.github.io/passwords_generator/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Live Demo
                 </a>
               </div>
             </article>
@@ -137,22 +132,25 @@
               <picture class="img-card">
                 <source
                   media="(max-width: 990px)"
-                  srcset="assets/images/unit_converter_ui240p.webp"
-                  type="image/webp"
+                  srcset="assets/img/unit_converter_ui240p.png"
+                  type="image/png"
                 />
                 <img
-                  src="assets/images/unit_converter_ui.webp"
+                  src="assets/img/unit_converter_ui.png"
                   alt="Image of Unit Converter UI"
                 />
               </picture>
             </article>
             <article class="article-card">
-              <h3>Unit Converter</h3>
-              <p>Converts a various fixed measures.</p>
-              <p>This Program is developed in Brazilian Portuguese</p>
-              <h4>Technologies</h4>
+              <h3 id="project3Title">Unit Converter</h3>
+              <p id="project3Description">
+                A Python application that stores and manager user passwords in
+                .csv files. Recommended to use only storage your non-critical
+                passwords
+              </p>
+              <h4 id="project3TechnologiesTitle">Technologies</h4>
               <div class="technologies-portfolio">
-                <span class="python"></span>
+                <span class="python">Python</span>
               </div>
             </article>
             <article class="article-card">
@@ -161,15 +159,9 @@
                   href="http://github.com/jlbbarco/unit_converter/"
                   target="_blank"
                   rel="noopener noreferrer"
+                  id="project3Link1"
                 >
                   View Code
-                </a>
-                <a
-                  href="http://jlbbarco.github.io/unit_converter/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Live Demo
                 </a>
               </div>
             </article>
@@ -177,15 +169,11 @@
         </article>
       </section>
       <section id="Technologies">
-        <h2>My Skills</h2>
+        <h2 id="technologiesTitle">My Skills</h2>
         <article class="container container-technologies">
           <section class="container containerTechLanguages">
-            <h3>Languages</h3>
+            <h3 id="technologiesLanguagesTitle">Languages</h3>
             <div class="container tech-container">
-              <div class="tech-cards card">
-                <span class="arduino"></span>
-                <p>Arduino</p>
-              </div>
               <div class="tech-cards card">
                 <span class="html5"></span>
                 <p>HTML5</p>
@@ -199,25 +187,13 @@
                 <p>JavaScript</p>
               </div>
               <div class="tech-cards card">
-                <span class="markdown"></span>
-                <p>Markdown</p>
-              </div>
-              <div class="tech-cards card">
                 <span class="python"></span>
                 <p>Python</p>
-              </div>
-              <div class="tech-cards card">
-                <span class="java"></span>
-                <p>Java</p>
-              </div>
-              <div class="tech-cards card">
-                <span class="sql"></span>
-                <p>SQL</p>
               </div>
             </div>
           </section>
           <section class="container containerTechPrograms">
-            <h3>Programs I Use</h3>
+            <h3 id="technologiesProgramsTitle">Programs I Use</h3>
             <div class="container tech-container">
               <div class="tech-cards card">
                 <span class="github"></span>
@@ -240,7 +216,7 @@
         </article>
       </section>
       <section id="AboutMe">
-        <h2>About me</h2>
+        <h2 id="aboutMeTitle">About me</h2>
         <article class="container container-about-me">
           <img
             src="https://avatars.githubusercontent.com/u/159829462?v=4"
@@ -248,7 +224,7 @@
             class="person"
           />
           <div class="text">
-            <p>
+            <p id="aboutMeText">
               My name is Jose Luiz Bruiani Barco. I'm a
               <span id="age"></span> years old and I'm a Brazilian developer. I
               like of play videogames and developing web systems. <br />
@@ -258,7 +234,7 @@
               doesn't fail again.
             </p>
             <div class="card">
-              <h3>Download CV</h3>
+              <h3 id="downloadCVTitle">Download CV</h3>
               <div class="resumes resume-en">
                 <a
                   href="assets/documents/Resume_Jose_Luiz_Bruiani_Barco_en-US.pdf"
@@ -282,7 +258,7 @@
         </article>
       </section>
       <section id="More">
-        <h2>This site is developed in</h2>
+        <h2 id="moreTitle">This site is developed in</h2>
         <article class="techs-this-site container">
           <span class="html5"></span>
           <span class="css3"></span>
@@ -293,7 +269,7 @@
         </article>
       </section>
       <section id="Contact">
-        <h2>Contact-me</h2>
+        <h2 id="contactTitle">Contact-me</h2>
         <div class="container container-contact">
           <section class="contact-options">
             <div class="contact-card card">
@@ -351,5 +327,6 @@
     </footer>
     <script src="assets/js/script.js"></script>
     <script src="assets/js/svg.js"></script>
+    <script src="assets/js/translate.js"></script>
   </body>
 </html>

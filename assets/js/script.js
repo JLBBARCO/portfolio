@@ -10,24 +10,17 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.fontSize = fontSize;
   }
 
-  // Calcula a idade do desenvolvedor
-  const birthYear = 2008;
-  const currentYear = new Date().getFullYear();
-  const ageElement = document.getElementById("age");
-
-  if (ageElement) {
-    ageElement.textContent = currentYear - birthYear;
-  }
-
   // Garante que o menu esteja no estado correto ao carregar
   resize();
   window.addEventListener("resize", resize);
 
   // Adiciona o evento de clique ao botão do menu
   const menuButton = document.getElementById("menu-button");
-  const menuIcon = document.getElementById("menu-icon");
   if (menuButton) {
-    menuIcon.classList.add("menu"); // Define o ícone inicial como "menu"
+    const menuIcon = document.getElementById("menu-icon");
+    if (menuIcon) {
+      menuIcon.classList.add("menu"); // Define o ícone inicial como "menu"
+    }
     menuButton.addEventListener("click", toggleMenu);
   }
 
@@ -61,6 +54,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+function calcularIdade() {
+  const nascimento = new Date("2008-09-24"); // exemplo
+  const hoje = new Date();
+  let idade = hoje.getFullYear() - nascimento.getFullYear();
+  const m = hoje.getMonth() - nascimento.getMonth();
+  if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+    idade--;
+  }
+  return idade;
+}
+
+// Removido fetch incorreto para 'translations.json' — traduções
+// são carregadas e aplicadas por `assets/js/translate.js`.
 
 function resize() {
   const navLinks = document.querySelector(".nav-links");

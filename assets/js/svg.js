@@ -1,6 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
   const icons = [
     // Normal Icons
+    {
+      className: "language",
+      src: "assets/icons/language.svg",
+      alt: "Language Icon",
+    },
     { className: "menu", src: "assets/icons/menu.svg", alt: "Menu Icon" },
     { className: "close", src: "assets/icons/close.svg", alt: "Close Icon" },
     {
@@ -37,11 +42,6 @@ document.addEventListener("DOMContentLoaded", function () {
     { className: "csharp", src: "assets/icons/csharp.svg", alt: "C# Icon" },
     { className: "java", src: "assets/icons/java.svg", alt: "Java Icon" },
     {
-      className: "typescript",
-      src: "assets/icons/typescript.svg",
-      alt: "TypeScript Icon",
-    },
-    {
       className: "nodejs",
       src: "assets/icons/nodejs.svg",
       alt: "Node.js Icon",
@@ -77,6 +77,11 @@ document.addEventListener("DOMContentLoaded", function () {
       className: "mysql",
       src: "assets/icons/mysql.svg",
       alt: "MySQL Icon",
+    },
+    {
+      className: "react",
+      src: "assets/icons/react.svg",
+      alt: "React Icon",
     },
     // Social Media Icons
     {
