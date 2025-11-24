@@ -67,12 +67,32 @@ function applyTranslations(language) {
     if (typeof text === "string") {
       text = text.replace(/\{\{age\}\}/g, age);
     }
-    const spans = Array.from(element.querySelectorAll("span"));
-    if (spans.length > 0) {
-      const spansHTML = spans.map((s) => s.outerHTML).join(" ");
-      element.innerHTML = text + (spansHTML ? " " + spansHTML : "");
+    const childElements = Array.from(element.children || []);
+    const onlySpans =
+      childElements.length === 0 ||
+      childElements.every((c) => c.tagName.toLowerCase() === "span");
+
+    if (onlySpans) {
+      const spans = childElements; // either empty or array of spans
+      if (spans.length > 0) {
+        const spansHTML = spans.map((s) => s.outerHTML).join(" ");
+        element.innerHTML = text + (spansHTML ? " " + spansHTML : "");
+      } else {
+        element.textContent = text;
+      }
     } else {
-      element.textContent = text;
+      // elemento possui filhos além de <span> — não sobrescrever a estrutura, apenas
+      // atualizar texto direto (remove nós de texto anteriores)
+      // procura primeiro nó de texto ou cria um
+      let textNode = Array.from(element.childNodes).find(
+        (n) => n.nodeType === Node.TEXT_NODE
+      );
+      if (textNode) {
+        textNode.nodeValue = text;
+      } else {
+        // insere no início
+        element.insertBefore(document.createTextNode(text), element.firstChild);
+      }
     }
   }
 
@@ -132,11 +152,24 @@ function calcularIdade() {
 function language() {
   const languageMenu = document.getElementById("language-menu");
   const selectedLanguage = languageMenu.value;
+  const downloadCV = document.getElementById("linkDownloadCV");
 
   if (selectedLanguage === "pt-BR") {
     applyTranslations("pt");
+
+    const linkToCV = "assets/Curriculo_Jose_Luiz_Bruiani_Barco_pt-BR.pdf";
+    if (downloadCV) {
+      downloadCV.href = linkToCV;
+      downloadCV.setAttribute("download", linkToCV.split("/").pop());
+    }
   } else if (selectedLanguage === "en-US") {
     applyTranslations("en");
+
+    const linkToCV = "assets/Resume_Jose_Luiz_Bruiani_Barco_en-US.pdf";
+    if (downloadCV) {
+      downloadCV.href = linkToCV;
+      downloadCV.setAttribute("download", linkToCV.split("/").pop());
+    }
   }
 }
 

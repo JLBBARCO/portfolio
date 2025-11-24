@@ -84,12 +84,16 @@ function toggleMenu() {
 
   if (navLinks.style.display === "grid") {
     navLinks.style.display = "none";
-    menuIcon.classList.remove("close");
-    menuIcon.classList.add("menu");
+    if (menuIcon) {
+      menuIcon.classList.remove("close");
+      menuIcon.classList.add("menu");
+    }
   } else {
     navLinks.style.display = "grid";
-    menuIcon.classList.remove("menu");
-    menuIcon.classList.add("close");
+    if (menuIcon) {
+      menuIcon.classList.remove("menu");
+      menuIcon.classList.add("close");
+    }
   }
 }
 

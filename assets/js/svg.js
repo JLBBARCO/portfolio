@@ -6,6 +6,11 @@ document.addEventListener("DOMContentLoaded", function () {
       src: "assets/icons/language.svg",
       alt: "Language Icon",
     },
+    {
+      className: "download",
+      src: "assets/icons/download.svg",
+      alt: "Download Icon",
+    },
     { className: "menu", src: "assets/icons/menu.svg", alt: "Menu Icon" },
     { className: "close", src: "assets/icons/close.svg", alt: "Close Icon" },
     {
@@ -110,9 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
       src: "assets/icons/youtube.svg",
       alt: "YouTube Icon",
     },
-    // Country Flags
-    { className: "br", src: "assets/icons/br.svg", alt: "Brazil Flag" },
-    { className: "uk", src: "assets/icons/uk.svg", alt: "UK Flag" },
   ];
 
   icons.forEach(({ className, src, alt }) => {
