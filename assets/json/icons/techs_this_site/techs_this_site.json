@@ -1,0 +1,21 @@
+{
+  "icons": [
+    { "name": "HTML5", "class": "html5", "style": "brands", "size": "3x" },
+    { "name": "CSS3", "class": "css3", "style": "brands", "size": "3x" },
+    { "name": "JavaScript", "class": "js", "style": "brands", "size": "3x" },
+    {
+      "name": "Font Awesome",
+      "class": "font-awesome",
+      "style": "brands",
+      "size": "3x"
+    },
+    { "name": "Python", "class": "python", "style": "brands", "size": "3x" },
+    {
+      "name": "Git",
+      "class": "git-alt",
+      "style": "brands",
+      "size": "3x"
+    },
+    { "name": "GitHub", "class": "github", "style": "brands", "size": "3x" }
+  ]
+}

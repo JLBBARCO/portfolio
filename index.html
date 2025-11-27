@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title id="webTitle">JLBBARCO's Portfolio</title>
     <link rel="stylesheet" href="assets/css/style.css" media="screen" />
+    <script
+      src="https://kit.fontawesome.com/4a1e49a1ca.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
     <header>
@@ -15,7 +19,7 @@
       </nav>
       <menu>
         <button id="menu-button" aria-label="Toggle navigation menu">
-          <span id="menu-icon" class="menu">Menu</span>
+          <i id="menuIcon" class="fa-solid fa-bars" style="color: #fff"></i>
         </button>
         <div class="nav-links">
           <a href="#Projects" class="links" id="link1"></a>
@@ -39,164 +43,24 @@
       </section>
       <section id="Projects" class="portfolio">
         <h2 id="projectsTitle"></h2>
-        <article class="container container-portfolio">
-          <div class="card card-portfolio">
-            <article class="article-card">
-              <picture class="img-card">
-                <source
-                  media="(max-width: 990px)"
-                  srcset="assets/img/receipt_generator240p.png"
-                  type="image/png"
-                />
-                <img
-                  src="assets/img/receipt_generator.png"
-                  alt="Image of Receipt Generator UI"
-                />
-              </picture>
-            </article>
-            <article class="article-card">
-              <h3 id="project1Title"></h3>
-              <p id="project1Description"></p>
-              <h4 id="project1TechnologiesTitle">Technologies</h4>
-              <div class="technologies-portfolio">
-                <span class="html5">HTML5</span>
-                <span class="css3">CSS3</span>
-                <span class="javascript">JavaScript</span>
-              </div>
-            </article>
-            <article class="article-card">
-              <div class="button button-link">
-                <a
-                  href="http://github.com/jlbbarco/receipt-generator/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  id="project1Link1"
-                >
-                </a>
-                <a
-                  href="http://jlbbarco.github.io/receipt-generator/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  id="project1Link2"
-                >
-                </a>
-              </div>
-            </article>
-          </div>
-          <div class="card card-portfolio">
-            <article class="article-card">
-              <picture class="img-card">
-                <source
-                  media="(max-width: 990px)"
-                  srcset="assets/img/passwords_manager_ui240p.png"
-                  type="image/png"
-                />
-                <img
-                  src="assets/img/passwords_manager_ui.png"
-                  alt="Image of Passwords Generator UI"
-                />
-              </picture>
-            </article>
-            <article class="article-card">
-              <h3 id="project2Title"></h3>
-              <p id="project2Description"></p>
-              <h4 id="project2TechnologiesTitle">Technologies</h4>
-              <div class="technologies-portfolio">
-                <span class="python">Python</span>
-              </div>
-            </article>
-            <article class="article-card">
-              <div class="button button-link">
-                <a
-                  href="http://github.com/jlbbarco/passwords_generator/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  id="project2Link1"
-                >
-                </a>
-              </div>
-            </article>
-          </div>
-          <div class="card card-portfolio">
-            <article class="article-card">
-              <picture class="img-card">
-                <source
-                  media="(max-width: 990px)"
-                  srcset="assets/img/unit_converter_ui240p.png"
-                  type="image/png"
-                />
-                <img
-                  src="assets/img/unit_converter_ui.png"
-                  alt="Image of Unit Converter UI"
-                />
-              </picture>
-            </article>
-            <article class="article-card">
-              <h3 id="project3Title"></h3>
-              <p id="project3Description"></p>
-              <h4 id="project3TechnologiesTitle">Technologies</h4>
-              <div class="technologies-portfolio">
-                <span class="python">Python</span>
-              </div>
-            </article>
-            <article class="article-card">
-              <div class="button button-link">
-                <a
-                  href="http://github.com/jlbbarco/unit_converter/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  id="project3Link1"
-                >
-                </a>
-              </div>
-            </article>
-          </div>
-        </article>
+        <article
+          id="projectsContainer"
+          class="container container-portfolio"
+        ></article>
       </section>
       <section id="Technologies">
         <h2 id="technologiesTitle"></h2>
         <article class="container container-technologies">
           <section class="container containerTechLanguages">
             <h3 id="technologiesLanguagesTitle"></h3>
-            <div class="container tech-container">
-              <div class="tech-cards card">
-                <span class="html5"></span>
-                <p>HTML5</p>
-              </div>
-              <div class="tech-cards card">
-                <span class="css3"></span>
-                <p>CSS3</p>
-              </div>
-              <div class="tech-cards card">
-                <span class="javascript"></span>
-                <p>JavaScript</p>
-              </div>
-              <div class="tech-cards card">
-                <span class="python"></span>
-                <p>Python</p>
-              </div>
-            </div>
+            <div
+              id="technologiesContainer"
+              class="container tech-container"
+            ></div>
           </section>
           <section class="container containerTechPrograms">
             <h3 id="technologiesProgramsTitle"></h3>
-            <div class="container tech-container">
-              <div class="tech-cards card">
-                <span class="github"></span>
-                <p>GitHub</p>
-              </div>
-              <div class="tech-cards card">
-                <span class="git"></span>
-                <p>Git</p>
-              </div>
-              <div class="tech-cards card">
-                <span class="vscode"></span>
-                <p>VS Code</p>
-              </div>
-              <div class="tech-cards card">
-                <span class="mysql"></span>
-                <p>MySQL</p>
-              </div>
-            </div>
+            <div id="programsContainer" class="container tech-container"></div>
           </section>
         </article>
       </section>
@@ -210,9 +74,10 @@
           />
           <div class="text">
             <p id="aboutMeText"></p>
-            <div class="card">
+            <div class="cv">
+              <h3 id="downloadCVTitle"></h3>
               <a type="application/pdf" id="linkDownloadCV">
-                <h3 id="downloadCVTitle"></h3>
+                <i class="fa-solid fa-download fa-2x"></i>
               </a>
             </div>
           </div>
@@ -220,51 +85,12 @@
       </section>
       <section id="More">
         <h2 id="moreTitle"></h2>
-        <article class="techs-this-site container">
-          <span class="html5"></span>
-          <span class="css3"></span>
-          <span class="javascript"></span>
-          <span class="markdown"></span>
-          <span class="git"></span>
-          <span class="github"></span>
-        </article>
+        <article id="techsThisSite" class="container"></article>
       </section>
       <section id="Contact">
         <h2 id="contactTitle"></h2>
         <div class="container container-contact">
-          <section class="contact-options">
-            <div class="contact-card card">
-              <span class="mail"></span>
-              <p>
-                <a href="mailto:jbruianibarco@gmail.com" target="_blank">
-                  jbruianibarco@gmail.com
-                </a>
-              </p>
-            </div>
-            <div class="contact-card card">
-              <span class="linkedin"></span>
-              <p>
-                <a
-                  href="https://linkedin.com/in/joseluizbbarco"
-                  target="_blank"
-                >
-                  LinkedIn.com/in/joseluizbbarco
-                </a>
-              </p>
-            </div>
-            <div class="contact-card card">
-              <span class="github"></span>
-              <p>
-                <a
-                  href="http://github.com/JLBBARCO"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  github.com/JLBBARCO
-                </a>
-              </p>
-            </div>
-          </section>
+          <article id="contactContainer" class="contact-options"></article>
         </div>
       </section>
     </main>
@@ -287,7 +113,6 @@
       </article>
     </footer>
     <script src="assets/js/script.js"></script>
-    <script src="assets/js/svg.js"></script>
     <script src="assets/js/translate.js"></script>
   </body>
 </html>

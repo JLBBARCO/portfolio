@@ -1,0 +1,6 @@
+{
+  "cards": [
+    { "icon": "github", "name": "GitHub", "style": "brands" },
+    { "icon": "git-alt", "name": "Git", "style": "brands" }
+  ]
+}

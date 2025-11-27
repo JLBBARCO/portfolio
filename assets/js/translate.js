@@ -174,4 +174,17 @@ function language() {
 }
 
 // Carrega as traduções quando o DOM está pronto
-document.addEventListener("DOMContentLoaded", loadTranslations);
+document.addEventListener("DOMContentLoaded", () => {
+  // Aguarda que o conteúdo dinâmico seja carregado (evento disparado em script.js)
+  // ou usa um fallback curto para evitar bloqueio se o evento não chegar.
+  let loaded = false;
+  function onceLoad() {
+    if (loaded) return;
+    loaded = true;
+    loadTranslations();
+  }
+
+  window.addEventListener("dynamicContentReady", onceLoad, { once: true });
+  // Fallback: se o evento não for disparado em 500ms, carrega mesmo assim
+  setTimeout(onceLoad, 500);
+});

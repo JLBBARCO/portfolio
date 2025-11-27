@@ -1,0 +1,8 @@
+{
+  "cards": [
+    { "icon": "html5", "name": "HTML5", "style": "brands" },
+    { "icon": "css3", "name": "CSS3", "style": "brands" },
+    { "icon": "js", "name": "JavaScript", "style": "brands" },
+    { "icon": "python", "name": "Python", "style": "brands" }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "cards": [
+    {
+      "projectTitle": "project1",
+      "image": "assets/img/receipt_generator.png",
+      "descriptionImage": "Image of Receipt Generator UI",
+      "imageMobile": "assets/img/receipt_generator240p.png",
+      "imageType": "image/png",
+      "titleID": "project1Title",
+      "descriptionID": "project1Description",
+      "titleTechnologiesID": "project1TechnologiesTitle",
+      "linkProjectRepositoryURL": "http://github.com/jlbbarco/receipt-generator/",
+      "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkProjectRepositoryID": "project1Link1",
+      "linkProjectDemoURL": "http://jlbbarco.github.io/receipt-generator/",
+      "linkProjectDemoTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkProjectDemoID": "project1Link2"
+    },
+    {
+      "projectTitle": "project2",
+      "image": "assets/img/passwords_manager_ui.png",
+      "descriptionImage": "Image of Passwords Manager System UI",
+      "imageMobile": "assets/img/passwords_manager_ui240p.png",
+      "imageType": "image/png",
+      "titleID": "project2Title",
+      "descriptionID": "project2Description",
+      "titleTechnologiesID": "project2TechnologiesTitle",
+      "linkProjectRepositoryURL": "http://github.com/jlbbarco/passwords_manager/",
+      "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkProjectRepositoryID": "project2Link1"
+    },
+    {
+      "projectTitle": "project3",
+      "image": "assets/img/unit_converter_ui.png",
+      "descriptionImage": "Image of Unit Converter UI",
+      "imageMobile": "assets/img/unit_converter_ui240p.png",
+      "imageType": "image/png",
+      "titleID": "project3Title",
+      "descriptionID": "project3Description",
+      "titleTechnologiesID": "project3TechnologiesTitle",
+      "linkProjectRepositoryURL": "http://github.com/jlbbarco/unit_converter/",
+      "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkProjectRepositoryID": "project3Link1"
+    }
+  ],
+  "project1": [
+    { "icon": "html5", "name": "HTML5", "style": "brands" },
+    { "icon": "css3", "name": "CSS3", "style": "brands" },
+    { "icon": "js", "name": "JavaScript", "style": "brands" }
+  ],
+  "project2": [{ "icon": "python", "name": "Python", "style": "brands" }],
+  "project3": [{ "icon": "python", "name": "Python", "style": "brands" }]
+}

@@ -1,0 +1,25 @@
+{
+  "cards": [
+    {
+      "icon": "message",
+      "style": "regular",
+      "link": "mailto:jbruianibarco@gmail.com",
+      "name": "jbruianibarco@gmail.com",
+      "target": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
+      "icon": "linkedin",
+      "style": "brands",
+      "link": "https://linkedin.com/in/joseluizbbarco",
+      "name": "LinkedIn.com/in/joseluizbbarco",
+      "target": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
+      "icon": "github",
+      "style": "brands",
+      "link": "http://github.com/JLBBARCO",
+      "name": "GitHub.com/JLBBARCO",
+      "target": "target='_blank' rel='noopener noreferrer'"
+    }
+  ]
+}
