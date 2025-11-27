@@ -442,6 +442,7 @@ main .icon:hover {
 
 #accessibility button {
   margin: 10px;
+  padding: 5px;
   border: none;
   border-radius: 10px;
   background: var(--secondary-bg);
