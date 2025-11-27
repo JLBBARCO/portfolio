@@ -1,6 +1,6 @@
 {
   "cards": [
-    { "icon": "github", "name": "GitHub", "style": "brands" },
-    { "icon": "git-alt", "name": "Git", "style": "brands" }
+    { "icon": "fa-github", "name": "GitHub", "style": "fa-brands" },
+    { "icon": "fa-git-alt", "name": "Git", "style": "fa-brands" }
   ]
 }

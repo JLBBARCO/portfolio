@@ -1,21 +1,46 @@
 {
   "icons": [
-    { "name": "HTML5", "class": "html5", "style": "brands", "size": "3x" },
-    { "name": "CSS3", "class": "css3", "style": "brands", "size": "3x" },
-    { "name": "JavaScript", "class": "js", "style": "brands", "size": "3x" },
+    {
+      "name": "HTML5",
+      "class": "fa-html5",
+      "style": "fa-brands",
+      "size": "fa-3x"
+    },
+    {
+      "name": "CSS3",
+      "class": "fa-css3",
+      "style": "fa-brands",
+      "size": "fa-3x"
+    },
+    {
+      "name": "JavaScript",
+      "class": "fa-js",
+      "style": "fa-brands",
+      "size": "fa-3x"
+    },
     {
       "name": "Font Awesome",
-      "class": "font-awesome",
-      "style": "brands",
-      "size": "3x"
+      "class": "fa-font-awesome",
+      "style": "fa-brands",
+      "size": "fa-3x"
     },
-    { "name": "Python", "class": "python", "style": "brands", "size": "3x" },
+    {
+      "name": "Python",
+      "class": "fa-python",
+      "style": "fa-brands",
+      "size": "fa-3x"
+    },
     {
       "name": "Git",
-      "class": "git-alt",
-      "style": "brands",
-      "size": "3x"
+      "class": "fa-git-alt",
+      "style": "fa-brands",
+      "size": "fa-3x"
     },
-    { "name": "GitHub", "class": "github", "style": "brands", "size": "3x" }
+    {
+      "name": "GitHub",
+      "class": "fa-github",
+      "style": "fa-brands",
+      "size": "fa-3x"
+    }
   ]
 }

@@ -1,22 +1,22 @@
 {
   "cards": [
     {
-      "icon": "message",
-      "style": "regular",
+      "icon": "fa-message",
+      "style": "fa-regular",
       "link": "mailto:jbruianibarco@gmail.com",
       "name": "jbruianibarco@gmail.com",
       "target": "target='_blank' rel='noopener noreferrer'"
     },
     {
-      "icon": "linkedin",
-      "style": "brands",
+      "icon": "fa-linkedin",
+      "style": "fa-brands",
       "link": "https://linkedin.com/in/joseluizbbarco",
       "name": "LinkedIn.com/in/joseluizbbarco",
       "target": "target='_blank' rel='noopener noreferrer'"
     },
     {
-      "icon": "github",
-      "style": "brands",
+      "icon": "fa-github",
+      "style": "fa-brands",
       "link": "http://github.com/JLBBARCO",
       "name": "GitHub.com/JLBBARCO",
       "target": "target='_blank' rel='noopener noreferrer'"

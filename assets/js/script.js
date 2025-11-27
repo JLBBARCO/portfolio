@@ -1,5 +1,26 @@
 const windowWidth = 990;
 
+// Helper para normalizar classes do Font Awesome
+function faClass(style, icon, size) {
+  let styleClass = style || "brands";
+  if (styleClass && !styleClass.startsWith("fa-")) {
+    styleClass = `fa-${styleClass}`;
+  }
+  let iconClass = icon || "";
+  if (iconClass && !iconClass.startsWith("fa-")) {
+    iconClass = `fa-${iconClass}`;
+  }
+  let sizeClass = size || "";
+  if (sizeClass && !sizeClass.startsWith("fa-")) {
+    if (/^[0-9]+x$/.test(sizeClass)) {
+      sizeClass = `fa-${sizeClass}`;
+    } else if (sizeClass) {
+      sizeClass = `fa-${sizeClass}`;
+    }
+  }
+  return [styleClass, iconClass, sizeClass].filter(Boolean).join(" ");
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // Recupera o tamanho da fonte do cookie, se existir
   const fontSize = document.cookie
@@ -181,10 +202,13 @@ function setIcons(fileURL, containerID, iconSize = "3x") {
       data.icons.forEach((icon) => {
         const iconElement = document.createElement("div");
         iconElement.className = "icon-container";
-        const style = icon.style || "brands";
-        const cls = icon.class || icon.name || "";
-        iconElement.innerHTML = `<i class="fa-${style} fa-${cls} fa-${iconSize} icon" title="${
-          icon.name || cls
+        const classes = faClass(
+          icon.style,
+          icon.class || icon.name,
+          icon.size || iconSize
+        );
+        iconElement.innerHTML = `<i class="${classes} icon" title="${
+          icon.name || icon.class || ""
         }"></i>`;
         container.appendChild(iconElement);
       });
@@ -213,12 +237,10 @@ function jsonCardProjectsFetch(fileURL, containerId, iconSize = "3x") {
         const projectKey = card.projectTitle;
         const projectTechs = data[projectKey] || [];
         const techsHTML = projectTechs
-          .map(
-            (tech) =>
-              `<i class="fa-${tech.style || "brands"} fa-${
-                tech.icon
-              } fa-${iconSize} icon" title="${tech.name}"></i>`
-          )
+          .map((tech) => {
+            const classes = faClass(tech.style, tech.icon, iconSize);
+            return `<i class="${classes} icon" title="${tech.name}"></i>`;
+          })
           .join(" ");
 
         projectCard.innerHTML = `
@@ -284,10 +306,9 @@ function jsonCardSkillsFetch(url, containerId, iconSize = "3x") {
       data.cards.forEach((card) => {
         const techCard = document.createElement("div");
         techCard.className = "tech-cards card";
+        const classes = faClass(card.style, card.icon, iconSize);
         techCard.innerHTML = `
-          <i class="fa-${card.style || "brands"} fa-${
-          card.icon
-        } fa-${iconSize} icon" title="${card.name}"></i>
+          <i class="${classes} icon" title="${card.name}"></i>
           <p>${card.name}</p>
         `;
         container.appendChild(techCard);
@@ -313,11 +334,8 @@ function jsonLinksFetch(fileUrl, containerID, iconSize = "2x") {
         const linkCard = document.createElement("div");
         linkCard.className = "link-cards card";
         const targetLink = card.target || "";
-        linkCard.innerHTML = `<i class="fa-${card.style || "solid"} fa-${
-          card.icon
-        } fa-${iconSize} icon"></i><a href="${card.link}" ${targetLink}>${
-          card.name
-        }</a>`;
+        const classes = faClass(card.style || "solid", card.icon, iconSize);
+        linkCard.innerHTML = `<i class="${classes} icon"></i><a href="${card.link}" ${targetLink}>${card.name}</a>`;
         container.appendChild(linkCard);
       });
     })
