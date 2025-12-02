@@ -15,6 +15,13 @@
       "target": "target='_blank' rel='noopener noreferrer'"
     },
     {
+      "icon": "fa-instagram",
+      "style": "fa-brands",
+      "link": "https://instagram.com/JoseLuizBBarco",
+      "name": "Instagram.com/JoseLuizBBarco",
+      "target": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
       "icon": "fa-github",
       "style": "fa-brands",
       "link": "http://github.com/JLBBARCO",

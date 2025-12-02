@@ -25,12 +25,6 @@
       "size": "fa-3x"
     },
     {
-      "name": "Python",
-      "class": "fa-python",
-      "style": "fa-brands",
-      "size": "fa-3x"
-    },
-    {
       "name": "Git",
       "class": "fa-git-alt",
       "style": "fa-brands",
