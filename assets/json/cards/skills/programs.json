@@ -1,6 +1,7 @@
 {
   "cards": [
     { "icon": "fa-github", "name": "GitHub", "style": "fa-brands" },
-    { "icon": "fa-git-alt", "name": "Git", "style": "fa-brands" }
+    { "icon": "fa-git-alt", "name": "Git", "style": "fa-brands" },
+    { "icon": "fa-visual-studio-code", "name": "VS Code", "style": "fa-brands" }
   ]
 }

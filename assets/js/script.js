@@ -105,8 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
     "contactContainer",
     "2x"
   );
+  const pFormations = jsonCardFormationFetch(
+    "assets/json/cards/skills/formation.json",
+    "formationsContainer",
+    "3x"
+  );
 
-  Promise.all([pProjects, pSkills, pPrograms, pIcons, pLinks])
+  Promise.all([pProjects, pSkills, pPrograms, pIcons, pLinks, pFormations])
     .then(() => {
       // notify that dynamic content is ready for translation
       window.dispatchEvent(new Event("dynamicContentReady"));
@@ -130,16 +135,23 @@ function calcularIdade() {
 
 function resize() {
   const navLinks = document.querySelector(".nav-links");
+  const menuButton = document.getElementById("menu-button");
+  if (!navLinks) return;
+
   if (window.innerWidth > windowWidth) {
     navLinks.style.display = "flex";
+    if (menuButton) menuButton.setAttribute("aria-expanded", "true");
   } else {
     navLinks.style.display = "none";
+    if (menuButton) menuButton.setAttribute("aria-expanded", "false");
   }
 }
 
 function toggleMenu() {
   const navLinks = document.querySelector(".nav-links");
   const menuIcon = document.getElementById("menuIcon");
+  const menuButton = document.getElementById("menu-button");
+  if (!navLinks) return;
 
   if (navLinks.style.display === "grid") {
     navLinks.style.display = "none";
@@ -148,6 +160,7 @@ function toggleMenu() {
       menuIcon.classList.remove("fa-xmark", "fa-close");
       menuIcon.classList.add("fa-bars");
     }
+    if (menuButton) menuButton.setAttribute("aria-expanded", "false");
   } else {
     navLinks.style.display = "grid";
     if (menuIcon) {
@@ -155,17 +168,23 @@ function toggleMenu() {
       menuIcon.classList.remove("fa-bars");
       menuIcon.classList.add("fa-xmark");
     }
+    if (menuButton) menuButton.setAttribute("aria-expanded", "true");
   }
 }
 
 function accessibilityToggle() {
   const accessibilityMenu = document.getElementById("accessibility-menu");
-  if (accessibilityMenu) {
-    if (accessibilityMenu.style.display === "flex") {
-      accessibilityMenu.style.display = "none";
-    } else {
-      accessibilityMenu.style.display = "flex";
-    }
+  const accessibilityButton = document.getElementById("accessibility-button");
+  if (!accessibilityMenu) return;
+
+  if (accessibilityMenu.style.display === "flex") {
+    accessibilityMenu.style.display = "none";
+    if (accessibilityButton)
+      accessibilityButton.setAttribute("aria-expanded", "false");
+  } else {
+    accessibilityMenu.style.display = "flex";
+    if (accessibilityButton)
+      accessibilityButton.setAttribute("aria-expanded", "true");
   }
 }
 
@@ -341,5 +360,56 @@ function jsonLinksFetch(fileUrl, containerID, iconSize = "2x") {
     })
     .catch((error) => {
       console.error("Failed to load links:", error);
+    });
+}
+
+function jsonCardFormationFetch(fileURL, containerId, iconSize = "3x") {
+  return fetch(fileURL)
+    .then((responsive) => {
+      if (!responsive.ok) {
+        throw new Error(`Error fetching formations: ${responsive.status}`);
+      }
+      return responsive.json();
+    })
+    .then((data) => {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      data.cards.forEach((card) => {
+        const formationCard = document.createElement("div");
+        formationCard.className = "formation-cards card";
+        const classes = faClass(card.style, card.icon, iconSize);
+        formationCard.innerHTML = `
+        <picture class="img-card">
+          <source
+            media="(max-width: 990px)"
+            srcset="${card.imageMobile}"
+            type="${card.imageType}"
+          />
+          <img
+            src="${card.image}"
+            alt="${card.descriptionImage}"
+          />
+        </picture>
+        <h3 id="${card.titleID}"></h3>
+        <p id="${card.institutionID}"></p>
+        <p id="${card.descriptionID}"></p>
+        ${
+          card.dateText
+            ? `<p>${card.dateText}</p>`
+            : `<p id="${card.dateID}"></p>`
+        }
+        <div class="button button-link">
+          <a
+            href="${card.linkFormationURL}"
+            ${card.linkFormationTarget || ""}
+            id="${card.linkFormationTitleID}"
+          ></a>
+        </div>
+      `;
+        container.appendChild(formationCard);
+      });
+    })
+    .catch((error) => {
+      console.error("Failed to load formations:", error);
     });
 }

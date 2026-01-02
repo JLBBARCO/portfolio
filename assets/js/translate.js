@@ -43,6 +43,9 @@ async function loadTranslations() {
 
     // Atualiza o seletor de idioma com a linguagem salva
     updateLanguageSelector();
+
+    // Define o link do CV (se existir), caso contrário esconde o link
+    setCVLink(currentLanguage);
   } catch (error) {
     console.error("Erro ao carregar traduções:", error);
   }
@@ -148,6 +151,31 @@ function calcularIdade() {
   return idade;
 }
 
+// Verifica e define link para o CV (PDF). Se o arquivo não existir, oculta o link
+function setCVLink(language) {
+  const downloadCV = document.getElementById("linkDownloadCV");
+  if (!downloadCV) return;
+  const linkToCV =
+    language === "pt"
+      ? "assets/documents/Curriculo_Jose_Luiz_Bruiani_Barco_pt-BR.pdf"
+      : "assets/documents/Resume_Jose_Luiz_Bruiani_Barco_en-US.pdf";
+
+  // Verifica se o arquivo existe via HEAD (se falhar, oculta o link)
+  fetch(linkToCV, { method: "HEAD" })
+    .then((resp) => {
+      if (resp.ok) {
+        downloadCV.style.display = "";
+        downloadCV.href = linkToCV;
+        downloadCV.setAttribute("download", linkToCV.split("/").pop());
+      } else {
+        downloadCV.style.display = "none";
+      }
+    })
+    .catch(() => {
+      downloadCV.style.display = "none";
+    });
+}
+
 // Função para mudar de idioma
 function language() {
   const languageMenu = document.getElementById("language-menu");
@@ -156,20 +184,10 @@ function language() {
 
   if (selectedLanguage === "pt-BR") {
     applyTranslations("pt");
-
-    const linkToCV = "assets/Curriculo_Jose_Luiz_Bruiani_Barco_pt-BR.pdf";
-    if (downloadCV) {
-      downloadCV.href = linkToCV;
-      downloadCV.setAttribute("download", linkToCV.split("/").pop());
-    }
+    setCVLink("pt");
   } else if (selectedLanguage === "en-US") {
     applyTranslations("en");
-
-    const linkToCV = "assets/Resume_Jose_Luiz_Bruiani_Barco_en-US.pdf";
-    if (downloadCV) {
-      downloadCV.href = linkToCV;
-      downloadCV.setAttribute("download", linkToCV.split("/").pop());
-    }
+    setCVLink("en");
   }
 }
 

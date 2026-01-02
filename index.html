@@ -1,118 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title id="webTitle">JLBBARCO's Portfolio</title>
-    <link rel="stylesheet" href="assets/css/style.css" media="screen" />
-    <script
-      src="https://kit.fontawesome.com/4a1e49a1ca.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body>
-    <header>
-      <nav>
-        <a href="#Home">
-          <h1>JLBBARCO</h1>
-        </a>
-      </nav>
-      <menu>
-        <button id="menu-button" aria-label="Toggle navigation menu">
-          <i id="menuIcon" class="fa-solid fa-bars" style="color: #fff"></i>
-        </button>
-        <div class="nav-links">
-          <a href="#Projects" class="links" id="link1"></a>
-          <a href="#Technologies" class="links" id="link2"></a>
-          <a href="#AboutMe" class="links" id="link3"></a>
-          <a href="#More" class="links" id="link4"></a>
-          <a href="#Contact" class="links" id="link5"></a>
-        </div>
-      </menu>
-      <select name="language" id="language-menu" onclick="language()">
-        <option value="en-US">En - US</option>
-        <option value="pt-BR">Pt - BR</option>
-      </select>
-    </header>
-    <main>
-      <section id="Home">
-        <div>
-          <h1 id="welcome_title"></h1>
-          <p id="welcome_message"></p>
-        </div>
-      </section>
-      <section id="Projects" class="portfolio">
-        <h2 id="projectsTitle"></h2>
-        <article
-          id="projectsContainer"
-          class="container container-portfolio"
-        ></article>
-      </section>
-      <section id="Technologies">
-        <h2 id="technologiesTitle"></h2>
-        <article class="container container-technologies">
-          <section class="container containerTechLanguages">
-            <h3 id="technologiesLanguagesTitle"></h3>
-            <div
-              id="technologiesContainer"
-              class="container tech-container"
-            ></div>
-          </section>
-          <section class="container containerTechPrograms">
-            <h3 id="technologiesProgramsTitle"></h3>
-            <div id="programsContainer" class="container tech-container"></div>
-          </section>
-        </article>
-      </section>
-      <section id="AboutMe">
-        <h2 id="aboutMeTitle"></h2>
-        <article class="container container-about-me">
-          <img
-            src="https://avatars.githubusercontent.com/u/159829462?v=4"
-            alt="Avatar of GitHub"
-            class="person"
-          />
-          <div class="text">
-            <p id="aboutMeText"></p>
-            <div class="cv">
-              <h3 id="downloadCVTitle"></h3>
-              <a type="application/pdf" id="linkDownloadCV">
-                <i class="fa-solid fa-download fa-2x"></i>
-              </a>
-            </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="webTitle">JLBBARCO's Portfolio</title>
+  <link rel="stylesheet" href="assets/css/style.css" media="screen" />
+  <script src="https://kit.fontawesome.com/4a1e49a1ca.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <a href="#Home">
+        <h1>JLBBARCO</h1>
+      </a>
+    </nav>
+    <menu>
+      <button id="menu-button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
+        <i id="menuIcon" class="fa-solid fa-bars" style="color: #fff"></i>
+      </button>
+      <div id="nav-links" class="nav-links">
+        <a href="#Projects" class="links" id="link1"></a>
+        <a href="#Technologies" class="links" id="link2"></a>
+        <a href="#AboutMe" class="links" id="link3"></a>
+        <a href="#More" class="links" id="link4"></a>
+        <a href="#Contact" class="links" id="link5"></a>
+      </div>
+    </menu>
+    <select name="language" id="language-menu" onchange="language()" aria-label="Language menu">
+      <option value="en-US">En - US</option>
+      <option value="pt-BR">Pt - BR</option>
+    </select>
+  </header>
+  <main>
+    <section id="Home">
+      <div>
+        <h1 id="welcome_title"></h1>
+        <p id="welcome_message"></p>
+      </div>
+    </section>
+    <section id="Projects" class="portfolio">
+      <h2 id="projectsTitle"></h2>
+      <article id="projectsContainer" class="container container-portfolio"></article>
+    </section>
+    <section id="Technologies">
+      <h2 id="technologiesTitle"></h2>
+      <article class="container container-technologies">
+        <section class="container containerTechLanguages">
+          <h3 id="technologiesLanguagesTitle"></h3>
+          <div id="technologiesContainer" class="container tech-container"></div>
+        </section>
+        <section class="container containerTechPrograms">
+          <h3 id="technologiesProgramsTitle"></h3>
+          <div id="programsContainer" class="container tech-container"></div>
+        </section>
+      </article>
+    </section>
+    <section id="AboutMe">
+      <h2 id="aboutMeTitle"></h2>
+      <article class="container container-about-me">
+        <img src="https://avatars.githubusercontent.com/u/159829462?v=4" alt="Avatar of GitHub" class="person" />
+        <div class="text">
+          <p id="aboutMeText"></p>
+          <div class="cv">
+            <h3 id="downloadCVTitle"></h3>
+            <a type="application/pdf" id="linkDownloadCV" href="#" aria-label="Download CV" style="display:none">
+              <i class="fa-solid fa-download fa-2x"></i>
+            </a>
           </div>
-        </article>
-      </section>
-      <section id="More">
-        <h2 id="moreTitle"></h2>
-        <article id="techsThisSite" class="container"></article>
-      </section>
-      <section id="Contact">
-        <h2 id="contactTitle"></h2>
-        <div class="container container-contact">
-          <article id="contactContainer" class="contact-options"></article>
-        </div>
-      </section>
-    </main>
-    <footer>
-      <article id="accessibility">
-        <button id="accessibility-button">
-          <i class="fa-solid fa-universal-access fa-3x" style="color: #fff"></i>
-        </button>
-        <div id="accessibility-menu">
-          <button id="increase-font">
-            <p style="color: #fff; font-size: 48px">A +</p>
-          </button>
-          <button id="decrease-font">
-            <p style="color: #fff; font-size: 48px">A -</p>
-          </button>
-          <button id="reset-font">
-            <i class="fa-solid fa-text-slash fa-3x" style="color: #fff"></i>
-          </button>
         </div>
       </article>
-    </footer>
-    <script src="assets/js/script.js"></script>
-    <script src="assets/js/translate.js"></script>
-  </body>
+    </section>
+    <section id="formations">
+      <h2 id="formationsTitle"></h2>
+      <article id="formationsContainer" class="container container-formations"></article>
+    </section>
+    <section id="More">
+      <h2 id="moreTitle"></h2>
+      <article id="techsThisSite" class="container"></article>
+    </section>
+    <section id="Contact">
+      <h2 id="contactTitle"></h2>
+      <div class="container container-contact">
+        <article id="contactContainer" class="contact-options"></article>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <article id="accessibility">
+      <button id="accessibility-button" aria-expanded="false" aria-controls="accessibility-menu">
+        <i class="fa-solid fa-universal-access fa-3x" style="color: #fff"></i>
+      </button>
+      <div id="accessibility-menu">
+        <button id="increase-font">
+          <p style="color: #fff; font-size: 48px">A +</p>
+        </button>
+        <button id="decrease-font">
+          <p style="color: #fff; font-size: 48px">A -</p>
+        </button>
+        <button id="reset-font">
+          <i class="fa-solid fa-text-slash fa-3x" style="color: #fff"></i>
+        </button>
+      </div>
+    </article>
+  </footer>
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/translate.js"></script>
+</body>
+
 </html>
