@@ -26,8 +26,17 @@ function setCookie(name, value, days = 365) {
 // Função para carregar os arquivos de tradução
 async function loadTranslations() {
   try {
-    const enResponse = await fetch("assets/json/translate/en/translation.json");
-    const ptResponse = await fetch("assets/json/translate/pt/translation.json");
+    const [enResponse, ptResponse] = await Promise.all([
+      fetch("assets/json/translate/en/translation.json"),
+      fetch("assets/json/translate/pt/translation.json"),
+    ]);
+
+    if (!enResponse.ok) {
+      throw new Error(`Error fetching en translations: ${enResponse.status}`);
+    }
+    if (!ptResponse.ok) {
+      throw new Error(`Error fetching pt translations: ${ptResponse.status}`);
+    }
 
     translations.en = await enResponse.json();
     translations.pt = await ptResponse.json();
@@ -60,8 +69,10 @@ function t(key) {
 function applyTranslations(language) {
   currentLanguage = language;
 
-  // Salva a linguagem em cookie
+  // Atualiza atributo lang do HTML e salva a linguagem em cookie
+  document.documentElement.lang = language;
   setCookie("language", language);
+  updateLanguageSelector();
 
   // Helper: atualiza texto preservando spans (ex: bandeiras dentro de opções)
   function setTextPreserveSpans(element, text) {
@@ -179,8 +190,8 @@ function setCVLink(language) {
 // Função para mudar de idioma
 function language() {
   const languageMenu = document.getElementById("language-menu");
+  if (!languageMenu) return;
   const selectedLanguage = languageMenu.value;
-  const downloadCV = document.getElementById("linkDownloadCV");
 
   if (selectedLanguage === "pt-BR") {
     applyTranslations("pt");
@@ -205,4 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("dynamicContentReady", onceLoad, { once: true });
   // Fallback: se o evento não for disparado em 500ms, carrega mesmo assim
   setTimeout(onceLoad, 500);
+
+  const languageTranslator = document.querySelector("html");
+  languageTranslator.lang = currentLanguage;
 });
