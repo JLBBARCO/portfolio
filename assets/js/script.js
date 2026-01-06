@@ -22,13 +22,27 @@ function faClass(style, icon, size) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Verifica se o usuário prefere modo escuro
+  const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const faviconLink = document.getElementById("favicon");
+
+  if (faviconLink) {
+    faviconLink.href = isDarkMode
+      ? "assets/favicon/code-light.svg"
+      : "assets/favicon/code-dark.svg";
+  }
+
   // Recupera o tamanho da fonte do cookie, se existir
-  const fontSize = document.cookie
+  const savedFontSize = document.cookie
     .split("; ")
     .find((row) => row.startsWith("fontSize="))
     ?.split("=")[1];
-  if (fontSize) {
-    document.body.style.fontSize = fontSize;
+  if (savedFontSize) {
+    document.body.style.fontSize = savedFontSize;
+    const parsed = parseFloat(savedFontSize);
+    if (!isNaN(parsed)) {
+      fontSize = parsed; // atualiza a variável global para que increase/decrease usem o valor correto
+    }
   }
 
   // Garante que o menu esteja no estado correto ao carregar
@@ -190,13 +204,15 @@ function accessibilityToggle() {
 
 let fontSize = 1;
 function increaseFont() {
-  fontSize += 0.1;
+  // limita tamanho entre 0.6em e 3.0em para evitar valores extremos
+  fontSize = Math.min(3.0, Math.round((fontSize + 0.1) * 10) / 10);
   document.body.style.fontSize = fontSize + "em";
   document.cookie = "fontSize=" + document.body.style.fontSize + "; path=/";
 }
 
 function decreaseFont() {
-  fontSize -= 0.1;
+  // limita tamanho entre 0.6em e 3.0em
+  fontSize = Math.max(0.6, Math.round((fontSize - 0.1) * 10) / 10);
   document.body.style.fontSize = fontSize + "em";
   document.cookie = "fontSize=" + document.body.style.fontSize + "; path=/";
 }
