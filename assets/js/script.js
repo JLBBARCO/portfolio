@@ -378,34 +378,37 @@ function jsonCardFormationFetch(fileURL, containerId, iconSize = "3x") {
         const formationCard = document.createElement("div");
         formationCard.className = "formation-cards card";
         const classes = faClass(card.style, card.icon, iconSize);
+        const imageHTML = card.image
+          ? `<picture class="img-card">
+              <source
+                media="(max-width: 990px)"
+                srcset="${card.imageMobile}"
+                type="${card.imageType}"
+              />
+              <img
+                src="${card.image}"
+                alt="${card.descriptionImage}"
+              />
+            </picture>`
+          : "";
         formationCard.innerHTML = `
-        <picture class="img-card">
-          <source
-            media="(max-width: 990px)"
-            srcset="${card.imageMobile}"
-            type="${card.imageType}"
-          />
-          <img
-            src="${card.image}"
-            alt="${card.descriptionImage}"
-          />
-        </picture>
-        <h3 id="${card.titleID}"></h3>
-        <p id="${card.institutionID}"></p>
-        <p id="${card.descriptionID}"></p>
-        ${
-          card.dateText
-            ? `<p>${card.dateText}</p>`
-            : `<p id="${card.dateID}"></p>`
-        }
-        <div class="button button-link">
-          <a
-            href="${card.linkFormationURL}"
-            ${card.linkFormationTarget || ""}
-            id="${card.linkFormationTitleID}"
-          ></a>
-        </div>
-      `;
+          ${imageHTML}
+          <h3 id="${card.titleID}"></h3>
+          <p id="${card.institutionID}"></p>
+          <p id="${card.descriptionID}"></p>
+          ${
+            card.dateText
+              ? `<p>${card.dateText}</p>`
+              : `<p id="${card.dateID}"></p>`
+          }
+          <div class="button button-link">
+            <a
+              href="${card.linkFormationURL}"
+              ${card.linkFormationTarget || ""}
+              id="${card.linkFormationTitleID}"
+            ></a>
+          </div>
+        `;
         container.appendChild(formationCard);
       });
     })
