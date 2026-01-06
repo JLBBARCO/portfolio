@@ -7,10 +7,11 @@
   <title id="webTitle">JLBBARCO's Portfolio</title>
   <link rel="stylesheet" href="assets/css/style.css" media="screen" />
   <script src="https://kit.fontawesome.com/4a1e49a1ca.js" crossorigin="anonymous"></script>
-  <link rel="shortcut icon" type="image/x-icon" id="favicon">
+  <link rel="shortcut icon" href="assets/favicon/code-dark.svg" type="image/x-icon" id="favicon">
 </head>
 
 <body>
+  <a class="skip-link" href="#main" aria-label="Skip to main content">Skip to content</a>
   <header>
     <nav>
       <a href="#Home">
@@ -22,11 +23,11 @@
         <i id="menuIcon" class="fa-solid fa-bars" style="color: #fff"></i>
       </button>
       <div id="nav-links" class="nav-links">
-        <a href="#Projects" class="links" id="link1"></a>
-        <a href="#Technologies" class="links" id="link2"></a>
-        <a href="#AboutMe" class="links" id="link3"></a>
-        <a href="#More" class="links" id="link4"></a>
-        <a href="#Contact" class="links" id="link5"></a>
+        <a href="#Projects" class="links" id="link1" data-i18n="link1">Projects</a>
+        <a href="#Technologies" class="links" id="link2" data-i18n="link2">Technologies</a>
+        <a href="#AboutMe" class="links" id="link3" data-i18n="link3">About Me</a>
+        <a href="#More" class="links" id="link4" data-i18n="link4">More</a>
+        <a href="#Contact" class="links" id="link5" data-i18n="link5">Contact</a>
       </div>
     </menu>
     <select name="language" id="language-menu" onchange="language()" aria-label="Language menu">
@@ -34,15 +35,16 @@
       <option value="pt-BR">Pt - BR</option>
     </select>
   </header>
-  <main>
+  <main id="main">
     <section id="Home">
       <div>
-        <h1 id="welcome_title"></h1>
-        <p id="welcome_message"></p>
+        <h2 id="welcome_title" data-i18n="welcome_title">Welcome to My Portfolio</h2>
+        <p id="welcome_message" data-i18n="welcome_message">I'm a developer passionate about creating innovative web
+          solutions</p>
       </div>
     </section>
     <section id="Projects" class="portfolio">
-      <h2 id="projectsTitle"></h2>
+      <h2 id="projectsTitle" data-i18n="projectsTitle">Projects</h2>
       <article id="projectsContainer" class="container container-portfolio"></article>
     </section>
     <section id="Technologies">
@@ -61,7 +63,8 @@
     <section id="AboutMe">
       <h2 id="aboutMeTitle"></h2>
       <article class="container container-about-me">
-        <img src="https://avatars.githubusercontent.com/u/159829462?v=4" alt="Avatar of GitHub" class="person" />
+        <img src="https://avatars.githubusercontent.com/u/159829462?v=4" alt="Avatar of JLBBARCO" class="person"
+          loading="lazy" />
         <div class="text">
           <p id="aboutMeText"></p>
           <div class="cv">
@@ -93,14 +96,14 @@
       <button id="accessibility-button" aria-expanded="false" aria-controls="accessibility-menu">
         <i class="fa-solid fa-universal-access fa-3x" style="color: #fff"></i>
       </button>
-      <div id="accessibility-menu">
-        <button id="increase-font">
+      <div id="accessibility-menu" aria-hidden="true">
+        <button id="increase-font" aria-label="Aumentar fonte">
           <p style="color: #fff; font-size: 48px">A +</p>
         </button>
-        <button id="decrease-font">
+        <button id="decrease-font" aria-label="Diminuir fonte">
           <p style="color: #fff; font-size: 48px">A -</p>
         </button>
-        <button id="reset-font">
+        <button id="reset-font" aria-label="Redefinir fonte">
           <i class="fa-solid fa-text-slash fa-3x" style="color: #fff"></i>
         </button>
       </div>

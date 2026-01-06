@@ -9,10 +9,10 @@
       "titleID": "project1Title",
       "descriptionID": "project1Description",
       "titleTechnologiesID": "project1TechnologiesTitle",
-      "linkProjectRepositoryURL": "http://github.com/jlbbarco/colegio-adolpho/",
+      "linkProjectRepositoryURL": "https://github.com/jlbbarco/colegio-adolpho/",
       "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
       "linkProjectRepositoryID": "project1Link1",
-      "linkProjectDemoURL": "http://jlbbarco.github.io/colegio-adolpho/",
+      "linkProjectDemoURL": "https://jlbbarco.github.io/colegio-adolpho/",
       "linkProjectDemoTarget": "target='_blank' rel='noopener noreferrer'",
       "linkProjectDemoID": "project1Link2"
     },
@@ -25,7 +25,7 @@
       "titleID": "project2Title",
       "descriptionID": "project2Description",
       "titleTechnologiesID": "project2TechnologiesTitle",
-      "linkProjectRepositoryURL": "http://github.com/jlbbarco/passwords_manager/",
+      "linkProjectRepositoryURL": "https://github.com/jlbbarco/passwords_manager/",
       "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
       "linkProjectRepositoryID": "project2Link1"
     },
@@ -38,7 +38,7 @@
       "titleID": "project3Title",
       "descriptionID": "project3Description",
       "titleTechnologiesID": "project3TechnologiesTitle",
-      "linkProjectRepositoryURL": "http://github.com/jlbbarco/unit_converter/",
+      "linkProjectRepositoryURL": "https://github.com/jlbbarco/unit_converter/",
       "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
       "linkProjectRepositoryID": "project3Link1"
     }

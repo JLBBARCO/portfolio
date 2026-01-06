@@ -22,14 +22,31 @@ function faClass(style, icon, size) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Verifica se o usuário prefere modo escuro
-  const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  // Verifica se o usuário prefere modo escuro e escuta mudanças
   const faviconLink = document.getElementById("favicon");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 
-  if (faviconLink) {
-    faviconLink.href = isDarkMode
+  function updateFavicon(eventOrBool) {
+    const isDark =
+      typeof eventOrBool === "boolean"
+        ? eventOrBool
+        : eventOrBool?.matches ?? prefersDark.matches;
+    if (!faviconLink) return;
+    const newHref = isDark
       ? "assets/favicon/code-light.svg"
       : "assets/favicon/code-dark.svg";
+    // Adiciona cache-buster para forçar atualização do favicon
+    faviconLink.href = newHref + "?v=" + Date.now();
+  }
+
+  // Define favicon inicial
+  updateFavicon(prefersDark.matches);
+
+  // Ouve mudanças de preferência de cor (compatível com addEventListener/addListener)
+  if (typeof prefersDark.addEventListener === "function") {
+    prefersDark.addEventListener("change", updateFavicon);
+  } else if (typeof prefersDark.addListener === "function") {
+    prefersDark.addListener(updateFavicon);
   }
 
   // Recupera o tamanho da fonte do cookie, se existir
@@ -90,6 +107,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (accessibilityMenu && !isClickInsideMenu && !isClickOnButton) {
       accessibilityMenu.style.display = "none";
+      accessibilityMenu.setAttribute("aria-hidden", "true");
+      if (accessibilityButton)
+        accessibilityButton.setAttribute("aria-expanded", "false");
     }
   });
 
@@ -193,10 +213,14 @@ function accessibilityToggle() {
 
   if (accessibilityMenu.style.display === "flex") {
     accessibilityMenu.style.display = "none";
-    if (accessibilityButton)
+    accessibilityMenu.setAttribute("aria-hidden", "true");
+    if (accessibilityButton) {
       accessibilityButton.setAttribute("aria-expanded", "false");
+      accessibilityButton.focus();
+    }
   } else {
     accessibilityMenu.style.display = "flex";
+    accessibilityMenu.setAttribute("aria-hidden", "false");
     if (accessibilityButton)
       accessibilityButton.setAttribute("aria-expanded", "true");
   }
@@ -289,6 +313,7 @@ function jsonCardProjectsFetch(fileURL, containerId, iconSize = "3x") {
               <img
                 src="${card.image}"
                 alt="${card.descriptionImage}"
+                loading="lazy"
               />
             </picture>
           </article>
@@ -404,6 +429,7 @@ function jsonCardFormationFetch(fileURL, containerId, iconSize = "3x") {
               <img
                 src="${card.image}"
                 alt="${card.descriptionImage}"
+                loading="lazy"
               />
             </picture>`
           : "";

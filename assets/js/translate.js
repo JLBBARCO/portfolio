@@ -47,6 +47,16 @@ async function loadTranslations() {
       currentLanguage = savedLanguage;
     }
 
+    // Se não houver cookie, tenta usar a linguagem do navegador (pt/en)
+    if (!savedLanguage) {
+      const navLang = (
+        navigator.language ||
+        navigator.userLanguage ||
+        ""
+      ).toLowerCase();
+      currentLanguage = navLang.startsWith("pt") ? "pt" : "en";
+    }
+
     // Aplica a tradução padrão
     applyTranslations(currentLanguage);
 
@@ -69,8 +79,8 @@ function t(key) {
 function applyTranslations(language) {
   currentLanguage = language;
 
-  // Atualiza atributo lang do HTML e salva a linguagem em cookie
-  document.documentElement.lang = language;
+  // Atualiza atributo lang do HTML (usa códigos de localidade) e salva a linguagem em cookie
+  document.documentElement.lang = language === "pt" ? "pt-BR" : "en-US";
   setCookie("language", language);
   updateLanguageSelector();
 
@@ -134,6 +144,10 @@ function applyTranslations(language) {
         document.title = t(key);
       }
       setTextPreserveSpans(element, t(key));
+      // Para maior acessibilidade, garanta que anchors recebam aria-labels
+      if (element.tagName === "A") {
+        element.setAttribute("aria-label", t(key));
+      }
     }
   });
 }
