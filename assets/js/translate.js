@@ -41,6 +41,12 @@ async function loadTranslations() {
     translations.en = await enResponse.json();
     translations.pt = await ptResponse.json();
 
+    // Preserve templates so we can reformat {{date}} when language changes
+    window.__translationTemplates = {
+      en: translations.en?.lastUpdate || "Last Update: {{date}}",
+      pt: translations.pt?.lastUpdate || "Última atualização: {{date}}",
+    };
+
     // Verifica se há linguagem salva em cookie
     const savedLanguage = getCookie("language");
     if (savedLanguage && (savedLanguage === "pt" || savedLanguage === "en")) {
@@ -65,6 +71,15 @@ async function loadTranslations() {
 
     // Define o link do CV (se existir), caso contrário esconde o link
     setCVLink(currentLanguage);
+
+    // Se já tivermos uma data obtida (showLastUpdate pode rodar antes das traduções),
+    // aplica a data às traduções agora usando a data bruta (ISO)
+    if (window.__lastUpdateRawDate) {
+      window.setTranslationDate?.(window.__lastUpdateRawDate);
+    }
+
+    // Notifica que as traduções foram carregadas para outros scripts
+    window.dispatchEvent(new Event("translationsReady"));
   } catch (error) {
     console.error("Erro ao carregar traduções:", error);
   }
@@ -201,6 +216,78 @@ function setCVLink(language) {
     });
 }
 
+// Função para definir a data de última atualização nas traduções
+// Aceita uma data bruta (ISO string ou Date) e aplica formatação por idioma
+window.setTranslationDate = function (rawDate) {
+  if (!rawDate && window.__lastUpdateRawDate)
+    rawDate = window.__lastUpdateRawDate;
+  if (!rawDate) return;
+
+  const date = rawDate instanceof Date ? rawDate : new Date(rawDate);
+  if (isNaN(date)) return;
+
+  const formatted = {
+    en: date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+    pt: date.toLocaleDateString("pt-BR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+  };
+
+  // Use templates (preservadas em loadTranslations) para evitar perder {{date}}
+  const templateEn =
+    window.__translationTemplates?.en ||
+    translations.en?.lastUpdate ||
+    "Last Update: {{date}}";
+  const templatePt =
+    window.__translationTemplates?.pt ||
+    translations.pt?.lastUpdate ||
+    "Última atualização: {{date}}";
+
+  translations.en = translations.en || {};
+  translations.pt = translations.pt || {};
+  translations.en.lastUpdate = templateEn.replace(
+    /\{\{date\}\}/g,
+    formatted.en
+  );
+  translations.pt.lastUpdate = templatePt.replace(
+    /\{\{date\}\}/g,
+    formatted.pt
+  );
+
+  // Atualiza elemento #lastUpdate com a tradução no idioma atual
+  const el = document.getElementById("lastUpdate");
+  if (el) {
+    el.textContent = translations[currentLanguage]?.lastUpdate || "";
+  }
+
+  // Substitui {{date}} em nós de texto do DOM com a data formatada do idioma atual
+  const currentFormatted =
+    currentLanguage === "pt" ? formatted.pt : formatted.en;
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT,
+    null
+  );
+  const nodes = [];
+  while (walker.nextNode()) {
+    if (
+      walker.currentNode.nodeValue &&
+      walker.currentNode.nodeValue.includes("{{date}}")
+    ) {
+      nodes.push(walker.currentNode);
+    }
+  }
+  nodes.forEach((n) => {
+    n.nodeValue = n.nodeValue.replace(/\{\{date\}\}/g, currentFormatted);
+  });
+};
+
 // Função para mudar de idioma
 function language() {
   const languageMenu = document.getElementById("language-menu");
@@ -213,6 +300,11 @@ function language() {
   } else if (selectedLanguage === "en-US") {
     applyTranslations("en");
     setCVLink("en");
+  }
+
+  // Reaplica a data formatada ao trocar idioma (se já obtida)
+  if (window.__lastUpdateRawDate) {
+    window.setTranslationDate(window.__lastUpdateRawDate);
   }
 }
 

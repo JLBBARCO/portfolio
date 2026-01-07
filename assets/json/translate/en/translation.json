@@ -36,6 +36,8 @@
   "formation2Institution": "Curso em Vídeo",
   "formation2LinkTitle": "More Information",
   "moreTitle": "More About This Site",
+  "lastUpdate": "Last Update: {{date}}",
+  "skip_link": "Skip to content",
   "contactTitle": "Contact",
   "link1": "Projects",
   "link2": "Technologies",

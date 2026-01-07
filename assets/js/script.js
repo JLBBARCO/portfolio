@@ -154,6 +154,8 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn("One or more dynamic loads failed:", err);
       window.dispatchEvent(new Event("dynamicContentReady"));
     });
+
+  showLastUpdate("lastUpdate");
 });
 
 function calcularIdade() {
@@ -457,4 +459,95 @@ function jsonCardFormationFetch(fileURL, containerId, iconSize = "3x") {
     .catch((error) => {
       console.error("Failed to load formations:", error);
     });
+}
+
+async function showLastUpdate(elementId) {
+  // Obtém owner/repo a partir de data-attributes no <body>, com fallback
+  const owner = document.body.dataset.githubOwner || "JLBBARCO";
+  const repo = document.body.dataset.githubRepo || "portfolio";
+
+  const url = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`;
+
+  function replaceDateInDOM(dateStr) {
+    // Substitui ocorrências de {{date}} em nós de texto de forma segura
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+      null
+    );
+    const nodesToUpdate = [];
+    while (walker.nextNode()) {
+      if (
+        walker.currentNode.nodeValue &&
+        walker.currentNode.nodeValue.includes("{{date}}")
+      ) {
+        nodesToUpdate.push(walker.currentNode);
+      }
+    }
+    nodesToUpdate.forEach((textNode) => {
+      textNode.nodeValue = textNode.nodeValue.replace(/\{\{date\}\}/g, dateStr);
+    });
+
+    // Também atualiza explicitamente o elemento de última atualização, se existir
+    const lastEl = document.getElementById(elementId);
+    if (lastEl) {
+      // Use a tradução se disponível (translate.js expõe translations via t)
+      if (typeof window.t === "function") {
+        // Caso t tenha sido carregada, aplica a tradução atualizada
+        try {
+          // Garantir que, se o texto tiver {{date}}, ele seja substituído
+          const trans = window.t("lastUpdate");
+          lastEl.textContent = trans.includes("{{date}}")
+            ? trans.replace(/\{\{date\}\}/g, dateStr)
+            : trans;
+        } catch (e) {
+          lastEl.textContent = `Última atualização: ${dateStr}`;
+        }
+      } else {
+        lastEl.textContent = `Última atualização: ${dateStr}`;
+      }
+    }
+  }
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`GitHub API returned ${response.status}`);
+    const commits = await response.json();
+    if (!Array.isArray(commits) || commits.length === 0)
+      throw new Error("No commits found");
+
+    const commitDate = new Date(commits[0].commit.author.date);
+
+    // Formata a data usando a linguagem atual do documento (se disponível)
+    const locale = document.documentElement.lang || "pt-BR";
+    const formatted = commitDate.toLocaleDateString(locale, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    // Guarda a data bruta (ISO) para que possamos reformatá-la por idioma
+    window.__lastUpdateRawDate = commitDate.toISOString();
+
+    // Se a função setTranslationDate já existir, chame-a imediatamente com a data bruta
+    if (typeof window.setTranslationDate === "function") {
+      window.setTranslationDate(window.__lastUpdateRawDate);
+    }
+
+    // Reaplica a data quando o conteúdo dinâmico estiver pronto (formações, etc.)
+    window.addEventListener(
+      "dynamicContentReady",
+      () => {
+        if (
+          window.__lastUpdateRawDate &&
+          typeof window.setTranslationDate === "function"
+        ) {
+          window.setTranslationDate(window.__lastUpdateRawDate);
+        }
+      },
+      { once: true }
+    );
+  } catch (err) {
+    console.error("Erro ao buscar commits:", err);
+  }
 }
