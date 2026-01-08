@@ -8,7 +8,7 @@
       "titleID": "formation1Title",
       "institutionID": "formation1Institution",
       "descriptionID": "formation1Description",
-      "dateText": "{{date}}",
+      "dateText": "2023 - 2025",
       "linkFormationTitleID": "formation1LinkTitle",
       "linkFormationURL": "https://www.consultaescolas.pr.gov.br/consultaescolas/pages/templates/initial2.xhtml?windowId=b09&codigoEstab=19&codigoMunicipio=210",
       "linkFormationTarget": "target='_blank' rel='noopener noreferrer'"
@@ -17,7 +17,7 @@
       "titleID": "formation2Title",
       "institutionID": "formation2Institution",
       "descriptionID": "formation2Description",
-      "dateText": "2023 - {{date}}",
+      "dateText": "2023 - 2026",
       "linkFormationTitleID": "formation2LinkTitle",
       "linkFormationURL": "https://www.cursoemvideo.com/",
       "linkFormationTarget": "target='_blank' rel='noopener noreferrer'"

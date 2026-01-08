@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const pProjects = jsonCardProjectsFetch(
     "assets/json/cards/projects/projects.json",
     "projectsContainer",
-    "3x"
+    "2x"
   );
   const pSkills = jsonCardSkillsFetch(
     "assets/json/cards/skills/programmingLanguages.json",
@@ -294,7 +294,7 @@ function jsonCardProjectsFetch(fileURL, containerId, iconSize = "3x") {
         const projectCard = document.createElement("div");
         projectCard.className = "card card-projects";
 
-        // Obter tecnologias do projeto (project1, project2, project3)
+        // Obter tecnologias do projeto (project1, project4, project3)
         const projectKey = card.projectTitle;
         const projectTechs = data[projectKey] || [];
         const techsHTML = projectTechs
@@ -305,7 +305,7 @@ function jsonCardProjectsFetch(fileURL, containerId, iconSize = "3x") {
           .join(" ");
 
         projectCard.innerHTML = `
-          <article class="article-card">
+          <article class="article-card-image">
             <picture class="img-card">
               <source
                 media="(max-width: 990px)"
@@ -319,13 +319,13 @@ function jsonCardProjectsFetch(fileURL, containerId, iconSize = "3x") {
               />
             </picture>
           </article>
-          <article class="article-card">
+          <article class="article-card-description">
             <h3 id="${card.titleID}"></h3>
             <p id="${card.descriptionID}"></p>
             <h4 id="${card.titleTechnologiesID}"></h4>
             <div class="technologies-portfolio">${techsHTML}</div>
           </article>
-          <article class="article-card">
+          <article class="article-card-links">
             <div class="button button-link">
               <a
                 href="${card.linkProjectRepositoryURL}"
@@ -368,11 +368,23 @@ function jsonCardSkillsFetch(url, containerId, iconSize = "3x") {
       data.cards.forEach((card) => {
         const techCard = document.createElement("div");
         techCard.className = "tech-cards card";
-        const classes = faClass(card.style, card.icon, iconSize);
-        techCard.innerHTML = `
-          <i class="${classes} icon" title="${card.name}"></i>
-          <p>${card.name}</p>
-        `;
+        const classes = faClass(card.style, card.icon, iconSize) + " icon";
+
+        const i = document.createElement("i");
+        i.className = classes;
+        i.title = card.name;
+        if (card.svg) {
+          const svgImg = document.createElement("img");
+          svgImg.src = card.svg;
+          svgImg.alt = card.name;
+          i.appendChild(svgImg);
+        }
+        techCard.prepend(i);
+
+        const p = document.createElement("p");
+        p.textContent = card.name;
+        techCard.appendChild(p);
+
         container.appendChild(techCard);
       });
     })

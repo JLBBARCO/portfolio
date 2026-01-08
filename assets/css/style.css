@@ -281,6 +281,10 @@ section {
   margin: 10px;
 }
 
+.article-card-description {
+  padding: 0 15px;
+}
+
 .container-technologies {
   display: flex;
   flex-flow: column wrap;
@@ -354,7 +358,6 @@ section {
 }
 
 .button-link {
-  margin-top: 25px;
   display: flex;
   justify-content: center;
 }
@@ -430,16 +433,6 @@ section {
 .link-cards a:hover {
   color: var(--secondary-color);
   text-decoration: underline;
-}
-
-main .icon {
-  padding: 15px;
-  border-radius: 50%;
-}
-
-main .icon:hover {
-  border: 1px solid var(--accent);
-  box-shadow: 0 0 15px var(--accent);
 }
 
 #techsThisSite {
@@ -565,7 +558,7 @@ main .icon:hover {
   }
 
   .card-projects {
-    min-width: 500px;
+    min-width: 400px;
     max-width: 750px;
   }
 

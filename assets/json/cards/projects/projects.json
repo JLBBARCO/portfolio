@@ -12,22 +12,25 @@
       "linkProjectRepositoryURL": "https://github.com/jlbbarco/colegio-adolpho/",
       "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
       "linkProjectRepositoryID": "project1Link1",
-      "linkProjectDemoURL": "https://jlbbarco.github.io/colegio-adolpho/",
+      "linkProjectDemoURL": "https://colegio-adolpho.vercel.app/",
       "linkProjectDemoTarget": "target='_blank' rel='noopener noreferrer'",
       "linkProjectDemoID": "project1Link2"
     },
     {
       "projectTitle": "project2",
       "image": "assets/img/project2.png",
-      "descriptionImage": "Image of Passwords Manager System UI",
+      "descriptionImage": "Image of Image Conversor UI",
       "imageMobile": "assets/img/project2-mobile.png",
       "imageType": "image/png",
       "titleID": "project2Title",
       "descriptionID": "project2Description",
       "titleTechnologiesID": "project2TechnologiesTitle",
-      "linkProjectRepositoryURL": "https://github.com/jlbbarco/passwords_manager/",
+      "linkProjectRepositoryURL": "https://github.com/jlbbarco/image-conversor/",
       "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkProjectRepositoryID": "project2Link1"
+      "linkProjectRepositoryID": "project2Link1",
+      "linkProjectDemoURL": "https://image-converter-seven-chi.vercel.app/",
+      "linkProjectDemoTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkProjectDemoID": "project2Link2"
     },
     {
       "projectTitle": "project3",
@@ -48,6 +51,10 @@
     { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
     { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
   ],
-  "project2": [{ "icon": "fa-python", "name": "Python", "style": "fa-brands" }],
+  "project2": [
+    { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
+    { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
+    { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
+  ],
   "project3": [{ "icon": "fa-python", "name": "Python", "style": "fa-brands" }]
 }
