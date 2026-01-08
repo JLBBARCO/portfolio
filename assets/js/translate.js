@@ -179,15 +179,20 @@ function updateLanguageSelector() {
   }
 }
 
-// Calcula idade (mesma lógica usada em `script.js`)
+// Função importada de script.js para manter sincronismo
+// Veja script.js::calcularIdade() para a implementação principal
 function calcularIdade() {
-  const nascimento = new Date("2008-09-24");
+  // Data de nascimento: 24 de setembro de 2008
+  const nascimento = new Date(2008, 8, 24); // Mês é 0-indexado (8 = setembro)
   const hoje = new Date();
   let idade = hoje.getFullYear() - nascimento.getFullYear();
-  const m = hoje.getMonth() - nascimento.getMonth();
-  if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+  const mes = hoje.getMonth() - nascimento.getMonth();
+
+  // Ajusta se ainda não fez aniversário este ano
+  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
     idade--;
   }
+
   return idade;
 }
 

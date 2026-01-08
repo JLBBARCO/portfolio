@@ -228,6 +228,15 @@ main {
   margin: 50px;
 }
 
+main .icon {
+  transition: var(--transition);
+}
+
+main .icon:hover {
+  color: var(--hover-accent);
+  transform: scale(1.2);
+}
+
 section {
   display: grid;
   place-items: center;

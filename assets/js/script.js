@@ -2,7 +2,7 @@ const windowWidth = 990;
 
 // Helper para normalizar classes do Font Awesome
 function faClass(style, icon, size) {
-  let styleClass = style || "brands";
+  let styleClass = style || "solid";
   if (styleClass && !styleClass.startsWith("fa-")) {
     styleClass = `fa-${styleClass}`;
   }
@@ -145,6 +145,8 @@ document.addEventListener("DOMContentLoaded", () => {
     "3x"
   );
 
+  addNewIcons("assets/json/icons/svg.json", "3x");
+
   Promise.all([pProjects, pSkills, pPrograms, pIcons, pLinks, pFormations])
     .then(() => {
       // notify that dynamic content is ready for translation
@@ -159,13 +161,17 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function calcularIdade() {
-  const nascimento = new Date("2008-09-24"); // exemplo
+  // Data de nascimento: 24 de setembro de 2008
+  const nascimento = new Date(2008, 8, 24); // Mês é 0-indexado (8 = setembro)
   const hoje = new Date();
   let idade = hoje.getFullYear() - nascimento.getFullYear();
-  const m = hoje.getMonth() - nascimento.getMonth();
-  if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+  const mes = hoje.getMonth() - nascimento.getMonth();
+
+  // Ajusta se ainda não fez aniversário este ano
+  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
     idade--;
   }
+
   return idade;
 }
 
@@ -403,8 +409,12 @@ function jsonLinksFetch(fileUrl, containerID, iconSize = "2x") {
     })
     .then((data) => {
       const container = document.getElementById(containerID);
-      if (!container) return;
+      if (!container || !Array.isArray(data.cards)) return;
       data.cards.forEach((card) => {
+        if (!card.link || !card.name || !card.icon) {
+          console.warn("Invalid card data:", card);
+          return;
+        }
         const linkCard = document.createElement("div");
         linkCard.className = "link-cards card";
         const targetLink = card.target || "";
@@ -470,6 +480,56 @@ function jsonCardFormationFetch(fileURL, containerId, iconSize = "3x") {
     })
     .catch((error) => {
       console.error("Failed to load formations:", error);
+    });
+}
+
+function addNewIcons(linkFile, size = "3x") {
+  if (!linkFile) return;
+
+  // Extrai o número do tamanho (ex: "3x" -> 3)
+  let sizeNum = 3; // padrão
+  if (size && typeof size === "string") {
+    const match = size.match(/(\d+)/);
+    if (match) {
+      sizeNum = parseInt(match[1], 10);
+    }
+  }
+
+  fetch(linkFile)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Error fetching SVG icons: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (!Array.isArray(data.icons) || data.icons.length === 0) {
+        console.warn("No icons found in file:", linkFile);
+        return;
+      }
+
+      const icons = data.icons;
+      icons.forEach((icon) => {
+        if (!icon.class || !icon.svg) {
+          console.warn("Invalid icon data, missing class or svg:", icon);
+          return;
+        }
+
+        // Substitui o placeholder {{width}} no SVG pelo tamanho
+        const svgWithWidth = icon.svg.replace(
+          /\{\{width\}\}/g,
+          `width="${sizeNum * 16}px"`
+        );
+
+        // Encontra todos os elementos com a classe do ícone
+        const elements = document.querySelectorAll(`i.${icon.class}`);
+        Array.from(elements).forEach((element) => {
+          element.innerHTML = svgWithWidth;
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Error loading SVG icons:", error);
     });
 }
 

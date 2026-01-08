@@ -3,10 +3,9 @@
     { "icon": "fa-github", "name": "GitHub", "style": "fa-brands" },
     { "icon": "fa-git-alt", "name": "Git", "style": "fa-brands" },
     {
-      "icon": "fa-visual-studio-code",
+      "icon": "fa-vscode",
       "name": "VS Code",
-      "style": "fa-brands",
-      "svg": "assets/svg/vscode.svg"
+      "style": "fa-brands"
     },
     { "icon": "fa-linux", "name": "Linux", "style": "fa-brands" },
     { "icon": "fa-windows", "name": "Windows", "style": "fa-brands" }
