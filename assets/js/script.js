@@ -171,10 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
       locale
     );
 
-    addNewIcons("assets/json/icons/svg. json", "3x");
-
+    // Aguarda que os ícones padrão sejam carregados antes de aplicar SVGs personalizados
     Promise.all([pProjects, pSkills, pPrograms, pIcons, pLinks, pFormations])
       .then(() => {
+        addNewIcons("assets/json/icons/svg.json", "3x");
         window.dispatchEvent(new Event("dynamicContentReady"));
       })
       .catch((err) => {
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function calcularIdade() {
-  // Data de nascimento:  24 de setembro de 2008
+  // Data de nascimento:   24 de setembro de 2008
   const nascimento = new Date(2008, 8, 24); // Mês é 0-indexado (8 = setembro)
   const hoje = new Date();
   let idade = hoje.getFullYear() - nascimento.getFullYear();
@@ -497,12 +497,6 @@ function jsonCardFormationFetch(
         const formationCard = document.createElement("div");
         formationCard.className = "card card-formation";
 
-        // Não há ícone na formação, então removemos esta parte
-        // const classes = faClass(card.style, card.icon, iconSize);
-        // const i = document.createElement("i");
-        // i.className = classes;
-        // i.classList.add("icon");
-
         const title = document.createElement("h3");
         title.textContent = card.title[language] || card.title;
 
@@ -523,8 +517,6 @@ function jsonCardFormationFetch(
             ? card.dateText[language] || card.dateText
             : card.dateText;
 
-        // Apenas adicione o ícone se ele existir
-        // formationCard.appendChild(i);
         formationCard.appendChild(title);
         formationCard.appendChild(institution);
         formationCard.appendChild(type);
@@ -541,15 +533,6 @@ function jsonCardFormationFetch(
 function addNewIcons(linkFile, size = "3x") {
   if (!linkFile) return;
 
-  // Extrai o número do tamanho (ex: "3x" -> 3)
-  let sizeNum = 3; // padrão
-  if (size && typeof size === "string") {
-    const match = size.match(/(\d+)/);
-    if (match) {
-      sizeNum = parseInt(match[1], 10);
-    }
-  }
-
   fetch(linkFile)
     .then((response) => {
       if (!response.ok) {
@@ -558,6 +541,8 @@ function addNewIcons(linkFile, size = "3x") {
       return response.json();
     })
     .then((data) => {
+      console.log("SVG Icons loaded:", data);
+
       if (!Array.isArray(data.icons) || data.icons.length === 0) {
         console.warn("No icons found in file:", linkFile);
         return;
@@ -570,16 +555,55 @@ function addNewIcons(linkFile, size = "3x") {
           return;
         }
 
-        // Substitui o placeholder {{width}} no SVG pelo tamanho
-        const svgWithWidth = icon.svg.replace(
-          /\{\{width\}\}/g,
-          `width="${sizeNum * 16}px"`
-        );
+        // Limpa fills/strokes hardcoded
+        let svgMarkup = icon.svg
+          .replace(/fill='#[^']*'/g, "")
+          .replace(/fill="#[^"]*"/g, "")
+          .replace(/stroke='#[^']*'/g, "")
+          .replace(/stroke="#[^"]*"/g, "");
 
-        // Encontra todos os elementos com a classe do ícone
-        const elements = document.querySelectorAll(`i. ${icon.class}`);
+        // Adiciona classe svg-icon se não houver
+        if (!svgMarkup.includes('class="svg-icon"')) {
+          svgMarkup = svgMarkup.replace(/<svg/, '<svg class="svg-icon"');
+        }
+
+        // CORRETO: sem espaço após o ponto
+        const selector = `i.${icon.class}`;
+        const elements = document.querySelectorAll(selector);
+
+        console.log(`Searching for: ${selector}, found:  ${elements.length}`);
+
+        if (elements.length === 0) {
+          console.warn(`No elements found with selector: ${selector}`);
+          return;
+        }
+
         Array.from(elements).forEach((element) => {
-          element.innerHTML = svgWithWidth;
+          element.innerHTML = svgMarkup;
+
+          const svgElement = element.querySelector("svg");
+          if (!svgElement) return;
+
+          // Remove width e height fixos
+          svgElement.removeAttribute("width");
+          svgElement.removeAttribute("height");
+
+          // Garante viewBox
+          if (!svgElement.getAttribute("viewBox")) {
+            svgElement.setAttribute("viewBox", "0 0 24 24");
+          }
+
+          // Força paths a usar currentColor
+          svgElement
+            .querySelectorAll("path, circle, rect, line, polygon, ellipse")
+            .forEach((el) => {
+              if (el.getAttribute("fill") !== "none") {
+                el.setAttribute("fill", "currentColor");
+              }
+              if (el.getAttribute("stroke")) {
+                el.setAttribute("stroke", "currentColor");
+              }
+            });
         });
       });
     })
