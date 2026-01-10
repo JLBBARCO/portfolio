@@ -3,30 +3,26 @@
     {
       "icon": "fa-envelope",
       "style": "fa-regular",
-      "link": "mailto:jbruianibarco@gmail.com",
-      "name": "jbruianibarco@gmail.com",
-      "target": "target='_blank' rel='noopener noreferrer'"
+      "url": "mailto:jbruianibarco@gmail.com",
+      "name": "jbruianibarco@gmail.com"
     },
     {
       "icon": "fa-linkedin",
       "style": "fa-brands",
-      "link": "https://linkedin.com/in/joseluizbbarco",
-      "name": "LinkedIn.com/in/joseluizbbarco",
-      "target": "target='_blank' rel='noopener noreferrer'"
+      "url": "https://linkedin.com/in/joseluizbbarco",
+      "name": "LinkedIn.com/in/joseluizbbarco"
     },
     {
       "icon": "fa-instagram",
       "style": "fa-brands",
-      "link": "https://instagram.com/JoseLuizBBarco",
-      "name": "Instagram.com/JoseLuizBBarco",
-      "target": "target='_blank' rel='noopener noreferrer'"
+      "url": "https://instagram.com/JoseLuizBBarco",
+      "name": "Instagram.com/JoseLuizBBarco"
     },
     {
       "icon": "fa-github",
       "style": "fa-brands",
-      "link": "https://github.com/JLBBARCO",
-      "name": "GitHub.com/JLBBARCO",
-      "target": "target='_blank' rel='noopener noreferrer'"
+      "url": "https://github.com/JLBBARCO",
+      "name": "GitHub.com/JLBBARCO"
     }
   ]
 }

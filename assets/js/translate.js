@@ -92,11 +92,12 @@ function t(key) {
 
 // Função para aplicar traduções ao DOM
 function applyTranslations(language) {
-  currentLanguage = language;
+  // Normaliza o código da linguagem (ex: pt-BR -> pt)
+  currentLanguage = language.startsWith("pt") ? "pt" : "en";
 
   // Atualiza atributo lang do HTML (usa códigos de localidade) e salva a linguagem em cookie
-  document.documentElement.lang = language === "pt" ? "pt-BR" : "en-US";
-  setCookie("language", language);
+  document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en-US";
+  setCookie("language", currentLanguage);
   updateLanguageSelector();
 
   // Helper: atualiza texto preservando spans (ex: bandeiras dentro de opções)
@@ -151,20 +152,29 @@ function applyTranslations(language) {
   });
 
   // Atualiza elementos com ID de tradução (welcome_title, welcome_message, etc)
-  Object.keys(translations[currentLanguage]).forEach((key) => {
-    const element = document.getElementById(key);
-    if (element) {
-      // Se for o título da página, atualiza também document.title
-      if (key === "webTitle") {
-        document.title = t(key);
+  if (translations[currentLanguage]) {
+    Object.keys(translations[currentLanguage]).forEach((key) => {
+      const element = document.getElementById(key);
+      if (element) {
+        // Se for o título da página, atualiza também document.title
+        if (key === "webTitle") {
+          document.title = t(key);
+        }
+        setTextPreserveSpans(element, t(key));
+        // Para maior acessibilidade, garanta que anchors recebam aria-labels
+        if (element.tagName === "A") {
+          element.setAttribute("aria-label", t(key));
+        }
       }
-      setTextPreserveSpans(element, t(key));
-      // Para maior acessibilidade, garanta que anchors recebam aria-labels
-      if (element.tagName === "A") {
-        element.setAttribute("aria-label", t(key));
-      }
-    }
-  });
+    });
+  }
+
+  // Dispara evento para atualizar cards dinâmicos sem recarregar a página
+  window.dispatchEvent(
+    new CustomEvent("languageChanged", {
+      detail: { language: document.documentElement.lang },
+    })
+  );
 }
 
 // Função para atualizar o seletor de idioma
@@ -179,22 +189,7 @@ function updateLanguageSelector() {
   }
 }
 
-// Função importada de script.js para manter sincronismo
-// Veja script.js::calcularIdade() para a implementação principal
-function calcularIdade() {
-  // Data de nascimento: 24 de setembro de 2008
-  const nascimento = new Date(2008, 8, 24); // Mês é 0-indexado (8 = setembro)
-  const hoje = new Date();
-  let idade = hoje.getFullYear() - nascimento.getFullYear();
-  const mes = hoje.getMonth() - nascimento.getMonth();
-
-  // Ajusta se ainda não fez aniversário este ano
-  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
-    idade--;
-  }
-
-  return idade;
-}
+// A função calcularIdade() é definida no script.js e está disponível globalmente.
 
 // Verifica e define link para o CV (PDF). Se o arquivo não existir, oculta o link
 function setCVLink(language) {
@@ -293,19 +288,17 @@ window.setTranslationDate = function (rawDate) {
   });
 };
 
-// Função para mudar de idioma
-function language() {
+/**
+ * Função para mudar de idioma.
+ * Renomeada de 'language' para 'changeLanguage' para evitar conflitos com variáveis globais ou propriedades do DOM.
+ */
+function changeLanguage() {
   const languageMenu = document.getElementById("language-menu");
   if (!languageMenu) return;
   const selectedLanguage = languageMenu.value;
 
-  if (selectedLanguage === "pt-BR") {
-    applyTranslations("pt");
-    setCVLink("pt");
-  } else if (selectedLanguage === "en-US") {
-    applyTranslations("en");
-    setCVLink("en");
-  }
+  applyTranslations(selectedLanguage);
+  setCVLink(currentLanguage);
 
   // Reaplica a data formatada ao trocar idioma (se já obtida)
   if (window.__lastUpdateRawDate) {
@@ -327,7 +320,4 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("dynamicContentReady", onceLoad, { once: true });
   // Fallback: se o evento não for disparado em 500ms, carrega mesmo assim
   setTimeout(onceLoad, 500);
-
-  const languageTranslator = document.querySelector("html");
-  languageTranslator.lang = currentLanguage;
 });
