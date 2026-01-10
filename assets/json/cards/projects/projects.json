@@ -1,60 +1,85 @@
 {
   "cards": [
     {
-      "projectTitle": "project1",
+      "projectTitle": "Adolpho College",
       "image": "assets/img/project1.png",
-      "descriptionImage": "Image of Adolpho College Website UI",
+      "descriptionImage": {
+        "en-US": "Image of Adolpho College Website UI",
+        "pt-BR": "Imagem da UI do website do Colégio Adolpho"
+      },
       "imageMobile": "assets/img/project1-mobile.png",
       "imageType": "image/png",
-      "titleID": "project1Title",
-      "descriptionID": "project1Description",
-      "titleTechnologiesID": "project1TechnologiesTitle",
-      "linkProjectRepositoryURL": "https://github.com/jlbbarco/colegio-adolpho/",
-      "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkProjectRepositoryID": "project1Link1",
-      "linkProjectDemoURL": "https://colegio-adolpho.vercel.app/",
-      "linkProjectDemoTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkProjectDemoID": "project1Link2"
+      "title": {
+        "en-US": "Adolpho College",
+        "pt-BR": "Colégio Adolpho"
+      },
+      "description": {
+        "en-US": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news.",
+        "pt-BR": "Site do Colégio Estadual Adolpho de Oliveira Franco, com informações sobre a instituição, cursos e notícias."
+      },
+      "titleTechnologies": {
+        "en-US": "Technologies",
+        "pt-BR": "Tecnologias"
+      },
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
+      "linkRepository": "https://github.com/jlbbarco/colegio-adolpho/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkSite": "https://colegio-adolpho.vercel.app/",
+      "linkSiteTarget": "target='_blank' rel='noopener noreferrer'"
     },
     {
-      "projectTitle": "project2",
+      "projectTitle": "Image Converter",
       "image": "assets/img/project2.png",
-      "descriptionImage": "Image of Image Conversor UI",
+      "descriptionImage": {
+        "en-US": "Image of Image Converter UI",
+        "pt-BR": "Imagem da UI do Conversor de Imagens"
+      },
       "imageMobile": "assets/img/project2-mobile.png",
       "imageType": "image/png",
-      "titleID": "project2Title",
-      "descriptionID": "project2Description",
-      "titleTechnologiesID": "project2TechnologiesTitle",
-      "linkProjectRepositoryURL": "https://github.com/jlbbarco/image-conversor/",
-      "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkProjectRepositoryID": "project2Link1",
-      "linkProjectDemoURL": "https://image-converter-seven-chi.vercel.app/",
-      "linkProjectDemoTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkProjectDemoID": "project2Link2"
+      "title": { "en-US": "Image Converter", "pt-BR": "Conversor de imagens" },
+      "description": {
+        "en-US": "Website for converter images for PNG, JPEG and WEBP formats.",
+        "pt-BR": "Site para converter imagens para os formatos PNG, JPEG e WEBP."
+      },
+      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "linkRepository": "https://github.com/jlbbarco/image-conversor/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkSite": "https://image-converter-seven-chi.vercel.app/",
+      "linkSiteTarget": "target='_blank' rel='noopener noreferrer'"
     },
     {
-      "projectTitle": "project3",
+      "projectTitle": "Unit Converter",
       "image": "assets/img/project3.png",
-      "descriptionImage": "Image of Unit Converter UI",
+      "descriptionImage": {
+        "en-US": "Image of Unit Converter UI",
+        "pt-BR": "Imagem da UI do Conversor de Unidades"
+      },
       "imageMobile": "assets/img/project3-mobile.png",
       "imageType": "image/png",
-      "titleID": "project3Title",
-      "descriptionID": "project3Description",
-      "titleTechnologiesID": "project3TechnologiesTitle",
-      "linkProjectRepositoryURL": "https://github.com/jlbbarco/unit_converter/",
-      "linkProjectRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkProjectRepositoryID": "project3Link1"
+      "title": { "en-US": "Unit Converter", "pt-BR": "Conversor de unidades" },
+      "description": {
+        "en-US": "A tool to convert between different units of measurement",
+        "pt-BR": "Uma ferramenta para converter entre diferentes unidades de medida."
+      },
+      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "linkRepository": "https://github.com/jlbbarco/unit_converter/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
     }
   ],
-  "project1": [
+  "Adolpho College": [
     { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
     { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
     { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
   ],
-  "project2": [
+  "Image Converter": [
     { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
     { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
     { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
   ],
-  "project3": [{ "icon": "fa-python", "name": "Python", "style": "fa-brands" }]
+  "Unit Converter": [
+    { "icon": "fa-python", "name": "Python", "style": "fa-brands" }
+  ]
 }

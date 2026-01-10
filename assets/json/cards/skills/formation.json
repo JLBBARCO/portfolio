@@ -3,24 +3,49 @@
     {
       "image": "",
       "imageType": "",
-      "descriptionImage": "Certification of Conclusion of SAD Course",
+      "descriptionImage": {
+        "en-US": "Certification of Conclusion of SAD Course",
+        "pt-BR": "Certificado de Conclusão do Curso de SAD"
+      },
       "imageMobile": "",
-      "titleID": "formation1Title",
-      "institutionID": "formation1Institution",
-      "descriptionID": "formation1Description",
-      "dateText": "2023 - 2025",
-      "linkFormationTitleID": "formation1LinkTitle",
-      "linkFormationURL": "https://www.consultaescolas.pr.gov.br/consultaescolas/pages/templates/initial2.xhtml?windowId=b09&codigoEstab=19&codigoMunicipio=210",
-      "linkFormationTarget": "target='_blank' rel='noopener noreferrer'"
+      "title": {
+        "en-US": "System Analysis and Development (SAD)",
+        "pt-BR": "Análise e Desenvolvimento de Sistemas (ADS)"
+      },
+      "institution": {
+        "en-US": "Adolpho de Oliveira Franco State School",
+        "pt-BR": "Colégio Estadual Adolpho de Oliveira Franco"
+      },
+      "description": {
+        "en-US": "Course focused on software development, systems analysis, and project management.",
+        "pt-BR": "Curso focado no desenvolvimento de software, sistemas analíticos e gerenciamento de projetos."
+      },
+      "type": {
+        "id": "technicalCourse",
+        "en-US": "Technical Course",
+        "pt-BR": "Curso Técnico"
+      },
+      "dateText": "2023 - 2025"
     },
     {
-      "titleID": "formation2Title",
-      "institutionID": "formation2Institution",
-      "descriptionID": "formation2Description",
-      "dateText": "2023 - 2026",
-      "linkFormationTitleID": "formation2LinkTitle",
-      "linkFormationURL": "https://www.cursoemvideo.com/",
-      "linkFormationTarget": "target='_blank' rel='noopener noreferrer'"
+      "title": {
+        "en-US": "Web Development Course",
+        "pt-BR": "Curso de desenvolvimento web"
+      },
+      "institution": {
+        "en-US": "Course in Video",
+        "pt-BR": "Curso em Vídeo"
+      },
+      "description": {
+        "en-US": "Course covering front-end and back-end web development technologies and best practices.",
+        "pt-BR": "Curso que abrange tecnologias de desenvolvimento web (front-end e back-end) e melhores práticas."
+      },
+      "type": {
+        "id": "onlineCourse",
+        "en-US": "Online Course",
+        "pt-BR": "Curso Online"
+      },
+      "dateText": { "en-US": "2023 - Present", "pt-BR": "2023 - Presente" }
     }
   ]
 }

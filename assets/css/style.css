@@ -256,7 +256,7 @@ section {
 
 .card {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column wrap;
   justify-content: center;
   align-items: center;
   text-align: justify;
@@ -292,6 +292,15 @@ section {
 
 .article-card-description {
   padding: 0 15px;
+}
+
+.links-portfolio {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin: 15px;
 }
 
 .container-technologies {
@@ -400,7 +409,7 @@ section {
 
 .contact-options {
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   gap: 2rem;
   flex-wrap: wrap;
@@ -518,6 +527,10 @@ section {
   height: auto;
   border-radius: 8px 8px 0 0;
   margin-bottom: 15px;
+}
+
+.container-contact {
+  width: 100%;
 }
 
 @media (min-width: 990px) {

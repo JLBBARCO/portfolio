@@ -113,55 +113,89 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // start dynamic loads and wait for all to complete before firing translation
-  const pProjects = jsonCardProjectsFetch(
-    "assets/json/cards/projects/projects.json",
-    "projectsContainer",
-    "2x"
-  );
-  const pSkills = jsonCardSkillsFetch(
-    "assets/json/cards/skills/programmingLanguages.json",
-    "technologiesContainer",
-    "3x"
-  );
-  const pPrograms = jsonCardSkillsFetch(
-    "assets/json/cards/skills/programs.json",
-    "programsContainer",
-    "3x"
-  );
-  const pIcons = setIcons(
-    "assets/json/icons/techs_this_site/techs_this_site.json",
-    "techsThisSite",
-    "3x"
-  );
-  const pLinks = jsonLinksFetch(
-    "assets/json/cards/links/contact.json",
-    "contactContainer",
-    "2x"
-  );
-  const pFormations = jsonCardFormationFetch(
-    "assets/json/cards/skills/formation.json",
-    "formationsContainer",
-    "3x"
-  );
-
-  addNewIcons("assets/json/icons/svg.json", "3x");
-
-  Promise.all([pProjects, pSkills, pPrograms, pIcons, pLinks, pFormations])
-    .then(() => {
-      // notify that dynamic content is ready for translation
-      window.dispatchEvent(new Event("dynamicContentReady"));
-    })
-    .catch((err) => {
-      console.warn("One or more dynamic loads failed:", err);
-      window.dispatchEvent(new Event("dynamicContentReady"));
+  // Função para carregar todo o conteúdo dinâmico
+  function loadDynamicContent() {
+    // Limpa containers antes de recarregar (opcional, dependendo da implementação das funções de fetch)
+    const containers = [
+      "projectsContainer",
+      "technologiesContainer",
+      "programsContainer",
+      "techsThisSite",
+      "contactContainer",
+      "formationsContainer",
+    ];
+    containers.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = "";
     });
+
+    // Obtém o idioma atual
+    const savedLang = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("language="))
+      ?.split("=")[1];
+    const currentLang =
+      savedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
+    const locale = currentLang === "pt" ? "pt-BR" : "en-US";
+
+    const pProjects = jsonCardProjectsFetch(
+      "assets/json/cards/projects/projects.json",
+      "projectsContainer",
+      "2x",
+      locale
+    );
+    const pSkills = jsonCardSkillsFetch(
+      "assets/json/cards/skills/programmingLanguages.json",
+      "technologiesContainer",
+      "3x"
+    );
+    const pPrograms = jsonCardSkillsFetch(
+      "assets/json/cards/skills/programs.json",
+      "programsContainer",
+      "3x"
+    );
+    const pIcons = setIcons(
+      "assets/json/icons/techs-this-site.json",
+      "techsThisSite",
+      "3x"
+    );
+    const pLinks = jsonLinksFetch(
+      "/assets/json/cards/links/contact.json",
+      "contactContainer",
+      "2x"
+    );
+    const pFormations = jsonCardFormationFetch(
+      "assets/json/cards/skills/formation.json",
+      "formationsContainer",
+      "3x",
+      locale
+    );
+
+    addNewIcons("assets/json/icons/svg. json", "3x");
+
+    Promise.all([pProjects, pSkills, pPrograms, pIcons, pLinks, pFormations])
+      .then(() => {
+        window.dispatchEvent(new Event("dynamicContentReady"));
+      })
+      .catch((err) => {
+        console.warn("One or more dynamic loads failed:", err);
+        window.dispatchEvent(new Event("dynamicContentReady"));
+      });
+  }
+
+  // Carregamento inicial
+  loadDynamicContent();
+
+  // Ouve o evento de mudança de idioma para recarregar os cards sem reload da página
+  window.addEventListener("languageChanged", () => {
+    loadDynamicContent();
+  });
 
   showLastUpdate("lastUpdate");
 });
 
 function calcularIdade() {
-  // Data de nascimento: 24 de setembro de 2008
+  // Data de nascimento:  24 de setembro de 2008
   const nascimento = new Date(2008, 8, 24); // Mês é 0-indexado (8 = setembro)
   const hoje = new Date();
   let idade = hoje.getFullYear() - nascimento.getFullYear();
@@ -236,7 +270,7 @@ function accessibilityToggle() {
 
 let fontSize = 1;
 function increaseFont() {
-  // limita tamanho entre 0.6em e 3.0em para evitar valores extremos
+  // limita tamanho entre 0. 6em e 3. 0em para evitar valores extremos
   fontSize = Math.min(3.0, Math.round((fontSize + 0.1) * 10) / 10);
   document.body.style.fontSize = fontSize + "em";
   document.cookie = "fontSize=" + document.body.style.fontSize + "; path=/";
@@ -285,7 +319,12 @@ function setIcons(fileURL, containerID, iconSize = "3x") {
     });
 }
 
-function jsonCardProjectsFetch(fileURL, containerId, iconSize = "3x") {
+function jsonCardProjectsFetch(
+  fileURL,
+  containerId,
+  iconSize = "3x",
+  language = "pt-BR"
+) {
   return fetch(fileURL)
     .then((responsive) => {
       if (!responsive.ok) {
@@ -300,7 +339,7 @@ function jsonCardProjectsFetch(fileURL, containerId, iconSize = "3x") {
         const projectCard = document.createElement("div");
         projectCard.className = "card card-projects";
 
-        // Obter tecnologias do projeto (project1, project4, project3)
+        // Obter tecnologias dos projetos
         const projectKey = card.projectTitle;
         const projectTechs = data[projectKey] || [];
         const techsHTML = projectTechs
@@ -310,46 +349,64 @@ function jsonCardProjectsFetch(fileURL, containerId, iconSize = "3x") {
           })
           .join(" ");
 
-        projectCard.innerHTML = `
-          <article class="article-card-image">
-            <picture class="img-card">
-              <source
-                media="(max-width: 990px)"
-                srcset="${card.imageMobile}"
-                type="${card.imageType}"
-              />
-              <img
-                src="${card.image}"
-                alt="${card.descriptionImage}"
-                loading="lazy"
-              />
-            </picture>
-          </article>
-          <article class="article-card-description">
-            <h3 id="${card.titleID}"></h3>
-            <p id="${card.descriptionID}"></p>
-            <h4 id="${card.titleTechnologiesID}"></h4>
-            <div class="technologies-portfolio">${techsHTML}</div>
-          </article>
-          <article class="article-card-links">
-            <div class="button button-link">
-              <a
-                href="${card.linkProjectRepositoryURL}"
-                ${card.linkProjectRepositoryTarget || ""}
-                id="${card.linkProjectRepositoryID}"
-              ></a>
-              ${
-                card.linkProjectDemoURL
-                  ? `<a
-                href="${card.linkProjectDemoURL}"
-                ${card.linkProjectDemoTarget || ""}
-                id="${card.linkProjectDemoID}"
-              ></a>`
-                  : ""
-              }
-            </div>
-          </article>
-        `;
+        const articleCardImage = document.createElement("article");
+        articleCardImage.className = "article-card-image";
+        const picture = document.createElement("picture");
+        picture.className = "img-card";
+        const source = document.createElement("source");
+        source.media = "(max-width: 990px)";
+        source.srcset = card.imageMobile;
+        source.type = card.imageType;
+        const img = document.createElement("img");
+        img.src = card.image;
+        img.alt = card.descriptionImage[language];
+        img.loading = "lazy";
+        picture.appendChild(source);
+        picture.appendChild(img);
+        articleCardImage.appendChild(picture);
+
+        const articleCardDescription = document.createElement("article");
+        articleCardDescription.className = "article-card-description";
+        const h3 = document.createElement("h3");
+        h3.innerHTML = card.title[language];
+        const pDescription = document.createElement("p");
+        pDescription.innerHTML = card.description[language];
+        const h4Technologies = document.createElement("h4");
+        h4Technologies.innerHTML = card.titleTechnologies[language];
+        const divTechnologies = document.createElement("div");
+        divTechnologies.className = "technologies-portfolio";
+        divTechnologies.innerHTML = techsHTML;
+
+        const divLinks = document.createElement("div");
+        divLinks.className = "links-portfolio";
+        const h4Links = document.createElement("h4");
+        h4Links.innerHTML = card.titleLinks
+          ? card.titleLinks[language]
+          : "Links";
+        const aRepo = document.createElement("a");
+        aRepo.href = card.linkRepository;
+        aRepo.setAttribute("target", "_blank");
+        aRepo.setAttribute("rel", "noopener noreferrer");
+        aRepo.innerHTML = `<i class="fa-brands fa-github fa-${iconSize} icon"></i>`;
+        divLinks.appendChild(aRepo);
+        if (card.linkSite) {
+          const aDemo = document.createElement("a");
+          aDemo.href = card.linkSite;
+          aDemo.setAttribute("target", "_blank");
+          aDemo.setAttribute("rel", "noopener noreferrer");
+          aDemo.innerHTML = `<i class="fa-solid fa-share-from-square fa-${iconSize} icon"></i>`;
+          divLinks.appendChild(aDemo);
+        }
+
+        articleCardDescription.appendChild(h3);
+        articleCardDescription.appendChild(pDescription);
+        articleCardDescription.appendChild(h4Technologies);
+        articleCardDescription.appendChild(divTechnologies);
+        articleCardDescription.appendChild(h4Links);
+        articleCardDescription.appendChild(divLinks);
+
+        projectCard.appendChild(articleCardImage);
+        projectCard.appendChild(articleCardDescription);
         container.appendChild(projectCard);
       });
     })
@@ -358,69 +415,58 @@ function jsonCardProjectsFetch(fileURL, containerId, iconSize = "3x") {
     });
 }
 
-function jsonCardSkillsFetch(url, containerId, iconSize = "3x") {
-  return fetch(url)
-    .then((responsive) => {
-      if (!responsive.ok) {
-        throw new Error(
-          `Error fetching programming languages: ${responsive.status}`
-        );
+function jsonCardSkillsFetch(fileURL, containerId, iconSize = "3x") {
+  return fetch(fileURL)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Error fetching skills: ${response.status}`);
       }
-      return responsive.json();
+      return response.json();
     })
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container) return;
       data.cards.forEach((card) => {
-        const techCard = document.createElement("div");
-        techCard.className = "tech-cards card";
-        const classes = faClass(card.style, card.icon, iconSize) + " icon";
-
-        const i = document.createElement("i");
-        i.className = classes;
-        i.title = card.name;
-        if (card.svg) {
-          const svgImg = document.createElement("img");
-          svgImg.src = card.svg;
-          svgImg.alt = card.name;
-          i.appendChild(svgImg);
-        }
-        techCard.prepend(i);
-
-        const p = document.createElement("p");
-        p.textContent = card.name;
-        techCard.appendChild(p);
-
-        container.appendChild(techCard);
+        const skillCard = document.createElement("div");
+        skillCard.className = "card card-skills";
+        const classes = faClass(card.style, card.icon, iconSize);
+        skillCard.innerHTML = `
+          <i class="${classes} icon" title="${card.name}"></i>
+          <p>${card.name}</p>
+        `;
+        container.appendChild(skillCard);
       });
     })
     .catch((error) => {
-      console.error("Failed to load programming languages:", error);
+      console.error("Failed to load skills:", error);
     });
 }
 
-function jsonLinksFetch(fileUrl, containerID, iconSize = "2x") {
-  return fetch(fileUrl)
-    .then((responsive) => {
-      if (!responsive.ok) {
-        throw new Error(`Error fetching links: ${responsive.status}`);
+function jsonLinksFetch(fileURL, containerId, iconSize = "2x") {
+  return fetch(fileURL)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Error fetching links: ${response.status}`);
       }
-      return responsive.json();
+      return response.json();
     })
     .then((data) => {
-      const container = document.getElementById(containerID);
-      if (!container || !Array.isArray(data.cards)) return;
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      // Corrige:  contact.json usa "cards", não "links"
+      if (!data.cards || !Array.isArray(data.cards)) {
+        throw new Error("Invalid data structure:  expected data.cards array");
+      }
       data.cards.forEach((card) => {
-        if (!card.link || !card.name || !card.icon) {
-          console.warn("Invalid card data:", card);
-          return;
-        }
-        const linkCard = document.createElement("div");
-        linkCard.className = "link-cards card";
-        const targetLink = card.target || "";
-        const classes = faClass(card.style || "solid", card.icon, iconSize);
-        linkCard.innerHTML = `<i class="${classes} icon"></i><a href="${card.link}" ${targetLink}>${card.name}</a>`;
-        container.appendChild(linkCard);
+        const linkElement = document.createElement("a");
+        linkElement.href = card.link || card.url; // Aceita tanto 'link' quanto 'url'
+        linkElement.setAttribute("target", "_blank");
+        linkElement.setAttribute("rel", "noopener noreferrer");
+        const classes = faClass(card.style, card.icon, iconSize);
+        linkElement.innerHTML = `<i class="${classes} icon"></i>`;
+        linkElement.setAttribute("aria-label", card.name);
+        linkElement.setAttribute("title", card.name);
+        container.appendChild(linkElement);
       });
     })
     .catch((error) => {
@@ -428,53 +474,62 @@ function jsonLinksFetch(fileUrl, containerID, iconSize = "2x") {
     });
 }
 
-function jsonCardFormationFetch(fileURL, containerId, iconSize = "3x") {
+function jsonCardFormationFetch(
+  fileURL,
+  containerId,
+  iconSize = "3x",
+  language = "pt-BR"
+) {
   return fetch(fileURL)
-    .then((responsive) => {
-      if (!responsive.ok) {
-        throw new Error(`Error fetching formations: ${responsive.status}`);
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Error fetching formations: ${response.status}`);
       }
-      return responsive.json();
+      return response.json();
     })
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container) return;
+      if (!data.cards || !Array.isArray(data.cards)) {
+        throw new Error("Invalid data structure: expected data.cards array");
+      }
       data.cards.forEach((card) => {
         const formationCard = document.createElement("div");
-        formationCard.className = "formation-cards card";
-        const classes = faClass(card.style, card.icon, iconSize);
-        const imageHTML = card.image
-          ? `<picture class="img-card">
-              <source
-                media="(max-width: 990px)"
-                srcset="${card.imageMobile}"
-                type="${card.imageType}"
-              />
-              <img
-                src="${card.image}"
-                alt="${card.descriptionImage}"
-                loading="lazy"
-              />
-            </picture>`
-          : "";
-        formationCard.innerHTML = `
-          ${imageHTML}
-          <h3 id="${card.titleID}"></h3>
-          <p id="${card.institutionID}"></p>
-          <p id="${card.descriptionID}"></p>
-          ${
-            card.dateText
-              ? `<p>${card.dateText}</p>`
-              : `<p id="${card.dateID}"></p>`
-          }
-          <div class="button button-link">
-            <a
-              href="${card.linkFormationURL}"
-              ${card.linkFormationTarget || ""}
-              id="${card.linkFormationTitleID}"
-            ></a>
-          </div>
-        `;
+        formationCard.className = "card card-formation";
+
+        // Não há ícone na formação, então removemos esta parte
+        // const classes = faClass(card.style, card.icon, iconSize);
+        // const i = document.createElement("i");
+        // i.className = classes;
+        // i.classList.add("icon");
+
+        const title = document.createElement("h3");
+        title.textContent = card.title[language] || card.title;
+
+        const institution = document.createElement("p");
+        institution.textContent =
+          card.institution[language] || card.institution;
+
+        const description = document.createElement("p");
+        description.textContent =
+          card.description[language] || card.description;
+
+        const type = document.createElement("p");
+        type.textContent = card.type ? card.type[language] || card.type.id : "";
+
+        const year = document.createElement("p");
+        year.textContent =
+          typeof card.dateText === "object"
+            ? card.dateText[language] || card.dateText
+            : card.dateText;
+
+        // Apenas adicione o ícone se ele existir
+        // formationCard.appendChild(i);
+        formationCard.appendChild(title);
+        formationCard.appendChild(institution);
+        formationCard.appendChild(type);
+        formationCard.appendChild(description);
+        formationCard.appendChild(year);
         container.appendChild(formationCard);
       });
     })
@@ -522,7 +577,7 @@ function addNewIcons(linkFile, size = "3x") {
         );
 
         // Encontra todos os elementos com a classe do ícone
-        const elements = document.querySelectorAll(`i.${icon.class}`);
+        const elements = document.querySelectorAll(`i. ${icon.class}`);
         Array.from(elements).forEach((element) => {
           element.innerHTML = svgWithWidth;
         });
@@ -538,7 +593,7 @@ async function showLastUpdate(elementId) {
   const owner = document.body.dataset.githubOwner || "JLBBARCO";
   const repo = document.body.dataset.githubRepo || "portfolio";
 
-  const url = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`;
+  const url = `https://api.github.com/repos/${owner}/${repo}/commits? per_page=1`;
 
   function replaceDateInDOM(dateStr) {
     // Substitui ocorrências de {{date}} em nós de texto de forma segura
@@ -563,7 +618,7 @@ async function showLastUpdate(elementId) {
     // Também atualiza explicitamente o elemento de última atualização, se existir
     const lastEl = document.getElementById(elementId);
     if (lastEl) {
-      // Use a tradução se disponível (translate.js expõe translations via t)
+      // Use a tradução se disponível (translate. js expõe translations via t)
       if (typeof window.t === "function") {
         // Caso t tenha sido carregada, aplica a tradução atualizada
         try {
