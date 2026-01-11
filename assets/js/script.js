@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const locale = currentLang === "pt" ? "pt-BR" : "en-US";
 
     const pProjects = jsonCardProjectsFetch(
-      "assets/json/cards/projects/projects.json",
+      "assets/json/cards/projects.json",
       "projectsContainer",
       "2x",
       locale
@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "3x"
     );
     const pLinks = jsonLinksFetch(
-      "/assets/json/cards/links/contact.json",
+      "/assets/json/cards/contact.json",
       "contactContainer",
       "2x"
     );
@@ -171,10 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
       locale
     );
 
-    addNewIcons("assets/json/icons/svg. json", "3x");
-
+    // Aguarda que os ícones padrão sejam carregados antes de aplicar SVGs personalizados
     Promise.all([pProjects, pSkills, pPrograms, pIcons, pLinks, pFormations])
       .then(() => {
+        addNewIcons("assets/json/icons/svg.json", "3x");
         window.dispatchEvent(new Event("dynamicContentReady"));
       })
       .catch((err) => {
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function calcularIdade() {
-  // Data de nascimento:  24 de setembro de 2008
+  // Data de nascimento:    24 de setembro de 2008
   const nascimento = new Date(2008, 8, 24); // Mês é 0-indexado (8 = setembro)
   const hoje = new Date();
   let idade = hoje.getFullYear() - nascimento.getFullYear();
@@ -270,14 +270,14 @@ function accessibilityToggle() {
 
 let fontSize = 1;
 function increaseFont() {
-  // limita tamanho entre 0. 6em e 3. 0em para evitar valores extremos
+  // limita tamanho entre 0.  6em e 3.  0em para evitar valores extremos
   fontSize = Math.min(3.0, Math.round((fontSize + 0.1) * 10) / 10);
   document.body.style.fontSize = fontSize + "em";
   document.cookie = "fontSize=" + document.body.style.fontSize + "; path=/";
 }
 
 function decreaseFont() {
-  // limita tamanho entre 0.6em e 3.0em
+  // limita tamanho entre 0. 6em e 3.0em
   fontSize = Math.max(0.6, Math.round((fontSize - 0.1) * 10) / 10);
   document.body.style.fontSize = fontSize + "em";
   document.cookie = "fontSize=" + document.body.style.fontSize + "; path=/";
@@ -453,9 +453,9 @@ function jsonLinksFetch(fileURL, containerId, iconSize = "2x") {
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container) return;
-      // Corrige:  contact.json usa "cards", não "links"
+      // Corrige:   contact.json usa "cards", não "links"
       if (!data.cards || !Array.isArray(data.cards)) {
-        throw new Error("Invalid data structure:  expected data.cards array");
+        throw new Error("Invalid data structure:   expected data.cards array");
       }
       data.cards.forEach((card) => {
         const linkElement = document.createElement("a");
@@ -489,47 +489,96 @@ function jsonCardFormationFetch(
     })
     .then((data) => {
       const container = document.getElementById(containerId);
-      if (!container) return;
-      if (!data.cards || !Array.isArray(data.cards)) {
-        throw new Error("Invalid data structure: expected data.cards array");
+      if (!container) {
+        console.error(`Container with ID "${containerId}" not found`);
+        return;
       }
+      if (!data.cards || !Array.isArray(data.cards)) {
+        throw new Error("Invalid data structure:  expected data.cards array");
+      }
+
+      // Contabilizar tipos de cursos
+      const typeCount = {};
+      data.cards.forEach((card) => {
+        if (card.type && card.type.id) {
+          typeCount[card.type.id] = (typeCount[card.type.id] || 0) + 1;
+        }
+      });
+
+      // Criar container para filtros
+      const filterContainer = document.createElement("div");
+      filterContainer.className = "filter-container";
+
+      // Criar botão "Todos" se houver mais de um tipo
+      if (Object.keys(typeCount).length > 1) {
+        const buttonAll = document.createElement("button");
+        buttonAll.className = "filter-button active";
+        buttonAll.dataset.filter = "all";
+        buttonAll.textContent = language === "pt-BR" ? "Todos" : "All";
+        buttonAll.addEventListener("click", () =>
+          filterFormationsByType("all")
+        );
+        filterContainer.appendChild(buttonAll);
+
+        // Criar botões de filtro por tipo
+        Object.entries(typeCount).forEach(([typeId, count]) => {
+          const button = document.createElement("button");
+          button.className = "filter-button";
+          button.dataset.filter = typeId;
+          button.textContent = `${typeId} (${count})`;
+          button.addEventListener("click", () =>
+            filterFormationsByType(typeId)
+          );
+          filterContainer.appendChild(button);
+        });
+
+        container.appendChild(filterContainer);
+      }
+
+      // Criar cards de formação
       data.cards.forEach((card) => {
         const formationCard = document.createElement("div");
         formationCard.className = "card card-formation";
 
-        // Não há ícone na formação, então removemos esta parte
-        // const classes = faClass(card.style, card.icon, iconSize);
-        // const i = document.createElement("i");
-        // i.className = classes;
-        // i.classList.add("icon");
+        // Adicionar data-type para filtro
+        if (card.type && card.type.id) {
+          formationCard.dataset.type = card.type.id;
+        }
 
+        // Criar e adicionar título
         const title = document.createElement("h3");
         title.textContent = card.title[language] || card.title;
+        formationCard.appendChild(title);
 
+        // Criar e adicionar instituição
         const institution = document.createElement("p");
+        institution.className = "institution";
         institution.textContent =
           card.institution[language] || card.institution;
+        formationCard.appendChild(institution);
 
+        // Criar e adicionar tipo de curso
+        const type = document.createElement("p");
+        type.className = "formation-type";
+        type.textContent = card.type ? card.type[language] || card.type.id : "";
+        formationCard.appendChild(type);
+
+        // Criar e adicionar descrição
         const description = document.createElement("p");
+        description.className = "description";
         description.textContent =
           card.description[language] || card.description;
+        formationCard.appendChild(description);
 
-        const type = document.createElement("p");
-        type.textContent = card.type ? card.type[language] || card.type.id : "";
-
+        // Criar e adicionar período
         const year = document.createElement("p");
+        year.className = "period";
         year.textContent =
           typeof card.dateText === "object"
-            ? card.dateText[language] || card.dateText
+            ? card.dateText[language] || JSON.stringify(card.dateText)
             : card.dateText;
-
-        // Apenas adicione o ícone se ele existir
-        // formationCard.appendChild(i);
-        formationCard.appendChild(title);
-        formationCard.appendChild(institution);
-        formationCard.appendChild(type);
-        formationCard.appendChild(description);
         formationCard.appendChild(year);
+
         container.appendChild(formationCard);
       });
     })
@@ -538,17 +587,31 @@ function jsonCardFormationFetch(
     });
 }
 
+// Função para filtrar formações por tipo
+function filterFormationsByType(typeId) {
+  const cards = document.querySelectorAll(".card.card-formation"); // ✅ SEM ESPAÇO entre as classes
+
+  cards.forEach((card) => {
+    if (typeId === "all" || card.dataset.type === typeId) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  });
+
+  // Atualizar estado dos botões de filtro
+  const buttons = document.querySelectorAll(".filter-button");
+  buttons.forEach((btn) => {
+    if (btn.dataset.filter === typeId) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+}
+
 function addNewIcons(linkFile, size = "3x") {
   if (!linkFile) return;
-
-  // Extrai o número do tamanho (ex: "3x" -> 3)
-  let sizeNum = 3; // padrão
-  if (size && typeof size === "string") {
-    const match = size.match(/(\d+)/);
-    if (match) {
-      sizeNum = parseInt(match[1], 10);
-    }
-  }
 
   fetch(linkFile)
     .then((response) => {
@@ -570,16 +633,52 @@ function addNewIcons(linkFile, size = "3x") {
           return;
         }
 
-        // Substitui o placeholder {{width}} no SVG pelo tamanho
-        const svgWithWidth = icon.svg.replace(
-          /\{\{width\}\}/g,
-          `width="${sizeNum * 16}px"`
-        );
+        // Limpa fills/strokes hardcoded
+        let svgMarkup = icon.svg
+          .replace(/fill='#[^']*'/g, "")
+          .replace(/fill="#[^"]*"/g, "")
+          .replace(/stroke='#[^']*'/g, "")
+          .replace(/stroke="#[^"]*"/g, "");
 
-        // Encontra todos os elementos com a classe do ícone
-        const elements = document.querySelectorAll(`i. ${icon.class}`);
+        // Adiciona classe svg-icon se não houver
+        if (!svgMarkup.includes('class="svg-icon"')) {
+          svgMarkup = svgMarkup.replace(/<svg/, '<svg class="svg-icon"');
+        }
+
+        // Seletor correto SEM espaços
+        const selector = `i.${icon.class}`;
+        const elements = document.querySelectorAll(selector);
+
+        if (elements.length === 0) {
+          return;
+        }
+
         Array.from(elements).forEach((element) => {
-          element.innerHTML = svgWithWidth;
+          element.innerHTML = svgMarkup;
+
+          const svgElement = element.querySelector("svg");
+          if (!svgElement) return;
+
+          // Remove width e height fixos
+          svgElement.removeAttribute("width");
+          svgElement.removeAttribute("height");
+
+          // Garante viewBox
+          if (!svgElement.getAttribute("viewBox")) {
+            svgElement.setAttribute("viewBox", "0 0 24 24");
+          }
+
+          // Força paths a usar currentColor
+          svgElement
+            .querySelectorAll("path, circle, rect, line, polygon, ellipse")
+            .forEach((el) => {
+              if (el.getAttribute("fill") !== "none") {
+                el.setAttribute("fill", "currentColor");
+              }
+              if (el.getAttribute("stroke")) {
+                el.setAttribute("stroke", "currentColor");
+              }
+            });
         });
       });
     })
@@ -618,7 +717,7 @@ async function showLastUpdate(elementId) {
     // Também atualiza explicitamente o elemento de última atualização, se existir
     const lastEl = document.getElementById(elementId);
     if (lastEl) {
-      // Use a tradução se disponível (translate. js expõe translations via t)
+      // Use a tradução se disponível (translate.js expõe translations via t)
       if (typeof window.t === "function") {
         // Caso t tenha sido carregada, aplica a tradução atualizada
         try {
