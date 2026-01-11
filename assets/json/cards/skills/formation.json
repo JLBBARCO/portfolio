@@ -18,7 +18,7 @@
       },
       "description": {
         "en-US": "Course focused on software development, systems analysis, and project management.",
-        "pt-BR": "Curso focado no desenvolvimento de software, sistemas analíticos e gerenciamento de projetos."
+        "pt-BR": "Curso focado no desenvolvimento de software, análise de sistemas e gerenciamento de projetos."
       },
       "type": {
         "id": "technicalCourse",
@@ -30,7 +30,7 @@
     {
       "title": {
         "en-US": "Web Development Course",
-        "pt-BR": "Curso de desenvolvimento web"
+        "pt-BR": "Curso de Desenvolvimento Web"
       },
       "institution": {
         "en-US": "Course in Video",
@@ -45,7 +45,11 @@
         "en-US": "Online Course",
         "pt-BR": "Curso Online"
       },
-      "dateText": { "en-US": "2023 - Present", "pt-BR": "2023 - Presente" }
+      "dateText": {
+        "en-US": "2023 - Present",
+        "pt-BR": "2023 - Presente"
+      }
     }
-  ]
+  ],
+  "buttons": [{ "filterAll": { "en-US": "All", "pt-BR": "Todos" } }]
 }

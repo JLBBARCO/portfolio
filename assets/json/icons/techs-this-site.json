@@ -19,12 +19,6 @@
       "size": "fa-3x"
     },
     {
-      "name": "JSON",
-      "class": "fa-json",
-      "style": "fa-brands",
-      "size": "fa-3x"
-    },
-    {
       "name": "Font Awesome",
       "class": "fa-font-awesome",
       "style": "fa-brands",
