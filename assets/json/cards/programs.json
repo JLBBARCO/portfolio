@@ -1,5 +1,5 @@
 {
-  "cards": [
+  "cardsIcons": [
     { "icon": "fa-github", "name": "GitHub", "style": "fa-brands" },
     { "icon": "fa-git-alt", "name": "Git", "style": "fa-brands" },
     {

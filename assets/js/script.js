@@ -12,14 +12,13 @@ function faClass(style, icon, size) {
   }
   let sizeClass = size || "";
   if (sizeClass && !sizeClass.startsWith("fa-")) {
-    if (/^[0-9]+x$/.test(sizeClass)) {
-      sizeClass = `fa-${sizeClass}`;
-    } else if (sizeClass) {
-      sizeClass = `fa-${sizeClass}`;
-    }
+    sizeClass = `fa-${sizeClass}`;
   }
   return [styleClass, iconClass, sizeClass].filter(Boolean).join(" ");
 }
+
+// Variável global para controle de tamanho de fonte
+let fontSize = 1;
 
 document.addEventListener("DOMContentLoaded", () => {
   // Verifica se o usuário prefere modo escuro e escuta mudanças
@@ -30,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isDark =
       typeof eventOrBool === "boolean"
         ? eventOrBool
-        : eventOrBool?.matches ?? prefersDark.matches;
+        : (eventOrBool?.matches ?? prefersDark.matches);
     if (!faviconLink) return;
     const newHref = isDark
       ? "assets/favicon/code-light.svg"
@@ -58,7 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.fontSize = savedFontSize;
     const parsed = parseFloat(savedFontSize);
     if (!isNaN(parsed)) {
-      fontSize = parsed; // atualiza a variável global para que increase/decrease usem o valor correto
+      // Usa a variável global 'fontSize'
+      fontSize = parsed;
     }
   }
 
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Função para carregar todo o conteúdo dinâmico
   function loadDynamicContent() {
-    // Limpa containers antes de recarregar (opcional, dependendo da implementação das funções de fetch)
+    // Limpa containers antes de recarregar
     const containers = [
       "projectsContainer",
       "technologiesContainer",
@@ -138,37 +138,41 @@ document.addEventListener("DOMContentLoaded", () => {
       savedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
     const locale = currentLang === "pt" ? "pt-BR" : "en-US";
 
-    const pProjects = jsonCardProjectsFetch(
+    // Chamadas corrigidas para usar a função genérica jsonCardsFetch,
+    // que foi refatorada para lidar com os diferentes tipos de dados.
+    const pProjects = jsonCardsFetch(
       "assets/json/cards/projects.json",
       "projectsContainer",
       "2x",
-      locale
+      locale,
     );
-    const pSkills = jsonCardSkillsFetch(
-      "assets/json/cards/skills/programmingLanguages.json",
+    const pSkills = jsonCardsFetch(
+      "assets/json/cards/programmingLanguages.json",
       "technologiesContainer",
-      "3x"
+      "3x",
+      locale,
     );
-    const pPrograms = jsonCardSkillsFetch(
-      "assets/json/cards/skills/programs.json",
+    const pPrograms = jsonCardsFetch(
+      "assets/json/cards/programs.json",
       "programsContainer",
-      "3x"
+      "3x",
+      locale,
     );
     const pIcons = setIcons(
       "assets/json/icons/techs-this-site.json",
       "techsThisSite",
-      "3x"
+      "3x",
     );
     const pLinks = jsonLinksFetch(
-      "/assets/json/cards/contact.json",
+      "assets/json/cards/contact.json",
       "contactContainer",
-      "2x"
+      "2x",
     );
-    const pFormations = jsonCardFormationFetch(
-      "assets/json/cards/skills/formation.json",
+    const pFormations = jsonCardsFetch(
+      "assets/json/cards/formation.json",
       "formationsContainer",
       "3x",
-      locale
+      locale,
     );
 
     // Aguarda que os ícones padrão sejam carregados antes de aplicar SVGs personalizados
@@ -195,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function calcularIdade() {
-  // Data de nascimento:    24 de setembro de 2008
+  // Data de nascimento: 24 de setembro de 2008
   const nascimento = new Date(2008, 8, 24); // Mês é 0-indexado (8 = setembro)
   const hoje = new Date();
   let idade = hoje.getFullYear() - nascimento.getFullYear();
@@ -232,7 +236,6 @@ function toggleMenu() {
   if (navLinks.style.display === "grid") {
     navLinks.style.display = "none";
     if (menuIcon) {
-      // trocar ícone para menu (fa-bars)
       menuIcon.classList.remove("fa-xmark", "fa-close");
       menuIcon.classList.add("fa-bars");
     }
@@ -240,7 +243,6 @@ function toggleMenu() {
   } else {
     navLinks.style.display = "grid";
     if (menuIcon) {
-      // trocar ícone para fechar (fa-xmark)
       menuIcon.classList.remove("fa-bars");
       menuIcon.classList.add("fa-xmark");
     }
@@ -268,16 +270,13 @@ function accessibilityToggle() {
   }
 }
 
-let fontSize = 1;
 function increaseFont() {
-  // limita tamanho entre 0.  6em e 3.  0em para evitar valores extremos
   fontSize = Math.min(3.0, Math.round((fontSize + 0.1) * 10) / 10);
   document.body.style.fontSize = fontSize + "em";
   document.cookie = "fontSize=" + document.body.style.fontSize + "; path=/";
 }
 
 function decreaseFont() {
-  // limita tamanho entre 0. 6em e 3.0em
   fontSize = Math.max(0.6, Math.round((fontSize - 0.1) * 10) / 10);
   document.body.style.fontSize = fontSize + "em";
   document.cookie = "fontSize=" + document.body.style.fontSize + "; path=/";
@@ -306,7 +305,7 @@ function setIcons(fileURL, containerID, iconSize = "3x") {
         const classes = faClass(
           icon.style,
           icon.class || icon.name,
-          icon.size || iconSize
+          icon.size || iconSize,
         );
         iconElement.innerHTML = `<i class="${classes} icon" title="${
           icon.name || icon.class || ""
@@ -316,129 +315,6 @@ function setIcons(fileURL, containerID, iconSize = "3x") {
     })
     .catch((error) => {
       console.error("Failed to load icons:", error);
-    });
-}
-
-function jsonCardProjectsFetch(
-  fileURL,
-  containerId,
-  iconSize = "3x",
-  language = "pt-BR"
-) {
-  return fetch(fileURL)
-    .then((responsive) => {
-      if (!responsive.ok) {
-        throw new Error(`Error fetching projects: ${responsive.status}`);
-      }
-      return responsive.json();
-    })
-    .then((data) => {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      data.cards.forEach((card) => {
-        const projectCard = document.createElement("div");
-        projectCard.className = "card card-projects";
-
-        // Obter tecnologias dos projetos
-        const projectKey = card.projectTitle;
-        const projectTechs = data[projectKey] || [];
-        const techsHTML = projectTechs
-          .map((tech) => {
-            const classes = faClass(tech.style, tech.icon, iconSize);
-            return `<i class="${classes} icon" title="${tech.name}"></i>`;
-          })
-          .join(" ");
-
-        const articleCardImage = document.createElement("article");
-        articleCardImage.className = "article-card-image";
-        const picture = document.createElement("picture");
-        picture.className = "img-card";
-        const source = document.createElement("source");
-        source.media = "(max-width: 990px)";
-        source.srcset = card.imageMobile;
-        source.type = card.imageType;
-        const img = document.createElement("img");
-        img.src = card.image;
-        img.alt = card.descriptionImage[language];
-        img.loading = "lazy";
-        picture.appendChild(source);
-        picture.appendChild(img);
-        articleCardImage.appendChild(picture);
-
-        const articleCardDescription = document.createElement("article");
-        articleCardDescription.className = "article-card-description";
-        const h3 = document.createElement("h3");
-        h3.innerHTML = card.title[language];
-        const pDescription = document.createElement("p");
-        pDescription.innerHTML = card.description[language];
-        const h4Technologies = document.createElement("h4");
-        h4Technologies.innerHTML = card.titleTechnologies[language];
-        const divTechnologies = document.createElement("div");
-        divTechnologies.className = "technologies-portfolio";
-        divTechnologies.innerHTML = techsHTML;
-
-        const divLinks = document.createElement("div");
-        divLinks.className = "links-portfolio";
-        const h4Links = document.createElement("h4");
-        h4Links.innerHTML = card.titleLinks
-          ? card.titleLinks[language]
-          : "Links";
-        const aRepo = document.createElement("a");
-        aRepo.href = card.linkRepository;
-        aRepo.setAttribute("target", "_blank");
-        aRepo.setAttribute("rel", "noopener noreferrer");
-        aRepo.innerHTML = `<i class="fa-brands fa-github fa-${iconSize} icon"></i>`;
-        divLinks.appendChild(aRepo);
-        if (card.linkSite) {
-          const aDemo = document.createElement("a");
-          aDemo.href = card.linkSite;
-          aDemo.setAttribute("target", "_blank");
-          aDemo.setAttribute("rel", "noopener noreferrer");
-          aDemo.innerHTML = `<i class="fa-solid fa-share-from-square fa-${iconSize} icon"></i>`;
-          divLinks.appendChild(aDemo);
-        }
-
-        articleCardDescription.appendChild(h3);
-        articleCardDescription.appendChild(pDescription);
-        articleCardDescription.appendChild(h4Technologies);
-        articleCardDescription.appendChild(divTechnologies);
-        articleCardDescription.appendChild(h4Links);
-        articleCardDescription.appendChild(divLinks);
-
-        projectCard.appendChild(articleCardImage);
-        projectCard.appendChild(articleCardDescription);
-        container.appendChild(projectCard);
-      });
-    })
-    .catch((error) => {
-      console.error("Failed to load projects:", error);
-    });
-}
-
-function jsonCardSkillsFetch(fileURL, containerId, iconSize = "3x") {
-  return fetch(fileURL)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Error fetching skills: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      data.cards.forEach((card) => {
-        const skillCard = document.createElement("div");
-        skillCard.className = "card card-skills";
-        const classes = faClass(card.style, card.icon, iconSize);
-        skillCard.innerHTML = `
-          <i class="${classes} icon" title="${card.name}"></i>
-          <p>${card.name}</p>
-        `;
-        container.appendChild(skillCard);
-      });
-    })
-    .catch((error) => {
-      console.error("Failed to load skills:", error);
     });
 }
 
@@ -453,13 +329,12 @@ function jsonLinksFetch(fileURL, containerId, iconSize = "2x") {
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container) return;
-      // Corrige:   contact.json usa "cards", não "links"
       if (!data.cards || !Array.isArray(data.cards)) {
-        throw new Error("Invalid data structure:   expected data.cards array");
+        throw new Error("Invalid data structure: expected data.cards array");
       }
       data.cards.forEach((card) => {
         const linkElement = document.createElement("a");
-        linkElement.href = card.link || card.url; // Aceita tanto 'link' quanto 'url'
+        linkElement.href = card.link || card.url;
         linkElement.setAttribute("target", "_blank");
         linkElement.setAttribute("rel", "noopener noreferrer");
         const classes = faClass(card.style, card.icon, iconSize);
@@ -474,122 +349,281 @@ function jsonLinksFetch(fileURL, containerId, iconSize = "2x") {
     });
 }
 
-function jsonCardFormationFetch(
+/**
+ * Helper para obter texto localizado de um campo que pode ser string ou objeto por idioma.
+ * value: string | object
+ * language: "pt-BR" | "en-US" (ou similar)
+ */
+function getLocalized(value, language) {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "object") {
+    // tenta chave exata primeiro, depois pt-BR/en-US e por fim qualquer valor disponível
+    return (
+      value[language] ||
+      value["pt-BR"] ||
+      value["en-US"] ||
+      value.pt ||
+      value.en ||
+      Object.values(value)[0] ||
+      ""
+    );
+  }
+  return String(value);
+}
+
+function jsonCardsFetch(
   fileURL,
   containerId,
   iconSize = "3x",
-  language = "pt-BR"
+  language = "pt-BR",
 ) {
   return fetch(fileURL)
     .then((response) => {
       if (!response.ok) {
-        throw new Error(`Error fetching formations: ${response.status}`);
+        throw new Error(`Error fetching ${containerId}: ${response.status}`);
       }
       return response.json();
     })
     .then((data) => {
       const container = document.getElementById(containerId);
-      if (!container) {
-        console.error(`Container with ID "${containerId}" not found`);
-        return;
-      }
-      if (!data.cards || !Array.isArray(data.cards)) {
-        throw new Error("Invalid data structure:  expected data.cards array");
-      }
+      if (!container) return;
 
-      // Contabilizar tipos de cursos
-      const typeCount = {};
-      data.cards.forEach((card) => {
-        if (card.type && card.type.id) {
-          typeCount[card.type.id] = (typeCount[card.type.id] || 0) + 1;
+      // Se for a seção de formações, aplica a lógica de filtro
+      if (containerId === "formationsContainer") {
+        if (!data.cards || !Array.isArray(data.cards)) {
+          throw new Error("Invalid data structure: expected data.cards array");
         }
-      });
 
-      // Criar container para filtros
-      const filterContainer = document.createElement("div");
-      filterContainer.className = "filter-container";
-
-      // Criar botão "Todos" se houver mais de um tipo
-      if (Object.keys(typeCount).length > 1) {
-        const buttonAll = document.createElement("button");
-        buttonAll.className = "filter-button active";
-        buttonAll.dataset.filter = "all";
-        buttonAll.textContent = language === "pt-BR" ? "Todos" : "All";
-        buttonAll.addEventListener("click", () =>
-          filterFormationsByType("all")
-        );
-        filterContainer.appendChild(buttonAll);
-
-        // Criar botões de filtro por tipo
-        Object.entries(typeCount).forEach(([typeId, count]) => {
-          const button = document.createElement("button");
-          button.className = "filter-button";
-          button.dataset.filter = typeId;
-          button.textContent = `${typeId} (${count})`;
-          button.addEventListener("click", () =>
-            filterFormationsByType(typeId)
-          );
-          filterContainer.appendChild(button);
+        // Contabilizar tipos de cursos e armazenar o nome traduzido
+        const typeCount = {};
+        const typeNames = {};
+        data.cards.forEach((card) => {
+          if (card.type && card.type.id) {
+            const typeId = card.type.id;
+            typeCount[typeId] = (typeCount[typeId] || 0) + 1;
+            // Armazena o nome traduzido
+            typeNames[typeId] =
+              card.type[language] || card.type["pt-BR"] || typeId;
+          }
         });
 
-        container.appendChild(filterContainer);
-      }
+        // Criar container para filtros
+        const filterContainer = document.createElement("div");
+        filterContainer.className = "filter-container";
 
-      // Criar cards de formação
-      data.cards.forEach((card) => {
-        const formationCard = document.createElement("div");
-        formationCard.className = "card card-formation";
+        // Criar botão "Todos" se houver mais de um tipo
+        if (Object.keys(typeCount).length > 1) {
+          const buttonAll = document.createElement("button");
+          buttonAll.className = "filter-button active";
+          buttonAll.dataset.filter = "all";
+          buttonAll.textContent = language === "pt-BR" ? "Todos" : "All";
+          buttonAll.addEventListener("click", () =>
+            filterFormationsByType("all"),
+          );
+          container.appendChild(filterContainer); // Adiciona o container de filtro antes dos cards
+          filterContainer.appendChild(buttonAll);
 
-        // Adicionar data-type para filtro
-        if (card.type && card.type.id) {
-          formationCard.dataset.type = card.type.id;
+          // Criar botões de filtro por tipo
+          Object.entries(typeCount).forEach(([typeId, count]) => {
+            const button = document.createElement("button");
+            button.className = "filter-button";
+            button.dataset.filter = typeId;
+            // Usa o nome traduzido armazenado
+            button.textContent = `${typeNames[typeId]} (${count})`;
+            button.addEventListener("click", () =>
+              filterFormationsByType(typeId),
+            );
+            filterContainer.appendChild(button);
+          });
         }
 
-        // Criar e adicionar título
-        const title = document.createElement("h3");
-        title.textContent = card.title[language] || card.title;
-        formationCard.appendChild(title);
+        // Criação dos cards de formação
+        data.cards.forEach((card) => {
+          const formationCard = document.createElement("div");
+          formationCard.className = "card card-formation";
 
-        // Criar e adicionar instituição
-        const institution = document.createElement("p");
-        institution.className = "institution";
-        institution.textContent =
-          card.institution[language] || card.institution;
-        formationCard.appendChild(institution);
+          // Adicionar data-type para filtro
+          if (card.type && card.type.id) {
+            formationCard.dataset.type = card.type.id;
+          }
 
-        // Criar e adicionar tipo de curso
-        const type = document.createElement("p");
-        type.className = "formation-type";
-        type.textContent = card.type ? card.type[language] || card.type.id : "";
-        formationCard.appendChild(type);
+          // Criar e adicionar título
+          const title = document.createElement("h3");
+          title.textContent = getLocalized(card.title, language) || "";
+          formationCard.appendChild(title);
 
-        // Criar e adicionar descrição
-        const description = document.createElement("p");
-        description.className = "description";
-        description.textContent =
-          card.description[language] || card.description;
-        formationCard.appendChild(description);
+          // Criar e adicionar instituição
+          const institution = document.createElement("p");
+          institution.className = "institution";
+          institution.textContent =
+            getLocalized(card.institution, language) || "";
+          formationCard.appendChild(institution);
 
-        // Criar e adicionar período
-        const year = document.createElement("p");
-        year.className = "period";
-        year.textContent =
-          typeof card.dateText === "object"
-            ? card.dateText[language] || JSON.stringify(card.dateText)
-            : card.dateText;
-        formationCard.appendChild(year);
+          // Criar e adicionar tipo de curso
+          const type = document.createElement("p");
+          type.className = "formation-type";
+          // Usa o nome traduzido para exibição
+          type.textContent = card.type ? getLocalized(card.type, language) : "";
+          formationCard.appendChild(type);
 
-        container.appendChild(formationCard);
-      });
+          // Criar e adicionar descrição
+          const description = document.createElement("p");
+          description.className = "description";
+          description.textContent =
+            getLocalized(card.description, language) || "";
+          formationCard.appendChild(description);
+
+          // Criar e adicionar período
+          const year = document.createElement("p");
+          year.className = "period";
+          year.textContent =
+            typeof card.dateText === "object"
+              ? getLocalized(card.dateText, language)
+              : card.dateText || "";
+          formationCard.appendChild(year);
+
+          container.appendChild(formationCard);
+        });
+      }
+      // Se for a seção de projetos
+      else if (containerId === "projectsContainer") {
+        if (!data.cards || !Array.isArray(data.cards)) {
+          throw new Error("Invalid data structure: expected data.cards array");
+        }
+
+        data.cards.forEach((card) => {
+          const createdCard = document.createElement("div");
+          createdCard.className = "card card-projects";
+
+          // Criar imagem/responsive (se existir)
+          if (card.image) {
+            const picture = document.createElement("picture");
+            picture.className = "img-card";
+            if (card.imageMobile) {
+              const source = document.createElement("source");
+              source.media = "(max-width: 990px)";
+              source.srcset = card.imageMobile;
+              if (card.imageType) source.type = card.imageType;
+              picture.appendChild(source);
+            }
+            const img = document.createElement("img");
+            img.src = card.image;
+            img.alt = getLocalized(card.descriptionImage, language) || "";
+            img.loading = "lazy";
+            picture.appendChild(img);
+            createdCard.appendChild(picture);
+          }
+
+          if (card.title) {
+            const h3 = document.createElement("h3");
+            h3.innerHTML = getLocalized(card.title, language) || "";
+            createdCard.appendChild(h3);
+          }
+
+          if (card.institution) {
+            const institution = document.createElement("p");
+            institution.className = "institution";
+            institution.textContent =
+              getLocalized(card.institution, language) || "";
+            createdCard.appendChild(institution);
+          }
+
+          if (card.description) {
+            const pDescription = document.createElement("p");
+            pDescription.innerHTML =
+              getLocalized(card.description, language) || "";
+            createdCard.appendChild(pDescription);
+          }
+
+          if (card.titleTechnologies) {
+            const h4Technologies = document.createElement("h4");
+            h4Technologies.innerHTML =
+              getLocalized(card.titleTechnologies, language) || "";
+            createdCard.appendChild(h4Technologies);
+          }
+
+          if (card.iconTechnologies && Array.isArray(card.iconTechnologies)) {
+            const divTechnologies = document.createElement("div");
+            divTechnologies.className = "technologies-portfolio";
+
+            // Usa cada ícone definido no card.iconTechnologies
+            card.iconTechnologies.forEach((tech) => {
+              const classes = faClass(tech.style, tech.icon, iconSize);
+              const iconEl = document.createElement("i");
+              iconEl.className = `${classes} icon`;
+              iconEl.title = tech.name || "";
+              divTechnologies.appendChild(iconEl);
+            });
+
+            createdCard.appendChild(divTechnologies);
+          }
+
+          if (card.titleLinks) {
+            const h4Links = document.createElement("h4");
+            h4Links.innerHTML =
+              getLocalized(card.titleLinks, language) || "Links";
+            createdCard.appendChild(h4Links);
+          }
+
+          const divLinks = document.createElement("div");
+          divLinks.className = "links-portfolio";
+
+          if (card.linkRepository) {
+            const aRepo = document.createElement("a");
+            aRepo.href = card.linkRepository;
+            aRepo.setAttribute("target", "_blank");
+            aRepo.setAttribute("rel", "noopener noreferrer");
+            aRepo.innerHTML = `<i class="fa-brands fa-github fa-${iconSize} icon"></i>`;
+            divLinks.appendChild(aRepo);
+          }
+
+          if (card.linkSite) {
+            const aDemo = document.createElement("a");
+            aDemo.href = card.linkSite;
+            aDemo.setAttribute("target", "_blank");
+            aDemo.setAttribute("rel", "noopener noreferrer");
+            aDemo.innerHTML = `<i class="fa-solid fa-share-from-square fa-${iconSize} icon"></i>`;
+            divLinks.appendChild(aDemo);
+          }
+          createdCard.appendChild(divLinks);
+          container.appendChild(createdCard);
+        });
+      }
+      // Se for a seção de skills/programs (cards simples de ícones)
+      else if (
+        containerId === "technologiesContainer" ||
+        containerId === "programsContainer"
+      ) {
+        const cardsToProcess = data.cards || data.cardsIcons;
+
+        if (!cardsToProcess || !Array.isArray(cardsToProcess)) {
+          throw new Error(
+            "Invalid data structure: expected data.cards or data.cardsIcons array",
+          );
+        }
+
+        cardsToProcess.forEach((card) => {
+          if (card.icon) {
+            const skillCard = document.createElement("div");
+            skillCard.className = "card card-skills";
+            const classes = faClass(card.style, card.icon, iconSize);
+            skillCard.innerHTML = `
+              <i class="${classes} icon" title="${card.name}"></i>
+              <p>${card.name}</p>
+            `;
+            container.appendChild(skillCard);
+          }
+        });
+      }
     })
     .catch((error) => {
-      console.error("Failed to load formations:", error);
+      console.error(`Failed to load ${containerId}:`, error);
     });
 }
 
-// Função para filtrar formações por tipo
 function filterFormationsByType(typeId) {
-  const cards = document.querySelectorAll(".card.card-formation"); // ✅ SEM ESPAÇO entre as classes
+  const cards = document.querySelectorAll(".card.card-formation");
 
   cards.forEach((card) => {
     if (typeId === "all" || card.dataset.type === typeId) {
@@ -599,7 +633,6 @@ function filterFormationsByType(typeId) {
     }
   });
 
-  // Atualizar estado dos botões de filtro
   const buttons = document.querySelectorAll(".filter-button");
   buttons.forEach((btn) => {
     if (btn.dataset.filter === typeId) {
@@ -633,19 +666,16 @@ function addNewIcons(linkFile, size = "3x") {
           return;
         }
 
-        // Limpa fills/strokes hardcoded
         let svgMarkup = icon.svg
           .replace(/fill='#[^']*'/g, "")
           .replace(/fill="#[^"]*"/g, "")
           .replace(/stroke='#[^']*'/g, "")
           .replace(/stroke="#[^"]*"/g, "");
 
-        // Adiciona classe svg-icon se não houver
         if (!svgMarkup.includes('class="svg-icon"')) {
           svgMarkup = svgMarkup.replace(/<svg/, '<svg class="svg-icon"');
         }
 
-        // Seletor correto SEM espaços
         const selector = `i.${icon.class}`;
         const elements = document.querySelectorAll(selector);
 
@@ -659,16 +689,13 @@ function addNewIcons(linkFile, size = "3x") {
           const svgElement = element.querySelector("svg");
           if (!svgElement) return;
 
-          // Remove width e height fixos
           svgElement.removeAttribute("width");
           svgElement.removeAttribute("height");
 
-          // Garante viewBox
           if (!svgElement.getAttribute("viewBox")) {
             svgElement.setAttribute("viewBox", "0 0 24 24");
           }
 
-          // Força paths a usar currentColor
           svgElement
             .querySelectorAll("path, circle, rect, line, polygon, ellipse")
             .forEach((el) => {
@@ -688,18 +715,16 @@ function addNewIcons(linkFile, size = "3x") {
 }
 
 async function showLastUpdate(elementId) {
-  // Obtém owner/repo a partir de data-attributes no <body>, com fallback
   const owner = document.body.dataset.githubOwner || "JLBBARCO";
   const repo = document.body.dataset.githubRepo || "portfolio";
 
-  const url = `https://api.github.com/repos/${owner}/${repo}/commits? per_page=1`;
+  const url = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`;
 
   function replaceDateInDOM(dateStr) {
-    // Substitui ocorrências de {{date}} em nós de texto de forma segura
     const walker = document.createTreeWalker(
       document.body,
       NodeFilter.SHOW_TEXT,
-      null
+      null,
     );
     const nodesToUpdate = [];
     while (walker.nextNode()) {
@@ -714,14 +739,10 @@ async function showLastUpdate(elementId) {
       textNode.nodeValue = textNode.nodeValue.replace(/\{\{date\}\}/g, dateStr);
     });
 
-    // Também atualiza explicitamente o elemento de última atualização, se existir
     const lastEl = document.getElementById(elementId);
     if (lastEl) {
-      // Use a tradução se disponível (translate.js expõe translations via t)
       if (typeof window.t === "function") {
-        // Caso t tenha sido carregada, aplica a tradução atualizada
         try {
-          // Garantir que, se o texto tiver {{date}}, ele seja substituído
           const trans = window.t("lastUpdate");
           lastEl.textContent = trans.includes("{{date}}")
             ? trans.replace(/\{\{date\}\}/g, dateStr)
@@ -744,7 +765,6 @@ async function showLastUpdate(elementId) {
 
     const commitDate = new Date(commits[0].commit.author.date);
 
-    // Formata a data usando a linguagem atual do documento (se disponível)
     const locale = document.documentElement.lang || "pt-BR";
     const formatted = commitDate.toLocaleDateString(locale, {
       year: "numeric",
@@ -752,15 +772,12 @@ async function showLastUpdate(elementId) {
       day: "numeric",
     });
 
-    // Guarda a data bruta (ISO) para que possamos reformatá-la por idioma
     window.__lastUpdateRawDate = commitDate.toISOString();
 
-    // Se a função setTranslationDate já existir, chame-a imediatamente com a data bruta
     if (typeof window.setTranslationDate === "function") {
       window.setTranslationDate(window.__lastUpdateRawDate);
     }
 
-    // Reaplica a data quando o conteúdo dinâmico estiver pronto (formações, etc.)
     window.addEventListener(
       "dynamicContentReady",
       () => {
@@ -771,8 +788,10 @@ async function showLastUpdate(elementId) {
           window.setTranslationDate(window.__lastUpdateRawDate);
         }
       },
-      { once: true }
+      { once: true },
     );
+
+    replaceDateInDOM(formatted);
   } catch (err) {
     console.error("Erro ao buscar commits:", err);
   }
