@@ -18,7 +18,10 @@
         "en-US": "Technical Course",
         "pt-BR": "Curso Técnico"
       },
-      "dateText": "2023 - 2025"
+      "dateText": {
+        "en-US": "2023 - 2025",
+        "pt-BR": "2023 - 2025"
+      }
     },
     {
       "title": {

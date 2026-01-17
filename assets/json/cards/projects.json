@@ -14,8 +14,8 @@
         "pt-BR": "Colégio Adolpho"
       },
       "description": {
-        "en-US": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news.",
-        "pt-BR": "Site do Colégio Estadual Adolpho de Oliveira Franco, com informações sobre a instituição, cursos e notícias."
+        "en-US": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news",
+        "pt-BR": "Site do Colégio Estadual Adolpho de Oliveira Franco, com informações sobre a instituição, cursos e notícias"
       },
       "titleTechnologies": {
         "en-US": "Technologies",
@@ -46,8 +46,8 @@
       "imageType": "image/png",
       "title": { "en-US": "Image Converter", "pt-BR": "Conversor de imagens" },
       "description": {
-        "en-US": "Website for converter images for PNG, JPEG and WEBP formats.",
-        "pt-BR": "Site para converter imagens para os formatos PNG, JPEG e WEBP."
+        "en-US": "Website for converter images for PNG, JPEG and WEBP formats",
+        "pt-BR": "Site para converter imagens para os formatos PNG, JPEG e WEBP"
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [
@@ -101,7 +101,7 @@
       "title": { "en-US": "Greentech", "pt-BR": "Tecnoverde" },
       "description": {
         "en-US": "A website for teach the cultive of Parsley",
-        "pt-BR": "Um website para ensinar o cultivo de Salsa."
+        "pt-BR": "Um website para ensinar o cultivo de Salsa"
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [
@@ -132,8 +132,8 @@
         "pt-BR": "Gerenciador de Senhas"
       },
       "description": {
-        "en-US": "A system to save your simple passwords. Don't save your important passwords because this program haven't cryptograph system.",
-        "pt-BR": "Um sistema que salva suas senhas simples. Não salve suas importantes senhas, porque este programa não possui um sistema de criptografia."
+        "en-US": "A system to save your simple passwords. Don't save your important passwords because this program haven't cryptograph system",
+        "pt-BR": "Um sistema que salva suas senhas simples. Não salve suas importantes senhas, porque este programa não possui um sistema de criptografia"
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [
@@ -143,7 +143,28 @@
         "en-US": "Links",
         "pt-BR": "Links"
       },
-      "linkRepository": "https://github.com/jlbbarco/unit_converter/",
+      "linkRepository": "https://github.com/jlbbarco/passwords-manager/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
+      "projectTitle": "Total Score",
+      "title": {
+        "en-US": "Total Score",
+        "pt-BR": "Pontuação Total"
+      },
+      "description": {
+        "en-US": "Repository of summation tests to discover your test score based on your answers and the answer key. The files to accept only extensions .csv and .tsv",
+        "pt-BR": "Repositório de testes de soma para descobrir sua pontuação com base nas respostas e na chave de respostas. Os arquivos aceitam apenas extensões .csv e .tsv"
+      },
+      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "iconTechnologies": [
+        { "icon": "fa-python", "name": "Python", "style": "fa-brands" }
+      ],
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
+      "linkRepository": "https://github.com/jlbbarco/unit-converter/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
     }
   ]
