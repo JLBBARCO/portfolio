@@ -2,12 +2,12 @@
   "cards": [
     {
       "projectTitle": "Adolpho College",
-      "image": "assets/img/project1.png",
+      "image": "assets/img/adolpho-college.png",
       "descriptionImage": {
         "en-US": "Image of Adolpho College Website UI",
         "pt-BR": "Imagem da UI do website do Colégio Adolpho"
       },
-      "imageMobile": "assets/img/project1-mobile.png",
+      "imageMobile": "assets/img/adolpho-college-mobile.png",
       "imageType": "image/png",
       "title": {
         "en-US": "Adolpho College",
@@ -21,6 +21,11 @@
         "en-US": "Technologies",
         "pt-BR": "Tecnologias"
       },
+      "iconTechnologies": [
+        { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
+        { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
+        { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
+      ],
       "titleLinks": {
         "en-US": "Links",
         "pt-BR": "Links"
@@ -32,12 +37,12 @@
     },
     {
       "projectTitle": "Image Converter",
-      "image": "assets/img/project2.png",
+      "image": "assets/img/image-converter.png",
       "descriptionImage": {
         "en-US": "Image of Image Converter UI",
         "pt-BR": "Imagem da UI do Conversor de Imagens"
       },
-      "imageMobile": "assets/img/project2-mobile.png",
+      "imageMobile": "assets/img/image-converter-mobile.png",
       "imageType": "image/png",
       "title": { "en-US": "Image Converter", "pt-BR": "Conversor de imagens" },
       "description": {
@@ -45,6 +50,15 @@
         "pt-BR": "Site para converter imagens para os formatos PNG, JPEG e WEBP."
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "iconTechnologies": [
+        { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
+        { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
+        { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
+      ],
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
       "linkRepository": "https://github.com/jlbbarco/image-conversor/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
       "linkSite": "https://image-converter-seven-chi.vercel.app/",
@@ -52,12 +66,12 @@
     },
     {
       "projectTitle": "Unit Converter",
-      "image": "assets/img/project3.png",
+      "image": "assets/img/unit-converter.png",
       "descriptionImage": {
         "en-US": "Image of Unit Converter UI",
         "pt-BR": "Imagem da UI do Conversor de Unidades"
       },
-      "imageMobile": "assets/img/project3-mobile.png",
+      "imageMobile": "assets/img/unit-converter-mobile.png",
       "imageType": "image/png",
       "title": { "en-US": "Unit Converter", "pt-BR": "Conversor de unidades" },
       "description": {
@@ -65,21 +79,72 @@
         "pt-BR": "Uma ferramenta para converter entre diferentes unidades de medida."
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "iconTechnologies": [
+        { "icon": "fa-python", "name": "Python", "style": "fa-brands" }
+      ],
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
+      "linkRepository": "https://github.com/jlbbarco/unit_converter/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
+      "projectTitle": "GreenTech",
+      "image": "assets/img/greentech.png",
+      "descriptionImage": {
+        "en-US": "Image of Greentech Website",
+        "pt-BR": "Imagem do Website Tecnoverde"
+      },
+      "imageMobile": "assets/img/greentech-mobile.png",
+      "imageType": "image/png",
+      "title": { "en-US": "Greentech", "pt-BR": "Tecnoverde" },
+      "description": {
+        "en-US": "A website for teach the cultive of Parsley",
+        "pt-BR": "Um website para ensinar o cultivo de Salsa."
+      },
+      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "iconTechnologies": [
+        { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
+        { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
+        { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
+      ],
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
+      "linkRepository": "https://github.com/jlbbarco/Salsa/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkSite": "https://tecnoverde.vercel.app",
+      "linkSiteTarget": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
+      "projectTitle": "Passwords Manager",
+      "image": "assets/img/passwords-manager.png",
+      "descriptionImage": {
+        "en-US": "Image of Passwords Manager UI",
+        "pt-BR": "Imagem da UI do Conversor de Unidades"
+      },
+      "imageMobile": "assets/img/passwords-manager-mobile.png",
+      "imageType": "image/png",
+      "title": {
+        "en-US": "Passwords Manager",
+        "pt-BR": "Gerenciador de Senhas"
+      },
+      "description": {
+        "en-US": "A system to save your simple passwords. Don't save your important passwords because this program haven't cryptograph system.",
+        "pt-BR": "Um sistema que salva suas senhas simples. Não salve suas importantes senhas, porque este programa não possui um sistema de criptografia."
+      },
+      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "iconTechnologies": [
+        { "icon": "fa-python", "name": "Python", "style": "fa-brands" }
+      ],
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
       "linkRepository": "https://github.com/jlbbarco/unit_converter/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
     }
-  ],
-  "Adolpho College": [
-    { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
-    { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
-    { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
-  ],
-  "Image Converter": [
-    { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
-    { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
-    { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
-  ],
-  "Unit Converter": [
-    { "icon": "fa-python", "name": "Python", "style": "fa-brands" }
   ]
 }

@@ -27,8 +27,8 @@ function setCookie(name, value, days = 365) {
 async function loadTranslations() {
   try {
     const [enResponse, ptResponse] = await Promise.all([
-      fetch("assets/json/translate/en/translation.json"),
-      fetch("assets/json/translate/pt/translation.json"),
+      fetch("assets/json/translate/en-us.json"),
+      fetch("assets/json/translate/pt-br.json"),
     ]);
 
     if (!enResponse.ok) {

@@ -1,13 +1,6 @@
 {
   "cards": [
     {
-      "image": "",
-      "imageType": "",
-      "descriptionImage": {
-        "en-US": "Certification of Conclusion of SAD Course",
-        "pt-BR": "Certificado de Conclusão do Curso de SAD"
-      },
-      "imageMobile": "",
       "title": {
         "en-US": "System Analysis and Development (SAD)",
         "pt-BR": "Análise e Desenvolvimento de Sistemas (ADS)"

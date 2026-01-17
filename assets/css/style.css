@@ -286,12 +286,9 @@ section {
 }
 
 .card-projects h3,
+.card-projects h4,
 .card-projects p {
-  margin: 10px;
-}
-
-.article-card-description {
-  padding: 0 15px;
+  margin: 10px 25px;
 }
 
 .links-portfolio {
@@ -337,7 +334,7 @@ section {
 
 .img-card {
   width: 100%;
-  height: 200px;
+  height: auto;
 }
 
 .img-card img,
@@ -705,8 +702,8 @@ button .icon:hover {
     margin: 25px;
   }
 
-  .card-participation {
-    min-width: 400px;
+  .container-formations {
+    max-height: 75dvh;
   }
 
   .container-contact {
