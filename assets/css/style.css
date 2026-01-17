@@ -20,9 +20,11 @@
 :root {
   --primary-bg: #121212;
   --secondary-bg: #1e1e1e;
+  --secondary-bg-transparent: #1e1e1eaa;
   --text-primary: #ffffff;
   --text-secondary: #b3b3b3;
   --accent: #7c4dff;
+  --accent-transparent: #7c4dffaa;
   --hover-accent: #9670ff;
   --card-bg: #252525;
   --transition: all 0.3s ease;
@@ -250,6 +252,7 @@ section {
 }
 
 .container-portfolio {
+  position: relative;
   display: flex;
   flex-direction: column;
 }
@@ -618,6 +621,10 @@ button .icon:hover {
   box-shadow: var(--shadow);
 }
 
+.btn {
+  display: none;
+}
+
 @media (min-width: 990px) {
   body {
     font-size: 1.15em;
@@ -708,5 +715,79 @@ button .icon:hover {
 
   .container-contact {
     max-height: none;
+  }
+
+  /* Carousel Controls */
+  .carousel-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+    width: 100%;
+  }
+
+  .btn {
+    position: absolute;
+    background-color: var(--secondary-bg-transparent);
+    border: 2px solid var(--accent);
+    color: var(--text-primary);
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    min-height: 50px;
+  }
+
+  .btn:hover {
+    background-color: var(--accent-transparent);
+    color: var(--primary-bg);
+    transform: scale(1.1);
+  }
+
+  .btn:active {
+    transform: scale(0.95);
+  }
+
+  .btn.prev {
+    left: 25px;
+  }
+  .btn.next {
+    right: 25px;
+  }
+
+  .btn i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Melhorar scroll do carrossel */
+  .container-portfolio {
+    scroll-behavior: smooth;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Esconder scrollbar do navegador mas manter funcionalidade */
+  .container-portfolio::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .container-portfolio::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .container-portfolio::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 4px;
+  }
+
+  .container-portfolio::-webkit-scrollbar-thumb:hover {
+    background: var(--hover-accent);
   }
 }

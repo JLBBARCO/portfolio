@@ -129,6 +129,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (el) el.innerHTML = "";
     });
 
+    // Limpa botões de carrossel existentes para evitar duplicação
+    document
+      .querySelectorAll(".btn.prev, .btn.next")
+      .forEach((btn) => btn.remove());
+
     // Obtém o idioma atual
     const savedLang = document.cookie
       .split("; ")
@@ -138,8 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
       savedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
     const locale = currentLang === "pt" ? "pt-BR" : "en-US";
 
-    // Chamadas corrigidas para usar a função genérica jsonCardsFetch,
-    // que foi refatorada para lidar com os diferentes tipos de dados.
+    // Chamadas corrigidas para usar a função genérica jsonCardsFetch
     const pProjects = jsonCardsFetch(
       "assets/json/cards/projects.json",
       "projectsContainer",
@@ -302,11 +306,7 @@ function setIcons(fileURL, containerID, iconSize = "3x") {
       data.icons.forEach((icon) => {
         const iconElement = document.createElement("div");
         iconElement.className = "icon-container";
-        const classes = faClass(
-          icon.style,
-          icon.class || icon.name,
-          icon.size || iconSize,
-        );
+        const classes = faClass(icon.style, icon.class || icon.name, iconSize);
         iconElement.innerHTML = `<i class="${classes} icon" title="${
           icon.name || icon.class || ""
         }"></i>`;
@@ -389,6 +389,25 @@ function jsonCardsFetch(
       const container = document.getElementById(containerId);
       if (!container) return;
 
+      // Se for a seção de projetos, aplica botões para navegar no carrossel
+      if (containerId === "projectsContainer") {
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "btn prev";
+        prevBtn.innerHTML = '<i class="fa-solid fa-angle-left"></i>';
+        prevBtn.addEventListener("click", prevProjects);
+
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "btn next";
+        nextBtn.innerHTML = '<i class="fa-solid fa-angle-right"></i>';
+        nextBtn.addEventListener("click", nextProjects);
+
+        // Adiciona os botões ao PAI do container para que fiquem fixos e não rolem com os cards
+        if (container.parentNode) {
+          container.parentNode.insertBefore(prevBtn, container);
+          container.parentNode.appendChild(nextBtn);
+        }
+      }
+
       // Se for a seção de formações, aplica a lógica de filtro
       if (containerId === "formationsContainer") {
         if (!data.cards || !Array.isArray(data.cards)) {
@@ -421,7 +440,7 @@ function jsonCardsFetch(
           buttonAll.addEventListener("click", () =>
             filterFormationsByType("all"),
           );
-          container.appendChild(filterContainer); // Adiciona o container de filtro antes dos cards
+          container.appendChild(filterContainer);
           filterContainer.appendChild(buttonAll);
 
           // Criar botões de filtro por tipo
@@ -429,7 +448,6 @@ function jsonCardsFetch(
             const button = document.createElement("button");
             button.className = "filter-button";
             button.dataset.filter = typeId;
-            // Usa o nome traduzido armazenado
             button.textContent = `${typeNames[typeId]} (${count})`;
             button.addEventListener("click", () =>
               filterFormationsByType(typeId),
@@ -442,39 +460,26 @@ function jsonCardsFetch(
         data.cards.forEach((card) => {
           const formationCard = document.createElement("div");
           formationCard.className = "card card-formation";
-
-          // Adicionar data-type para filtro
           if (card.type && card.type.id) {
             formationCard.dataset.type = card.type.id;
           }
-
-          // Criar e adicionar título
           const title = document.createElement("h3");
           title.textContent = getLocalized(card.title, language) || "";
           formationCard.appendChild(title);
-
-          // Criar e adicionar instituição
           const institution = document.createElement("p");
           institution.className = "institution";
           institution.textContent =
             getLocalized(card.institution, language) || "";
           formationCard.appendChild(institution);
-
-          // Criar e adicionar tipo de curso
           const type = document.createElement("p");
           type.className = "formation-type";
-          // Usa o nome traduzido para exibição
           type.textContent = card.type ? getLocalized(card.type, language) : "";
           formationCard.appendChild(type);
-
-          // Criar e adicionar descrição
           const description = document.createElement("p");
           description.className = "description";
           description.textContent =
             getLocalized(card.description, language) || "";
           formationCard.appendChild(description);
-
-          // Criar e adicionar período
           const year = document.createElement("p");
           year.className = "period";
           year.textContent =
@@ -482,7 +487,6 @@ function jsonCardsFetch(
               ? getLocalized(card.dateText, language)
               : card.dateText || "";
           formationCard.appendChild(year);
-
           container.appendChild(formationCard);
         });
       }
@@ -496,7 +500,6 @@ function jsonCardsFetch(
           const createdCard = document.createElement("div");
           createdCard.className = "card card-projects";
 
-          // Criar imagem/responsive (se existir)
           if (card.image) {
             const picture = document.createElement("picture");
             picture.className = "img-card";
@@ -546,8 +549,6 @@ function jsonCardsFetch(
           if (card.iconTechnologies && Array.isArray(card.iconTechnologies)) {
             const divTechnologies = document.createElement("div");
             divTechnologies.className = "technologies-portfolio";
-
-            // Usa cada ícone definido no card.iconTechnologies
             card.iconTechnologies.forEach((tech) => {
               const classes = faClass(tech.style, tech.icon, iconSize);
               const iconEl = document.createElement("i");
@@ -555,7 +556,6 @@ function jsonCardsFetch(
               iconEl.title = tech.name || "";
               divTechnologies.appendChild(iconEl);
             });
-
             createdCard.appendChild(divTechnologies);
           }
 
@@ -590,19 +590,17 @@ function jsonCardsFetch(
           container.appendChild(createdCard);
         });
       }
-      // Se for a seção de skills/programs (cards simples de ícones)
+      // Se for a seção de skills/programs
       else if (
         containerId === "technologiesContainer" ||
         containerId === "programsContainer"
       ) {
         const cardsToProcess = data.cards || data.cardsIcons;
-
         if (!cardsToProcess || !Array.isArray(cardsToProcess)) {
           throw new Error(
             "Invalid data structure: expected data.cards or data.cardsIcons array",
           );
         }
-
         cardsToProcess.forEach((card) => {
           if (card.icon) {
             const skillCard = document.createElement("div");
@@ -624,7 +622,6 @@ function jsonCardsFetch(
 
 function filterFormationsByType(typeId) {
   const cards = document.querySelectorAll(".card.card-formation");
-
   cards.forEach((card) => {
     if (typeId === "all" || card.dataset.type === typeId) {
       card.style.display = "block";
@@ -632,7 +629,6 @@ function filterFormationsByType(typeId) {
       card.style.display = "none";
     }
   });
-
   const buttons = document.querySelectorAll(".filter-button");
   buttons.forEach((btn) => {
     if (btn.dataset.filter === typeId) {
@@ -645,79 +641,51 @@ function filterFormationsByType(typeId) {
 
 function addNewIcons(linkFile, size = "3x") {
   if (!linkFile) return;
-
   fetch(linkFile)
     .then((response) => {
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`Error fetching SVG icons: ${response.status}`);
-      }
       return response.json();
     })
     .then((data) => {
-      if (!Array.isArray(data.icons) || data.icons.length === 0) {
-        console.warn("No icons found in file:", linkFile);
-        return;
-      }
-
-      const icons = data.icons;
-      icons.forEach((icon) => {
-        if (!icon.class || !icon.svg) {
-          console.warn("Invalid icon data, missing class or svg:", icon);
-          return;
-        }
-
+      if (!Array.isArray(data.icons) || data.icons.length === 0) return;
+      data.icons.forEach((icon) => {
+        if (!icon.class || !icon.svg) return;
         let svgMarkup = icon.svg
           .replace(/fill='#[^']*'/g, "")
           .replace(/fill="#[^"]*"/g, "")
           .replace(/stroke='#[^']*'/g, "")
           .replace(/stroke="#[^"]*"/g, "");
-
         if (!svgMarkup.includes('class="svg-icon"')) {
           svgMarkup = svgMarkup.replace(/<svg/, '<svg class="svg-icon"');
         }
-
         const selector = `i.${icon.class}`;
         const elements = document.querySelectorAll(selector);
-
-        if (elements.length === 0) {
-          return;
-        }
-
         Array.from(elements).forEach((element) => {
           element.innerHTML = svgMarkup;
-
           const svgElement = element.querySelector("svg");
           if (!svgElement) return;
-
           svgElement.removeAttribute("width");
           svgElement.removeAttribute("height");
-
-          if (!svgElement.getAttribute("viewBox")) {
+          if (!svgElement.getAttribute("viewBox"))
             svgElement.setAttribute("viewBox", "0 0 24 24");
-          }
-
           svgElement
             .querySelectorAll("path, circle, rect, line, polygon, ellipse")
             .forEach((el) => {
-              if (el.getAttribute("fill") !== "none") {
+              if (el.getAttribute("fill") !== "none")
                 el.setAttribute("fill", "currentColor");
-              }
-              if (el.getAttribute("stroke")) {
+              if (el.getAttribute("stroke"))
                 el.setAttribute("stroke", "currentColor");
-              }
             });
         });
       });
     })
-    .catch((error) => {
-      console.error("Error loading SVG icons:", error);
-    });
+    .catch((error) => console.error("Error loading SVG icons:", error));
 }
 
 async function showLastUpdate(elementId) {
   const owner = document.body.dataset.githubOwner || "JLBBARCO";
   const repo = document.body.dataset.githubRepo || "portfolio";
-
   const url = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`;
 
   function replaceDateInDOM(dateStr) {
@@ -738,7 +706,6 @@ async function showLastUpdate(elementId) {
     nodesToUpdate.forEach((textNode) => {
       textNode.nodeValue = textNode.nodeValue.replace(/\{\{date\}\}/g, dateStr);
     });
-
     const lastEl = document.getElementById(elementId);
     if (lastEl) {
       if (typeof window.t === "function") {
@@ -762,22 +729,16 @@ async function showLastUpdate(elementId) {
     const commits = await response.json();
     if (!Array.isArray(commits) || commits.length === 0)
       throw new Error("No commits found");
-
     const commitDate = new Date(commits[0].commit.author.date);
-
     const locale = document.documentElement.lang || "pt-BR";
     const formatted = commitDate.toLocaleDateString(locale, {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-
     window.__lastUpdateRawDate = commitDate.toISOString();
-
-    if (typeof window.setTranslationDate === "function") {
+    if (typeof window.setTranslationDate === "function")
       window.setTranslationDate(window.__lastUpdateRawDate);
-    }
-
     window.addEventListener(
       "dynamicContentReady",
       () => {
@@ -790,9 +751,18 @@ async function showLastUpdate(elementId) {
       },
       { once: true },
     );
-
     replaceDateInDOM(formatted);
   } catch (err) {
     console.error("Erro ao buscar commits:", err);
   }
+}
+
+function prevProjects() {
+  const container = document.getElementById("projectsContainer");
+  if (container) container.scrollBy({ left: -300, behavior: "smooth" });
+}
+
+function nextProjects() {
+  const container = document.getElementById("projectsContainer");
+  if (container) container.scrollBy({ left: 300, behavior: "smooth" });
 }
