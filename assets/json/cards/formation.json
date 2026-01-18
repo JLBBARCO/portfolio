@@ -10,8 +10,8 @@
         "pt-BR": "Colégio Estadual Adolpho de Oliveira Franco"
       },
       "description": {
-        "en-US": "Course focused on software development, systems analysis, and project management.",
-        "pt-BR": "Curso focado no desenvolvimento de software, análise de sistemas e gerenciamento de projetos."
+        "en-US": "Course focused on software development, systems analysis, and project management",
+        "pt-BR": "Curso focado no desenvolvimento de software, análise de sistemas e gerenciamento de projetos"
       },
       "type": {
         "id": "technicalCourse",
@@ -25,6 +25,29 @@
     },
     {
       "title": {
+        "en-US": "English Fluence Course",
+        "pt-BR": "Curso de Fluência em Inglês"
+      },
+      "institution": {
+        "en-US": "Athus Languages",
+        "pt-BR": "Athus Idiomas"
+      },
+      "description": {
+        "en-US": "Course of fluence English",
+        "pt-BR": "Curso de Inglês fluente"
+      },
+      "type": {
+        "id": "englishCourse",
+        "en-US": "English Course",
+        "pt-BR": "Curso de Inglês"
+      },
+      "dateText": {
+        "en-US": "2022 - 2026",
+        "pt-BR": "2022 - 2026"
+      }
+    },
+    {
+      "title": {
         "en-US": "Web Development Course",
         "pt-BR": "Curso de Desenvolvimento Web"
       },
@@ -33,8 +56,8 @@
         "pt-BR": "Curso em Vídeo"
       },
       "description": {
-        "en-US": "Course covering front-end and back-end web development technologies and best practices.",
-        "pt-BR": "Curso que abrange tecnologias de desenvolvimento web (front-end e back-end) e melhores práticas."
+        "en-US": "Course covering front-end and back-end web development technologies and best practices",
+        "pt-BR": "Curso que abrange tecnologias de desenvolvimento web (front-end e back-end) e melhores práticas"
       },
       "type": {
         "id": "onlineCourse",
