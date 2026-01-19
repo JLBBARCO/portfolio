@@ -391,30 +391,7 @@ function jsonCardsFetch(
 
       // Se for a seção de projetos, aplica botões para navegar no carrossel
       if (containerId === "projectsContainer") {
-        const prevBtn = document.createElement("button");
-        prevBtn.className = "btn prev";
-        prevBtn.innerHTML = '<i class="fa-solid fa-angle-left"></i>';
-        prevBtn.addEventListener("click", prevProjects);
-
-        const nextBtn = document.createElement("button");
-        nextBtn.className = "btn next";
-        nextBtn.innerHTML = '<i class="fa-solid fa-angle-right"></i>';
-        nextBtn.addEventListener("click", nextProjects);
-
-        // Adiciona os botões ao PAI do container para que fiquem fixos e não rolem com os cards
-        if (container.parentNode) {
-          container.parentNode.insertBefore(prevBtn, container);
-          container.parentNode.appendChild(nextBtn);
-        }
-      }
-
-      // Se for a seção de formações, aplica a lógica de filtro
-      if (containerId === "formationsContainer") {
-        if (!data.cards || !Array.isArray(data.cards)) {
-          throw new Error("Invalid data structure: expected data.cards array");
-        }
-
-        // Contabilizar tipos de cursos e armazenar o nome traduzido
+        // Contabilizar tipos de projetos e armazenar o nome traduzido
         const typeCount = {};
         const typeNames = {};
         data.cards.forEach((card) => {
@@ -438,7 +415,7 @@ function jsonCardsFetch(
           buttonAll.dataset.filter = "all";
           buttonAll.textContent = language === "pt-BR" ? "Todos" : "All";
           buttonAll.addEventListener("click", () =>
-            filterFormationsByType("all"),
+            filterProjectsByType("all"),
           );
           container.appendChild(filterContainer);
           filterContainer.appendChild(buttonAll);
@@ -450,48 +427,28 @@ function jsonCardsFetch(
             button.dataset.filter = typeId;
             button.textContent = `${typeNames[typeId]} (${count})`;
             button.addEventListener("click", () =>
-              filterFormationsByType(typeId),
+              filterProjectsByType(typeId),
             );
             filterContainer.appendChild(button);
           });
         }
 
-        // Criação dos cards de formação
-        data.cards.forEach((card) => {
-          const formationCard = document.createElement("div");
-          formationCard.className = "card card-formation";
-          if (card.type && card.type.id) {
-            formationCard.dataset.type = card.type.id;
-          }
-          const title = document.createElement("h3");
-          title.textContent = getLocalized(card.title, language) || "";
-          formationCard.appendChild(title);
-          const institution = document.createElement("p");
-          institution.className = "institution";
-          institution.textContent =
-            getLocalized(card.institution, language) || "";
-          formationCard.appendChild(institution);
-          const type = document.createElement("p");
-          type.className = "formation-type";
-          type.textContent = card.type ? getLocalized(card.type, language) : "";
-          formationCard.appendChild(type);
-          const description = document.createElement("p");
-          description.className = "description";
-          description.textContent =
-            getLocalized(card.description, language) || "";
-          formationCard.appendChild(description);
-          const year = document.createElement("p");
-          year.className = "period";
-          year.textContent =
-            typeof card.dateText === "object"
-              ? getLocalized(card.dateText, language)
-              : card.dateText || "";
-          formationCard.appendChild(year);
-          container.appendChild(formationCard);
-        });
-      }
-      // Se for a seção de projetos
-      else if (containerId === "projectsContainer") {
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "btn prev";
+        prevBtn.innerHTML = '<i class="fa-solid fa-angle-left"></i>';
+        prevBtn.addEventListener("click", prevProjects);
+
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "btn next";
+        nextBtn.innerHTML = '<i class="fa-solid fa-angle-right"></i>';
+        nextBtn.addEventListener("click", nextProjects);
+
+        // Adiciona os botões ao PAI do container para que fiquem fixos e não rolem com os cards
+        if (container.parentNode) {
+          container.parentNode.insertBefore(prevBtn, container);
+          container.parentNode.appendChild(nextBtn);
+        }
+
         if (!data.cards || !Array.isArray(data.cards)) {
           throw new Error("Invalid data structure: expected data.cards array");
         }
@@ -499,6 +456,9 @@ function jsonCardsFetch(
         data.cards.forEach((card) => {
           const createdCard = document.createElement("div");
           createdCard.className = "card card-projects";
+          if (card.type && card.type.id) {
+            createdCard.dataset.type = card.type.id;
+          }
 
           if (card.image) {
             const picture = document.createElement("picture");
@@ -590,6 +550,89 @@ function jsonCardsFetch(
           container.appendChild(createdCard);
         });
       }
+
+      // Se for a seção de formações, aplica a lógica de filtro
+      if (containerId === "formationsContainer") {
+        if (!data.cards || !Array.isArray(data.cards)) {
+          throw new Error("Invalid data structure: expected data.cards array");
+        }
+
+        // Contabilizar tipos de cursos e armazenar o nome traduzido
+        const typeCount = {};
+        const typeNames = {};
+        data.cards.forEach((card) => {
+          if (card.type && card.type.id) {
+            const typeId = card.type.id;
+            typeCount[typeId] = (typeCount[typeId] || 0) + 1;
+            // Armazena o nome traduzido
+            typeNames[typeId] =
+              card.type[language] || card.type["pt-BR"] || typeId;
+          }
+        });
+
+        // Criar container para filtros
+        const filterContainer = document.createElement("div");
+        filterContainer.className = "filter-container";
+
+        // Criar botão "Todos" se houver mais de um tipo
+        if (Object.keys(typeCount).length > 1) {
+          const buttonAll = document.createElement("button");
+          buttonAll.className = "filter-button active";
+          buttonAll.dataset.filter = "all";
+          buttonAll.textContent = language === "pt-BR" ? "Todos" : "All";
+          buttonAll.addEventListener("click", () =>
+            filterFormationsByType("all"),
+          );
+          container.appendChild(filterContainer);
+          filterContainer.appendChild(buttonAll);
+
+          // Criar botões de filtro por tipo
+          Object.entries(typeCount).forEach(([typeId, count]) => {
+            const button = document.createElement("button");
+            button.className = "filter-button";
+            button.dataset.filter = typeId;
+            button.textContent = `${typeNames[typeId]} (${count})`;
+            button.addEventListener("click", () =>
+              filterFormationsByType(typeId),
+            );
+            filterContainer.appendChild(button);
+          });
+        }
+
+        // Criação dos cards de formação
+        data.cards.forEach((card) => {
+          const formationCard = document.createElement("div");
+          formationCard.className = "card card-formation";
+          if (card.type && card.type.id) {
+            formationCard.dataset.type = card.type.id;
+          }
+          const title = document.createElement("h3");
+          title.textContent = getLocalized(card.title, language) || "";
+          formationCard.appendChild(title);
+          const institution = document.createElement("p");
+          institution.className = "institution";
+          institution.textContent =
+            getLocalized(card.institution, language) || "";
+          formationCard.appendChild(institution);
+          const type = document.createElement("p");
+          type.className = "formation-type";
+          type.textContent = card.type ? getLocalized(card.type, language) : "";
+          formationCard.appendChild(type);
+          const description = document.createElement("p");
+          description.className = "description";
+          description.textContent =
+            getLocalized(card.description, language) || "";
+          formationCard.appendChild(description);
+          const year = document.createElement("p");
+          year.className = "period";
+          year.textContent =
+            typeof card.dateText === "object"
+              ? getLocalized(card.dateText, language)
+              : card.dateText || "";
+          formationCard.appendChild(year);
+          container.appendChild(formationCard);
+        });
+      }
       // Se for a seção de skills/programs
       else if (
         containerId === "technologiesContainer" ||
@@ -618,6 +661,25 @@ function jsonCardsFetch(
     .catch((error) => {
       console.error(`Failed to load ${containerId}:`, error);
     });
+}
+
+function filterProjectsByType(typeId) {
+  const cards = document.querySelectorAll(".card.card-projects");
+  cards.forEach((card) => {
+    if (typeId === "all" || card.dataset.type === typeId) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  });
+  const buttons = document.querySelectorAll(".filter-button");
+  buttons.forEach((btn) => {
+    if (btn.dataset.filter === typeId) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
 }
 
 function filterFormationsByType(typeId) {

@@ -5,17 +5,22 @@
       "image": "assets/img/adolpho-college.png",
       "descriptionImage": {
         "en-US": "Image of Adolpho College Website UI",
-        "pt-BR": "Imagem da UI do website do Colégio Adolpho"
+        "pt-BR": "Imagem da UI do website do ColÃ©gio Adolpho"
       },
       "imageMobile": "assets/img/adolpho-college-mobile.png",
       "imageType": "image/png",
+      "type": {
+        "id": "webProject",
+        "en-US": "Web Project",
+        "pt-BR": "Projeto Web"
+      },
       "title": {
         "en-US": "Adolpho College",
-        "pt-BR": "Colégio Adolpho"
+        "pt-BR": "ColÃ©gio Adolpho"
       },
       "description": {
         "en-US": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news",
-        "pt-BR": "Site do Colégio Estadual Adolpho de Oliveira Franco, com informações sobre a instituição, cursos e notícias"
+        "pt-BR": "Site do ColÃ©gio Estadual Adolpho de Oliveira Franco, com informaÃ§Ãµes sobre a instituiÃ§Ã£o, cursos e notÃ­cias"
       },
       "titleTechnologies": {
         "en-US": "Technologies",
@@ -44,6 +49,11 @@
       },
       "imageMobile": "assets/img/image-converter-mobile.png",
       "imageType": "image/png",
+      "type": {
+        "id": "webProject",
+        "en-US": "Web Project",
+        "pt-BR": "Projeto Web"
+      },
       "title": { "en-US": "Image Converter", "pt-BR": "Conversor de imagens" },
       "description": {
         "en-US": "Website for converter images for PNG, JPEG and WEBP formats",
@@ -73,6 +83,11 @@
       },
       "imageMobile": "assets/img/unit-converter-mobile.png",
       "imageType": "image/png",
+      "type": {
+        "id": "pythonProject",
+        "en-US": "Python Project",
+        "pt-BR": "Projeto Python"
+      },
       "title": { "en-US": "Unit Converter", "pt-BR": "Conversor de unidades" },
       "description": {
         "en-US": "A tool to convert between different units of measurement",
@@ -98,9 +113,14 @@
       },
       "imageMobile": "assets/img/greentech-mobile.png",
       "imageType": "image/png",
+      "type": {
+        "id": "webProject",
+        "en-US": "Web Project",
+        "pt-BR": "Projeto Web"
+      },
       "title": { "en-US": "Greentech", "pt-BR": "Tecnoverde" },
       "description": {
-        "en-US": "A website for teach the cultive of Parsley",
+        "en-US": "A website for teaching the cultivation of Parsley",
         "pt-BR": "Um website para ensinar o cultivo de Salsa"
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
@@ -123,17 +143,22 @@
       "image": "assets/img/passwords-manager.png",
       "descriptionImage": {
         "en-US": "Image of Passwords Manager UI",
-        "pt-BR": "Imagem da UI do Conversor de Unidades"
+        "pt-BR": "Imagem da UI do Gerenciador de Senhas"
       },
       "imageMobile": "assets/img/passwords-manager-mobile.png",
       "imageType": "image/png",
+      "type": {
+        "id": "pythonProject",
+        "en-US": "Python Project",
+        "pt-BR": "Projeto Python"
+      },
       "title": {
         "en-US": "Passwords Manager",
         "pt-BR": "Gerenciador de Senhas"
       },
       "description": {
-        "en-US": "A system to save your simple passwords. Don't save your important passwords because this program haven't cryptograph system",
-        "pt-BR": "Um sistema que salva suas senhas simples. Não salve suas importantes senhas, porque este programa não possui um sistema de criptografia"
+        "en-US": "A system to save your simple passwords. Don't save your important passwords because this program doesn't have encryption",
+        "pt-BR": "Um sistema que salva suas senhas simples. NÃ£o salve suas importantes senhas, porque este programa nÃ£o possui um sistema de criptografia"
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [
@@ -148,13 +173,18 @@
     },
     {
       "projectTitle": "Total Score",
+      "type": {
+        "id": "pythonProject",
+        "en-US": "Python Project",
+        "pt-BR": "Projeto Python"
+      },
       "title": {
         "en-US": "Total Score",
-        "pt-BR": "Pontuação Total"
+        "pt-BR": "PontuaÃ§Ã£o Total"
       },
       "description": {
         "en-US": "Repository of summation tests to discover your test score based on your answers and the answer key. The files to accept only extensions .csv and .tsv",
-        "pt-BR": "Repositório de testes de soma para descobrir sua pontuação com base nas respostas e na chave de respostas. Os arquivos aceitam apenas extensões .csv e .tsv"
+        "pt-BR": "RepositÃ³rio de testes de soma para descobrir sua pontuaÃ§Ã£o com base nas respostas e na chave de respostas. Os arquivos aceitam apenas extensÃµes .csv e .tsv"
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [
@@ -164,8 +194,9 @@
         "en-US": "Links",
         "pt-BR": "Links"
       },
-      "linkRepository": "https://github.com/jlbbarco/unit-converter/",
+      "linkRepository": "https://github.com/jlbbarco/total-score/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
     }
-  ]
+  ],
+  "buttons": [{ "filterAll": { "en-US": "All", "pt-BR": "Todos" } }]
 }
