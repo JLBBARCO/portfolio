@@ -391,43 +391,46 @@ function jsonCardsFetch(
 
       // Se for a seção de projetos, aplica botões para navegar no carrossel
       if (containerId === "projectsContainer") {
-        // Contabilizar tipos de projetos e armazenar o nome traduzido
-        const typeCount = {};
-        const typeNames = {};
+        // Contabilizar tecnologias utilizadas nos projetos
+        const techCount = {};
         data.cards.forEach((card) => {
-          if (card.type && card.type.id) {
-            const typeId = card.type.id;
-            typeCount[typeId] = (typeCount[typeId] || 0) + 1;
-            // Armazena o nome traduzido
-            typeNames[typeId] =
-              card.type[language] || card.type["pt-BR"] || typeId;
+          if (card.iconTechnologies && Array.isArray(card.iconTechnologies)) {
+            card.iconTechnologies.forEach((tech) => {
+              if (tech.name) {
+                techCount[tech.name] = (techCount[tech.name] || 0) + 1;
+              }
+            });
           }
         });
 
-        // Criar container para filtros
+        // Criar container para filtros ANTES de adicionar cards
         const filterContainer = document.createElement("div");
         filterContainer.className = "filter-container";
 
-        // Criar botão "Todos" se houver mais de um tipo
-        if (Object.keys(typeCount).length > 1) {
+        // Criar botão "Todos" se houver mais de uma tecnologia
+        if (Object.keys(techCount).length > 1) {
           const buttonAll = document.createElement("button");
           buttonAll.className = "filter-button active";
           buttonAll.dataset.filter = "all";
           buttonAll.textContent = language === "pt-BR" ? "Todos" : "All";
           buttonAll.addEventListener("click", () =>
-            filterProjectsByType("all"),
+            filterProjectsByTechnology("all"),
           );
-          container.appendChild(filterContainer);
+          
+          // Insere o container de filtros ANTES do container de cards
+          if (container.parentNode) {
+            container.parentNode.insertBefore(filterContainer, container);
+          }
           filterContainer.appendChild(buttonAll);
 
-          // Criar botões de filtro por tipo
-          Object.entries(typeCount).forEach(([typeId, count]) => {
+          // Criar botões de filtro por tecnologia
+          Object.entries(techCount).forEach(([techName, count]) => {
             const button = document.createElement("button");
             button.className = "filter-button";
-            button.dataset.filter = typeId;
-            button.textContent = `${typeNames[typeId]} (${count})`;
+            button.dataset.filter = techName;
+            button.textContent = `${techName} (${count})`;
             button.addEventListener("click", () =>
-              filterProjectsByType(typeId),
+              filterProjectsByTechnology(techName),
             );
             filterContainer.appendChild(button);
           });
@@ -456,8 +459,13 @@ function jsonCardsFetch(
         data.cards.forEach((card) => {
           const createdCard = document.createElement("div");
           createdCard.className = "card card-projects";
-          if (card.type && card.type.id) {
-            createdCard.dataset.type = card.type.id;
+          
+          // Armazena as tecnologias usadas no card para filtro
+          if (card.iconTechnologies && Array.isArray(card.iconTechnologies)) {
+            const techNames = card.iconTechnologies
+              .map((tech) => tech.name)
+              .filter(Boolean);
+            createdCard.dataset.technologies = techNames.join(",");
           }
 
           if (card.image) {
@@ -663,10 +671,11 @@ function jsonCardsFetch(
     });
 }
 
-function filterProjectsByType(typeId) {
+function filterProjectsByTechnology(techName) {
   const cards = document.querySelectorAll(".card.card-projects");
   cards.forEach((card) => {
-    if (typeId === "all" || card.dataset.type === typeId) {
+    const techs = card.dataset.technologies ? card.dataset.technologies.split(",") : [];
+    if (techName === "all" || techs.includes(techName)) {
       card.style.display = "block";
     } else {
       card.style.display = "none";
@@ -674,7 +683,7 @@ function filterProjectsByType(typeId) {
   });
   const buttons = document.querySelectorAll(".filter-button");
   buttons.forEach((btn) => {
-    if (btn.dataset.filter === typeId) {
+    if (btn.dataset.filter === techName) {
       btn.classList.add("active");
     } else {
       btn.classList.remove("active");
