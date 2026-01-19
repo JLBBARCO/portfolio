@@ -255,7 +255,11 @@ section {
 .container-portfolio {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  width: 100%;
 }
 
 .card {
@@ -305,8 +309,7 @@ section {
 }
 
 .container-technologies {
-  display: flex;
-  flex-flow: column wrap;
+  display: grid;
 }
 
 .techFrame {
@@ -328,8 +331,8 @@ section {
   padding: 15px;
   justify-content: center;
   align-items: center;
-  width: 125px;
-  height: 125px;
+  width: auto;
+  height: auto;
 }
 
 .tech-cards p {

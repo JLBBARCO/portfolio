@@ -25,7 +25,7 @@
     },
     {
       "title": {
-        "en-US": "English Fluence Course",
+        "en-US": "English Fluency Course",
         "pt-BR": "Curso de Fluência em Inglês"
       },
       "institution": {
@@ -33,8 +33,8 @@
         "pt-BR": "Athus Idiomas"
       },
       "description": {
-        "en-US": "Course of fluence English",
-        "pt-BR": "Curso de Inglês fluente"
+        "en-US": "English fluency course",
+        "pt-BR": "Curso de fluência em inglês"
       },
       "type": {
         "id": "englishCourse",
