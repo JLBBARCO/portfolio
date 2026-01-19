@@ -255,7 +255,10 @@ section {
 .container-portfolio {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
 }
 
 .card {

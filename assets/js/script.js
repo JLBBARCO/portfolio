@@ -678,7 +678,7 @@ function filterProjectsByTechnology(techName) {
       ? card.dataset.technologies.split(",")
       : [];
     if (techName === "all" || techs.includes(techName)) {
-      card.style.display = "block";
+      card.style.display = "flex";
     } else {
       card.style.display = "none";
     }
