@@ -262,7 +262,7 @@ function accessibilityToggle() {
   menu.setAttribute("aria-hidden", isVisible);
   if (btn) {
     btn.setAttribute("aria-expanded", !isVisible);
-    if (isVisible) btn.focus();
+    if (isVisible) menu.focus();
   }
 }
 
@@ -288,13 +288,15 @@ function setIcons(fileURL, containerID, iconSize = "3x") {
     .then((data) => {
       const container = document.getElementById(containerID);
       if (!container || !data.icons) return;
+      const fragment = document.createDocumentFragment();
       data.icons.forEach((icon) => {
         const div = document.createElement("div");
         div.className = "icon-container";
         const classes = faClass(icon.style, icon.class || icon.name, iconSize);
         div.innerHTML = `<i class="${classes} icon" title="${icon.name || icon.class || ""}"></i>`;
-        container.appendChild(div);
+        fragment.appendChild(div);
       });
+      container.appendChild(fragment);
     })
     .catch((err) => console.error("Erro ao carregar ícones:", err));
 }
@@ -305,6 +307,7 @@ function jsonLinksFetch(fileURL, containerId, iconSize = "2x") {
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container || !Array.isArray(data.cards)) return;
+      const fragment = document.createDocumentFragment();
       data.cards.forEach((card) => {
         const a = document.createElement("a");
         a.href = card.link || card.url;
@@ -315,8 +318,9 @@ function jsonLinksFetch(fileURL, containerId, iconSize = "2x") {
         a.innerHTML = `<i class="${classes} icon"></i>`;
         a.setAttribute("aria-label", card.name);
         a.title = card.name;
-        container.appendChild(a);
+        fragment.appendChild(a);
       });
+      container.appendChild(fragment);
     })
     .catch((err) => console.error("Erro ao carregar links:", err));
 }
@@ -353,7 +357,9 @@ function jsonCardsFetch(
       } else if (containerId === "formationsContainer") {
         setupFormations(container, cards, language);
       } else if (
-        containerId === "technologiesContainer" ||
+        containerId === "frontEndContainer" ||
+        containerId === "backEndContainer" ||
+        containerId === "databasesContainer" ||
         containerId === "programsContainer"
       ) {
         setupSkills(container, cards, iconSize);
@@ -375,7 +381,6 @@ function setupProjects(container, cards, iconSize, language) {
   if (Object.keys(techCount).length > 1) {
     const filterContainer = document.createElement("div");
     filterContainer.className = "filter-container";
-
     const btnAll = document.createElement("button");
     btnAll.className = "filter-button active";
     btnAll.dataset.filter = "all";
@@ -407,6 +412,7 @@ function setupProjects(container, cards, iconSize, language) {
   container.parentNode.insertBefore(prevBtn, container);
   container.parentNode.appendChild(nextBtn);
 
+  const fragment = document.createDocumentFragment();
   cards.forEach((card) => {
     const div = document.createElement("div");
     div.className = "card card-projects";
@@ -448,8 +454,9 @@ function setupProjects(container, cards, iconSize, language) {
     html += `</div>`;
 
     div.innerHTML = html;
-    container.appendChild(div);
+    fragment.appendChild(div);
   });
+  container.appendChild(fragment);
 }
 
 function setupFormations(container, cards, language) {
@@ -483,6 +490,7 @@ function setupFormations(container, cards, language) {
     container.parentNode.insertBefore(filterContainer, container);
   }
 
+  const fragment = document.createDocumentFragment();
   cards.forEach((card) => {
     const div = document.createElement("div");
     div.className = "card card-formation";
@@ -495,12 +503,14 @@ function setupFormations(container, cards, language) {
       <p class="description">${getLocalized(card.description, language)}</p>
       <p class="period">${getLocalized(card.dateText, language)}</p>
     `;
-    container.appendChild(div);
+    fragment.appendChild(div);
   });
+  container.appendChild(fragment);
 }
 
 function setupSkills(container, cards, iconSize) {
   if (!cards) return;
+  const fragment = document.createDocumentFragment();
   cards.forEach((card) => {
     if (card.icon) {
       const div = document.createElement("div");
@@ -509,9 +519,10 @@ function setupSkills(container, cards, iconSize) {
         <i class="${faClass(card.style, card.icon, iconSize)} icon" title="${card.name}"></i>
         <p>${card.name}</p>
       `;
-      container.appendChild(div);
+      fragment.appendChild(div);
     }
   });
+  container.appendChild(fragment);
 }
 
 function filterProjectsByTechnology(tech) {
@@ -581,23 +592,25 @@ async function showLastUpdate(elementId) {
     if (!res.ok) return;
     const commits = await res.json();
     if (!Array.isArray(commits) || !commits.length) return;
-    if (!commits[0]?.commit?.author?.date) return;
     const date = new Date(commits[0].commit.author.date);
     const formatted = date.toLocaleDateString(
       document.documentElement.lang || "pt-BR",
       { year: "numeric", month: "long", day: "numeric" },
     );
 
-    const updateText = (node) => {
-      if (node.nodeValue?.includes("{{date}}"))
-        node.nodeValue = node.nodeValue.replace(/\{\{date\}\}/g, formatted);
-    };
     const walker = document.createTreeWalker(
       document.body,
       NodeFilter.SHOW_TEXT,
       null,
     );
-    while (walker.nextNode()) updateText(walker.currentNode);
+    while (walker.nextNode()) {
+      if (walker.currentNode.nodeValue?.includes("{{date}}")) {
+        walker.currentNode.nodeValue = walker.currentNode.nodeValue.replace(
+          /\{\{date\}\}/g,
+          formatted,
+        );
+      }
+    }
 
     const el = document.getElementById(elementId);
     if (el) el.textContent = `Última atualização: ${formatted}`;

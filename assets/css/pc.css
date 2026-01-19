@@ -51,11 +51,21 @@ main .container {
 .container-technologies {
   flex: auto;
   flex-flow: row wrap;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .container-technologies .container {
   width: auto;
+}
+
+.container-technologies .tech-container {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 20px;
+}
+
+.container-technologies .container h3 {
+  grid-column: span 2;
 }
 
 .techFrame {
