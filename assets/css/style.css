@@ -332,8 +332,8 @@ section {
   padding: 15px;
   justify-content: center;
   align-items: center;
-  width: 125px;
-  height: 125px;
+  width: auto;
+  height: auto;
 }
 
 .tech-cards p {

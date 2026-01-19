@@ -5,8 +5,8 @@
       "image": "assets/img/adolpho-college.png",
       "descriptionImage": {
         "en-US": "Image of Adolpho College Website UI",
-        "pt-BR": "Imagem da UI do website do ColÃ©gio Adolpho"
-      },
+        "pt-BR": "Imagem da UI do website do Colégio Adolpho"
+      }
       "imageMobile": "assets/img/adolpho-college-mobile.png",
       "imageType": "image/png",
       "type": {
@@ -16,11 +16,11 @@
       },
       "title": {
         "en-US": "Adolpho College",
-        "pt-BR": "ColÃ©gio Adolpho"
+        "pt-BR": "Colégio Adolpho"
       },
       "description": {
         "en-US": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news",
-        "pt-BR": "Site do ColÃ©gio Estadual Adolpho de Oliveira Franco, com informaÃ§Ãµes sobre a instituiÃ§Ã£o, cursos e notÃ­cias"
+        "pt-BR": "Site do Colégio Estadual Adolpho de Oliveira Franco, com informações sobre a instituição, cursos e notícias"
       },
       "titleTechnologies": {
         "en-US": "Technologies",
@@ -180,11 +180,11 @@
       },
       "title": {
         "en-US": "Total Score",
-        "pt-BR": "PontuaÃ§Ã£o Total"
+        "pt-BR": "Pontuação Total"
       },
       "description": {
-        "en-US": "Repository of summation tests to discover your test score based on your answers and the answer key. The files to accept only extensions .csv and .tsv",
-        "pt-BR": "RepositÃ³rio de testes de soma para descobrir sua pontuaÃ§Ã£o com base nas respostas e na chave de respostas. Os arquivos aceitam apenas extensÃµes .csv e .tsv"
+        "en-US": "Repository of summation tests to discover your test score based on your answers and the answer key. The files accept only extensions .csv and .tsv",
+        "pt-BR": "Repositório de testes de soma para descobrir sua pontuação com base nas respostas e na chave de respostas. Os arquivos aceitam apenas extensões .csv e .tsv"
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [
