@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
       locale,
     );
     const pPrograms = jsonCardsFetch(
-      "assets/json/cards/programs.json",
+      "assets/json/cards/technologies/programs.json",
       "programsContainer",
       "3x",
       locale,
@@ -557,7 +557,8 @@ async function showLastUpdate(elementId) {
     );
     if (!res.ok) return;
     const commits = await res.json();
-    if (!commits.length) return;
+    if (!Array.isArray(commits) || !commits.length) return;
+    if (!commits[0]?.commit?.author?.date) return;
     const date = new Date(commits[0].commit.author.date);
     const formatted = date.toLocaleDateString(
       document.documentElement.lang || "pt-BR",
