@@ -111,7 +111,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function loadDynamicContent() {
     const containers = [
       "projectsContainer",
-      "technologiesContainer",
+      "frontEndContainer",
+      "backEndContainer",
+      "databasesContainer",
       "programsContainer",
       "techsThisSite",
       "contactContainer",
@@ -142,9 +144,21 @@ document.addEventListener("DOMContentLoaded", () => {
       "2x",
       locale,
     );
-    const pSkills = jsonCardsFetch(
-      "assets/json/cards/programmingLanguages.json",
-      "technologiesContainer",
+    const pFrontEnd = jsonCardsFetch(
+      "assets/json/cards/technologies/front-end.json",
+      "frontEndContainer",
+      "3x",
+      locale,
+    );
+    const pBackEnd = jsonCardsFetch(
+      "assets/json/cards/technologies/back-end.json",
+      "backEndContainer",
+      "3x",
+      locale,
+    );
+    const pDataBases = jsonCardsFetch(
+      "assets/json/cards/technologies/data-bases.json",
+      "databasesContainer",
       "3x",
       locale,
     );
@@ -171,7 +185,16 @@ document.addEventListener("DOMContentLoaded", () => {
       locale,
     );
 
-    Promise.all([pProjects, pSkills, pPrograms, pIcons, pLinks, pFormations])
+    Promise.all([
+      pProjects,
+      pFrontEnd,
+      pBackEnd,
+      pDataBases,
+      pPrograms,
+      pIcons,
+      pLinks,
+      pFormations,
+    ])
       .then(() => {
         addNewIcons("assets/json/icons/svg.json", "3x");
         window.dispatchEvent(new Event("dynamicContentReady"));

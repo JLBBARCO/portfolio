@@ -1,0 +1,7 @@
+{
+  "cardsIcons": [
+    { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
+    { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
+    { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
+  ]
+}
