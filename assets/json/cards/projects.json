@@ -158,7 +158,7 @@
       },
       "description": {
         "en-US": "A system to save your simple passwords. Don't save your important passwords because this program doesn't have encryption",
-        "pt-BR": "Um sistema que salva suas senhas simples. NÃ£o salve suas importantes senhas, porque este programa nÃ£o possui um sistema de criptografia"
+        "pt-BR": "Um sistema que salva suas senhas simples. Não salve suas importantes senhas, porque este programa não possui um sistema de criptografia"
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [

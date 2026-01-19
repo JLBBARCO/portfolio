@@ -39,19 +39,16 @@ main .container {
   overflow: auto;
 }
 
-.container-portfolio {
-  width: 100%;
-}
-
 .card-projects {
   min-width: 400px;
   max-width: 750px;
 }
 
 .container-technologies {
-  flex: auto;
-  flex-flow: row wrap;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 20px;
+  padding: 25px;
 }
 
 .container-technologies .container {
@@ -59,9 +56,8 @@ main .container {
 }
 
 .container-technologies .tech-container {
-  display: grid;
-  grid-template-columns: repeat(2, auto);
   gap: 20px;
+  padding: 25px;
 }
 
 .container-technologies .container h3 {
@@ -74,7 +70,7 @@ main .container {
 
 .tech-cards {
   margin: 10px auto;
-  padding: 25px;
+  padding: 15px;
   width: auto;
   height: auto;
 }
@@ -150,8 +146,10 @@ main .container {
 
 /* Melhorar scroll do carrossel */
 .container-portfolio {
+  width: 100%;
   scroll-behavior: smooth;
   overflow-x: auto;
+  flex-wrap: nowrap;
   -webkit-overflow-scrolling: touch;
 }
 

@@ -1,3 +1,3 @@
 {
-  "cardsIcons": [{ "icon": "fa-sql", "name": "SQL", "style": "fa-brands" }]
+  "cardsIcons": [{ "icon": "fa-mysql", "name": "MySQL", "style": "fa-brands" }]
 }

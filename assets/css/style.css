@@ -256,7 +256,7 @@ section {
   position: relative;
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   overflow-x: auto;
   scroll-behavior: smooth;
   width: 100%;
@@ -309,8 +309,7 @@ section {
 }
 
 .container-technologies {
-  display: flex;
-  flex-flow: column wrap;
+  display: grid;
 }
 
 .techFrame {

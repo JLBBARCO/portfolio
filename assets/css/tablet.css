@@ -38,10 +38,6 @@ main .container {
   overflow: auto;
 }
 
-.container-portfolio {
-  width: 100%;
-}
-
 .card-projects {
   min-width: 400px;
   max-width: 750px;
@@ -135,6 +131,7 @@ main .container {
 
 /* Melhorar scroll do carrossel */
 .container-portfolio {
+  width: 100%;
   scroll-behavior: smooth;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
