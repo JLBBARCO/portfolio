@@ -322,17 +322,18 @@ function jsonCardsFetch(
     .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
     .then((data) => {
       const container = document.getElementById(containerId);
-      if (!container || !Array.isArray(data.cards)) return;
+      const cards = data.cards || data.cardsIcons;
+      if (!container || !Array.isArray(cards)) return;
 
       if (containerId === "projectsContainer") {
-        setupProjects(container, data.cards, iconSize, language);
+        setupProjects(container, cards, iconSize, language);
       } else if (containerId === "formationsContainer") {
-        setupFormations(container, data.cards, language);
+        setupFormations(container, cards, language);
       } else if (
         containerId === "technologiesContainer" ||
         containerId === "programsContainer"
       ) {
-        setupSkills(container, data.cards || data.cardsIcons, iconSize);
+        setupSkills(container, cards, iconSize);
       }
     })
     .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
