@@ -40,8 +40,6 @@ main .container {
 
 .container-portfolio {
   width: 100%;
-  flex-direction: row;
-  justify-content: space-around;
 }
 
 .card-projects {
