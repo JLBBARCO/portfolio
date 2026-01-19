@@ -416,7 +416,7 @@ function jsonCardsFetch(
           buttonAll.addEventListener("click", () =>
             filterProjectsByTechnology("all"),
           );
-          
+
           // Insere o container de filtros ANTES do container de cards
           if (container.parentNode) {
             container.parentNode.insertBefore(filterContainer, container);
@@ -459,7 +459,7 @@ function jsonCardsFetch(
         data.cards.forEach((card) => {
           const createdCard = document.createElement("div");
           createdCard.className = "card card-projects";
-          
+
           // Armazena as tecnologias usadas no card para filtro
           if (card.iconTechnologies && Array.isArray(card.iconTechnologies)) {
             const techNames = card.iconTechnologies
@@ -579,8 +579,8 @@ function jsonCardsFetch(
         });
 
         // Criar container para filtros
-        const filterContainer = document.createElement("div");
-        filterContainer.className = "filter-container";
+        const filterContainerFormations = document.createElement("div");
+        filterContainerFormations.className = "filter-container";
 
         // Criar botão "Todos" se houver mais de um tipo
         if (Object.keys(typeCount).length > 1) {
@@ -591,8 +591,8 @@ function jsonCardsFetch(
           buttonAll.addEventListener("click", () =>
             filterFormationsByType("all"),
           );
-          container.appendChild(filterContainer);
-          filterContainer.appendChild(buttonAll);
+          container.appendChild(filterContainerFormations);
+          filterContainerFormations.appendChild(buttonAll);
 
           // Criar botões de filtro por tipo
           Object.entries(typeCount).forEach(([typeId, count]) => {
@@ -603,7 +603,7 @@ function jsonCardsFetch(
             button.addEventListener("click", () =>
               filterFormationsByType(typeId),
             );
-            filterContainer.appendChild(button);
+            filterContainerFormations.appendChild(button);
           });
         }
 
@@ -674,7 +674,9 @@ function jsonCardsFetch(
 function filterProjectsByTechnology(techName) {
   const cards = document.querySelectorAll(".card.card-projects");
   cards.forEach((card) => {
-    const techs = card.dataset.technologies ? card.dataset.technologies.split(",") : [];
+    const techs = card.dataset.technologies
+      ? card.dataset.technologies.split(",")
+      : [];
     if (techName === "all" || techs.includes(techName)) {
       card.style.display = "block";
     } else {
