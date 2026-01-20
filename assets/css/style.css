@@ -5,14 +5,17 @@
   font-family: "Overlock";
   src: url(../fonts/Overlock/Overlock-Regular.ttf) format("truetype");
 }
+
 @font-face {
   font-family: "Caveat";
   src: url(../fonts/Caveat/Caveat.ttf) format("truetype");
 }
+
 @font-face {
   font-family: "MedievalSharp";
   src: url(../fonts/MedievalSharp/MedievalSharp-Regular.ttf) format("truetype");
 }
+
 @font-face {
   font-family: "Audiowide";
   src: url(../fonts/Audiowide/Audiowide-Regular.ttf) format("truetype");
@@ -25,9 +28,9 @@
   --secondary-bg-transparent: #1e1e1eaa;
   --text-primary: #ffffff;
   --text-secondary: #b3b3b3;
-  --accent: #7c4dff;
-  --accent-transparent: #7c4dffaa;
-  --hover-accent: #9670ff;
+  --accent: #238a9f;
+  --accent-transparent: #238a9faa;
+  --hover-accent: #0d4c68;
   --card-bg: #252525;
   --transition: all 0.3s ease;
   --font0: "Overlock", sans-serif;
@@ -68,7 +71,6 @@ a:hover {
 .icon {
   width: 24px;
   height: auto;
-  margin: 1rem;
   color: var(--text-primary);
 }
 
@@ -107,7 +109,7 @@ header {
   padding: 1rem;
   top: 0;
   z-index: 1000;
-  width: 98%;
+  width: 100%;
   background-color: var(--secondary-bg);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
@@ -144,6 +146,7 @@ nav a:hover {
   height: 1px;
   overflow: hidden;
 }
+
 .skip-link:focus {
   left: 0;
   top: 0;
@@ -240,8 +243,15 @@ main .icon:hover {
   transform: scale(1.2);
 }
 
+main .container {
+  width: 100%;
+}
+
 section {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   place-items: center;
   text-align: center;
   width: 100%;
@@ -309,7 +319,9 @@ section {
 }
 
 .container-technologies {
-  display: grid;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
 }
 
 .techFrame {
@@ -356,6 +368,7 @@ section {
   flex-flow: row wrap;
   justify-content: center;
   align-items: center;
+  gap: 20px;
 }
 
 .button {
@@ -437,8 +450,8 @@ section {
 }
 
 .link-cards:hover {
-  color: var(--text-color);
-  background-color: var(--background-color);
+  color: var(--text-primary);
+  background-color: var(--card-bg);
   transform: translateY(-5px);
 }
 
@@ -447,13 +460,13 @@ section {
 }
 
 .link-cards a {
-  color: var(--primary-color);
+  color: var(--accent);
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .link-cards a:hover {
-  color: var(--secondary-color);
+  color: var(--hover-accent);
   text-decoration: underline;
 }
 
@@ -484,7 +497,7 @@ section {
   padding: 5px;
   border: none;
   border-radius: 10px;
-  background: var(--secondary-bg);
+  background: var(--secondary-bg-transparent);
   transition: var(--transition);
 }
 
@@ -494,10 +507,6 @@ section {
 
 #accessibility button:active {
   background-color: var(--primary-bg);
-}
-
-#accessibility button .icon {
-  width: 24px;
 }
 
 #accessibility-button {
@@ -536,6 +545,7 @@ section {
 .container-contact {
   width: 100%;
 }
+
 /* SVG Icon Styling */
 .icon {
   display: inline-flex;

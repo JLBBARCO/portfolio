@@ -9,11 +9,6 @@
       },
       "imageMobile": "assets/img/adolpho-college-mobile.png",
       "imageType": "image/png",
-      "type": {
-        "id": "webProject",
-        "en-US": "Web Project",
-        "pt-BR": "Projeto Web"
-      },
       "title": {
         "en-US": "Adolpho College",
         "pt-BR": "Colégio Adolpho"
@@ -27,9 +22,24 @@
         "pt-BR": "Tecnologias"
       },
       "iconTechnologies": [
-        { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
-        { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
-        { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
+        {
+          "icon": "fa-html5",
+          "name": "HTML5",
+          "style": "fa-brands",
+          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+        },
+        {
+          "icon": "fa-css3",
+          "name": "CSS3",
+          "style": "fa-brands",
+          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+        }
       ],
       "titleLinks": {
         "en-US": "Links",
@@ -41,6 +51,83 @@
       "linkSiteTarget": "target='_blank' rel='noopener noreferrer'"
     },
     {
+      "projectTitle": "Passwords Manager",
+      "image": "assets/img/passwords-manager.png",
+      "descriptionImage": {
+        "en-US": "Image of Passwords Manager UI",
+        "pt-BR": "Imagem da UI do Gerenciador de Senhas"
+      },
+      "imageMobile": "assets/img/passwords-manager-mobile.png",
+      "imageType": "image/png",
+      "title": {
+        "en-US": "Passwords Manager",
+        "pt-BR": "Gerenciador de Senhas"
+      },
+      "description": {
+        "en-US": "A system to save your simple passwords. Don't save your important passwords because this program doesn't have encryption",
+        "pt-BR": "Um sistema que salva suas senhas simples. Não salve suas importantes senhas, porque este programa não possui um sistema de criptografia"
+      },
+      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "iconTechnologies": [
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": { "id": "backEnd", "en-US": "Back-end" }
+        }
+      ],
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
+      "linkRepository": "https://github.com/jlbbarco/passwords-manager/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
+      "projectTitle": "GreenTech",
+      "image": "assets/img/greentech.png",
+      "descriptionImage": {
+        "en-US": "Image of Greentech Website",
+        "pt-BR": "Imagem do Website Tecnoverde"
+      },
+      "imageMobile": "assets/img/greentech-mobile.png",
+      "imageType": "image/png",
+      "title": { "en-US": "Greentech", "pt-BR": "Tecnoverde" },
+      "description": {
+        "en-US": "A website for teaching the cultivation of Parsley",
+        "pt-BR": "Um website para ensinar o cultivo de Salsa"
+      },
+      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "iconTechnologies": [
+        {
+          "icon": "fa-html5",
+          "name": "HTML5",
+          "style": "fa-brands",
+          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+        },
+        {
+          "icon": "fa-css3",
+          "name": "CSS3",
+          "style": "fa-brands",
+          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+        }
+      ],
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
+      "linkRepository": "https://github.com/jlbbarco/Salsa/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkSite": "https://tecnoverde.vercel.app",
+      "linkSiteTarget": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
       "projectTitle": "Image Converter",
       "image": "assets/img/image-converter.png",
       "descriptionImage": {
@@ -49,11 +136,6 @@
       },
       "imageMobile": "assets/img/image-converter-mobile.png",
       "imageType": "image/png",
-      "type": {
-        "id": "webProject",
-        "en-US": "Web Project",
-        "pt-BR": "Projeto Web"
-      },
       "title": { "en-US": "Image Converter", "pt-BR": "Conversor de imagens" },
       "description": {
         "en-US": "Website for converter images for PNG, JPEG and WEBP formats",
@@ -61,9 +143,24 @@
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [
-        { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
-        { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
-        { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
+        {
+          "icon": "fa-html5",
+          "name": "HTML5",
+          "style": "fa-brands",
+          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+        },
+        {
+          "icon": "fa-css3",
+          "name": "CSS3",
+          "style": "fa-brands",
+          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+        }
       ],
       "titleLinks": {
         "en-US": "Links",
@@ -83,11 +180,6 @@
       },
       "imageMobile": "assets/img/unit-converter-mobile.png",
       "imageType": "image/png",
-      "type": {
-        "id": "pythonProject",
-        "en-US": "Python Project",
-        "pt-BR": "Projeto Python"
-      },
       "title": { "en-US": "Unit Converter", "pt-BR": "Conversor de unidades" },
       "description": {
         "en-US": "A tool to convert between different units of measurement",
@@ -95,7 +187,12 @@
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [
-        { "icon": "fa-python", "name": "Python", "style": "fa-brands" }
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": { "id": "backEnd", "en-US": "Back-end" }
+        }
       ],
       "titleLinks": {
         "en-US": "Links",
@@ -105,79 +202,7 @@
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
     },
     {
-      "projectTitle": "GreenTech",
-      "image": "assets/img/greentech.png",
-      "descriptionImage": {
-        "en-US": "Image of Greentech Website",
-        "pt-BR": "Imagem do Website Tecnoverde"
-      },
-      "imageMobile": "assets/img/greentech-mobile.png",
-      "imageType": "image/png",
-      "type": {
-        "id": "webProject",
-        "en-US": "Web Project",
-        "pt-BR": "Projeto Web"
-      },
-      "title": { "en-US": "Greentech", "pt-BR": "Tecnoverde" },
-      "description": {
-        "en-US": "A website for teaching the cultivation of Parsley",
-        "pt-BR": "Um website para ensinar o cultivo de Salsa"
-      },
-      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
-      "iconTechnologies": [
-        { "icon": "fa-html5", "name": "HTML5", "style": "fa-brands" },
-        { "icon": "fa-css3", "name": "CSS3", "style": "fa-brands" },
-        { "icon": "fa-js", "name": "JavaScript", "style": "fa-brands" }
-      ],
-      "titleLinks": {
-        "en-US": "Links",
-        "pt-BR": "Links"
-      },
-      "linkRepository": "https://github.com/jlbbarco/Salsa/",
-      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkSite": "https://tecnoverde.vercel.app",
-      "linkSiteTarget": "target='_blank' rel='noopener noreferrer'"
-    },
-    {
-      "projectTitle": "Passwords Manager",
-      "image": "assets/img/passwords-manager.png",
-      "descriptionImage": {
-        "en-US": "Image of Passwords Manager UI",
-        "pt-BR": "Imagem da UI do Gerenciador de Senhas"
-      },
-      "imageMobile": "assets/img/passwords-manager-mobile.png",
-      "imageType": "image/png",
-      "type": {
-        "id": "pythonProject",
-        "en-US": "Python Project",
-        "pt-BR": "Projeto Python"
-      },
-      "title": {
-        "en-US": "Passwords Manager",
-        "pt-BR": "Gerenciador de Senhas"
-      },
-      "description": {
-        "en-US": "A system to save your simple passwords. Don't save your important passwords because this program doesn't have encryption",
-        "pt-BR": "Um sistema que salva suas senhas simples. Não salve suas importantes senhas, porque este programa não possui um sistema de criptografia"
-      },
-      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
-      "iconTechnologies": [
-        { "icon": "fa-python", "name": "Python", "style": "fa-brands" }
-      ],
-      "titleLinks": {
-        "en-US": "Links",
-        "pt-BR": "Links"
-      },
-      "linkRepository": "https://github.com/jlbbarco/passwords-manager/",
-      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
-    },
-    {
       "projectTitle": "Total Score",
-      "type": {
-        "id": "pythonProject",
-        "en-US": "Python Project",
-        "pt-BR": "Projeto Python"
-      },
       "title": {
         "en-US": "Total Score",
         "pt-BR": "Pontuação Total"
@@ -188,7 +213,12 @@
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [
-        { "icon": "fa-python", "name": "Python", "style": "fa-brands" }
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": { "id": "backEnd", "en-US": "Back-end" }
+        }
       ],
       "titleLinks": {
         "en-US": "Links",
