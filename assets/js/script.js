@@ -111,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function loadDynamicContent() {
     const containers = [
       "projectsContainer",
+      "technologiesContainer",
       "frontEndContainer",
       "backEndContainer",
       "databasesContainer",
@@ -144,27 +145,9 @@ document.addEventListener("DOMContentLoaded", () => {
       "2x",
       locale,
     );
-    const pFrontEnd = jsonCardsFetch(
-      "assets/json/cards/technologies/front-end.json",
-      "frontEndContainer",
-      "3x",
-      locale,
-    );
-    const pBackEnd = jsonCardsFetch(
-      "assets/json/cards/technologies/back-end.json",
-      "backEndContainer",
-      "3x",
-      locale,
-    );
-    const pDataBases = jsonCardsFetch(
-      "assets/json/cards/technologies/data-bases.json",
-      "databasesContainer",
-      "3x",
-      locale,
-    );
-    const pPrograms = jsonCardsFetch(
-      "assets/json/cards/technologies/programs.json",
-      "programsContainer",
+    const pTechnologiesContainer = jsonCardsFetch(
+      "assets/json/cards/projects.json",
+      "technologiesContainer",
       "3x",
       locale,
     );
@@ -187,10 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     Promise.all([
       pProjects,
-      pFrontEnd,
-      pBackEnd,
-      pDataBases,
-      pPrograms,
+      pTechnologiesContainer,
       pIcons,
       pLinks,
       pFormations,
@@ -259,10 +239,10 @@ function accessibilityToggle() {
 
   const isVisible = menu.style.display === "flex";
   menu.style.display = isVisible ? "none" : "flex";
-  menu.setAttribute("aria-hidden", isVisible);
+  menu.setAttribute("aria-hidden", !isVisible);
   if (btn) {
     btn.setAttribute("aria-expanded", !isVisible);
-    if (isVisible) menu.focus();
+    if (!isVisible) menu.focus();
   }
 }
 
@@ -356,6 +336,8 @@ function jsonCardsFetch(
         setupProjects(container, cards, iconSize, language);
       } else if (containerId === "formationsContainer") {
         setupFormations(container, cards, language);
+      } else if (containerId === "technologiesContainer") {
+        setupTechnologies(container, cards, iconSize, language);
       } else if (
         containerId === "frontEndContainer" ||
         containerId === "backEndContainer" ||
@@ -508,18 +490,122 @@ function setupFormations(container, cards, language) {
   container.appendChild(fragment);
 }
 
+function setupTechnologies(container, cards, iconSize, language = "pt-BR") {
+  if (!Array.isArray(cards)) return;
+
+  // Agrupa tecnologias por stack e elimina duplicatas
+  const stackMap = {};
+
+  cards.forEach((card) => {
+    if (card.iconTechnologies && Array.isArray(card.iconTechnologies)) {
+      card.iconTechnologies.forEach((tech) => {
+        if (!tech.stack) return;
+
+        const stackId = tech.stack.id;
+        if (!stackMap[stackId]) {
+          stackMap[stackId] = {
+            stack: tech.stack,
+            technologies: [],
+          };
+        }
+
+        // Verifica se a tecnologia já existe neste stack (evita duplicatas)
+        const exists = stackMap[stackId].technologies.some(
+          (t) => t.name === tech.name,
+        );
+        if (!exists) {
+          stackMap[stackId].technologies.push(tech);
+        }
+      });
+    }
+  });
+
+  const fragment = document.createDocumentFragment();
+
+  // Renderiza cada stack com suas tecnologias
+  Object.values(stackMap).forEach((stackGroup) => {
+    const stackDiv = document.createElement("div");
+    stackDiv.className = "tech-stack-group";
+
+    // Cria o título do stack usando en-US ou pt-BR
+    const stackTitle =
+      getLocalized(stackGroup.stack, language) || stackGroup.stack.id;
+    const h3 = document.createElement("h3");
+    h3.textContent = stackTitle;
+    stackDiv.appendChild(h3);
+
+    // Cria container para os ícones
+    const iconsContainer = document.createElement("div");
+    iconsContainer.className = "technologies-portfolio";
+
+    // Renderiza as tecnologias deste stack (sem duplicatas)
+    const renderedTechs = new Set();
+    stackGroup.technologies.forEach((tech) => {
+      if (renderedTechs.has(tech.name)) return; // Pula se já foi renderizado
+      renderedTechs.add(tech.name);
+
+      const div = document.createElement("div");
+      div.className = "card tech-cards";
+      const classes = faClass(tech.style, tech.icon, iconSize);
+      div.innerHTML = `<i class="${classes} icon" title="${tech.name || ""}"></i>`;
+      const p = document.createElement("p");
+      p.textContent = tech.name || "";
+      div.appendChild(p);
+      iconsContainer.appendChild(div);
+    });
+
+    stackDiv.appendChild(iconsContainer);
+    fragment.appendChild(stackDiv);
+  });
+
+  container.appendChild(fragment);
+}
+
 function setupSkills(container, cards, iconSize) {
   if (!cards) return;
   const fragment = document.createDocumentFragment();
   cards.forEach((card) => {
-    if (card.icon) {
-      const div = document.createElement("div");
-      div.className = "card tech-cards";
-      div.innerHTML = `
-        <i class="${faClass(card.style, card.icon, iconSize)} icon" title="${card.name}"></i>
-        <p>${card.name}</p>
-      `;
-      fragment.appendChild(div);
+    if (card.iconTechnologies) {
+      const stackList = [];
+      const stackNames = [];
+      card.iconTechnologies.forEach((tech) => {
+        if (!stackList.includes(tech.stack.id)) {
+          stackList.push(tech.stack.id);
+          stackNames.push(getLocalized(tech.stack, "en-US"));
+        }
+
+        stackNames.forEach((stack) => {
+          const stackDiv = document.createElement("div");
+          stackDiv.className = "tech-stack-group";
+          stackDiv.innerHTML = `<h3>${stack}</h3>`;
+          fragment.appendChild(stackDiv);
+
+          const techNameList = [];
+          const techIconList = [];
+          const techStyleList = [];
+          if (tech.name) {
+            techNameList.push(tech.name);
+            techIconList.push(tech.icon);
+            techStyleList.push(tech.style);
+          }
+
+          techIconList.forEach((icon, index) => {
+            const div = document.createElement("div");
+            div.className = "card tech-cards";
+            div.innerHTML = `
+              <i class="${faClass(
+                techStyleList[index],
+                icon,
+                iconSize,
+              )} icon" title="${techNameList[index]}"></i>
+            `;
+            const p = document.createElement("p");
+            p.textContent = techNameList[index];
+            div.appendChild(p);
+            stackDiv.appendChild(div);
+          });
+        });
+      });
     }
   });
   container.appendChild(fragment);
@@ -593,6 +679,10 @@ async function showLastUpdate(elementId) {
     const commits = await res.json();
     if (!Array.isArray(commits) || !commits.length) return;
     const date = new Date(commits[0].commit.author.date);
+
+    // Armazena a data bruta para uso posterior
+    window.__lastUpdateRawDate = date;
+
     const formatted = date.toLocaleDateString(
       document.documentElement.lang || "pt-BR",
       { year: "numeric", month: "long", day: "numeric" },
@@ -614,6 +704,9 @@ async function showLastUpdate(elementId) {
 
     const el = document.getElementById(elementId);
     if (el) el.textContent = `Última atualização: ${formatted}`;
+
+    // Dispara evento para informar que a data foi atualizada
+    window.dispatchEvent(new Event("lastUpdateReady"));
   } catch (err) {
     console.error("Erro GitHub API:", err);
   }

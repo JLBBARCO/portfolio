@@ -44,9 +44,13 @@ main .container {
 }
 
 .container-technologies {
-  flex: auto;
+  display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
+  align-items: center;
+}
+
+.tech-stack-group {
+  width: auto;
 }
 
 .techFrame {
@@ -119,6 +123,7 @@ main .container {
 .btn.prev {
   left: 25px;
 }
+
 .btn.next {
   right: 25px;
 }
@@ -133,6 +138,7 @@ main .container {
 .container-portfolio {
   width: 100%;
   scroll-behavior: smooth;
+  scrollbar-width: thin;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
