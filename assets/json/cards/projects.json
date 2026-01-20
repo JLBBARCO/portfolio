@@ -39,6 +39,12 @@
           "name": "JavaScript",
           "style": "fa-brands",
           "stack": { "id": "frontEnd", "en-US": "Front-end" }
+        },
+        {
+          "icon": "fa-font-awesome",
+          "name": "Font Awesome",
+          "style": "fa-brands",
+          "stack": { "id": "frontEnd", "en-US": "Front-end" }
         }
       ],
       "titleLinks": {
