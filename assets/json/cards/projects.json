@@ -247,7 +247,7 @@
           "icon": "fa-python",
           "name": "Python",
           "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end" }
+          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
         }
       ],
       "titleLinks": {
