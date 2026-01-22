@@ -125,7 +125,7 @@ function applyTranslations(language) {
       // atualizar texto direto (remove nós de texto anteriores)
       // procura primeiro nó de texto ou cria um
       let textNode = Array.from(element.childNodes).find(
-        (n) => n.nodeType === Node.TEXT_NODE
+        (n) => n.nodeType === Node.TEXT_NODE,
       );
       if (textNode) {
         textNode.nodeValue = text;
@@ -169,11 +169,14 @@ function applyTranslations(language) {
     });
   }
 
+  // Preenche títulos reutilizáveis após atualizar as traduções
+  fillReusableTitles();
+
   // Dispara evento para atualizar cards dinâmicos sem recarregar a página
   window.dispatchEvent(
     new CustomEvent("languageChanged", {
       detail: { language: document.documentElement.lang },
-    })
+    }),
   );
 }
 
@@ -253,11 +256,11 @@ window.setTranslationDate = function (rawDate) {
   translations.pt = translations.pt || {};
   translations.en.lastUpdate = templateEn.replace(
     /\{\{date\}\}/g,
-    formatted.en
+    formatted.en,
   );
   translations.pt.lastUpdate = templatePt.replace(
     /\{\{date\}\}/g,
-    formatted.pt
+    formatted.pt,
   );
 
   // Atualiza elemento #lastUpdate com a tradução no idioma atual
@@ -272,7 +275,7 @@ window.setTranslationDate = function (rawDate) {
   const walker = document.createTreeWalker(
     document.body,
     NodeFilter.SHOW_TEXT,
-    null
+    null,
   );
   const nodes = [];
   while (walker.nextNode()) {
@@ -307,6 +310,26 @@ function changeLanguage() {
 }
 
 // Carrega as traduções quando o DOM está pronto
+/**
+ * Função para preencher títulos reutilizáveis (símbolos)
+ * Usa classes como .title-technologies, .title-links para aplicar traduções
+ */
+function fillReusableTitles() {
+  // Mapa de classes para chaves de tradução
+  const titleMap = {
+    "title-technologies": "technologiesTitle",
+    "title-links": "linksTitle",
+  };
+
+  Object.entries(titleMap).forEach(([className, translationKey]) => {
+    const elements = document.querySelectorAll(`.${className}`);
+    const translation = t(translationKey);
+    elements.forEach((el) => {
+      el.textContent = translation;
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // Aguarda que o conteúdo dinâmico seja carregado (evento disparado em script.js)
   // ou usa um fallback curto para evitar bloqueio se o evento não chegar.
@@ -321,3 +344,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fallback: se o evento não for disparado em 500ms, carrega mesmo assim
   setTimeout(onceLoad, 500);
 });
+
+// Preenche títulos reutilizáveis quando o conteúdo dinâmico estiver pronto
+window.addEventListener("dynamicContentReady", fillReusableTitles);

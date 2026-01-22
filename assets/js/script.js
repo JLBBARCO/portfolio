@@ -145,12 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
       "2x",
       locale,
     );
-    const pTechnologiesContainer = jsonCardsFetch(
-      "assets/json/cards/projects.json",
-      "technologiesContainer",
-      "3x",
-      locale,
-    );
     const pIcons = setIcons(
       "assets/json/icons/techs-this-site.json",
       "techsThisSite",
@@ -164,17 +158,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const pFormations = jsonCardsFetch(
       "assets/json/cards/formation.json",
       "formationsContainer",
-      "3x",
+      "2x",
       locale,
     );
 
-    Promise.all([
-      pProjects,
-      pTechnologiesContainer,
-      pIcons,
-      pLinks,
-      pFormations,
-    ])
+    // Carrega e renderiza tecnologias dos projetos e formações
+    const pTechnologies = loadAllTechnologies(locale);
+
+    Promise.all([pProjects, pIcons, pLinks, pFormations, pTechnologies])
       .then(() => {
         addNewIcons("assets/json/icons/svg.json", "3x");
         window.dispatchEvent(new Event("dynamicContentReady"));
@@ -335,16 +326,7 @@ function jsonCardsFetch(
       if (containerId === "projectsContainer") {
         setupProjects(container, cards, iconSize, language);
       } else if (containerId === "formationsContainer") {
-        setupFormations(container, cards, language);
-      } else if (containerId === "technologiesContainer") {
-        setupTechnologies(container, cards, iconSize, language);
-      } else if (
-        containerId === "frontEndContainer" ||
-        containerId === "backEndContainer" ||
-        containerId === "databasesContainer" ||
-        containerId === "programsContainer"
-      ) {
-        setupSkills(container, cards, iconSize);
+        setupFormations(container, cards, iconSize, language);
       }
     })
     .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
@@ -352,10 +334,17 @@ function jsonCardsFetch(
 
 function setupProjects(container, cards, iconSize, language) {
   const techCount = {};
+  const techId = {};
+  const techName = {};
   cards.forEach((card) => {
     if (card.iconTechnologies) {
       card.iconTechnologies.forEach((tech) => {
         if (tech.name) techCount[tech.name] = (techCount[tech.name] || 0) + 1;
+
+        if (tech.stack.id && tech.name != techId) {
+          techId[tech.name] = tech.stack.id;
+          techName[tech.name] = getLocalized(tech.stack, language);
+        }
       });
     }
   });
@@ -420,7 +409,7 @@ function setupProjects(container, cards, iconSize, language) {
 
     if (card.iconTechnologies) {
       if (card.titleTechnologies)
-        html += `<h4>${getLocalized(card.titleTechnologies, language)}</h4>`;
+        html += `<h4 class="title-technologies"></h4>`;
       html += `<div class="technologies-portfolio">`;
       card.iconTechnologies.forEach((tech) => {
         html += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
@@ -428,11 +417,13 @@ function setupProjects(container, cards, iconSize, language) {
       html += `</div>`;
     }
 
-    html += `<h4>${getLocalized(card.titleLinks, language) || "Links"}</h4><div class="links-portfolio">`;
+    if (card.linkRepository || card.linkDemo) {
+      html += `<h4 class="title-links"></h4><div class="links-portfolio">`;
+    }
     if (card.linkRepository)
       html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github fa-${iconSize} icon"></i></a>`;
-    if (card.linkSite)
-      html += `<a href="${card.linkSite}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-share-from-square fa-${iconSize} icon"></i></a>`;
+    if (card.linkDemo)
+      html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-share-from-square fa-${iconSize} icon"></i></a>`;
     html += `</div>`;
 
     div.innerHTML = html;
@@ -441,7 +432,13 @@ function setupProjects(container, cards, iconSize, language) {
   container.appendChild(fragment);
 }
 
-function setupFormations(container, cards, language) {
+function setupFormations(container, cards, iconSize = "3x", language) {
+  // Se apenas 3 parâmetros forem passados, ajusta language
+  if (typeof iconSize === "string" && !language) {
+    language = iconSize;
+    iconSize = "3x";
+  }
+
   const typeCount = {};
   const typeNames = {};
   cards.forEach((card) => {
@@ -478,13 +475,43 @@ function setupFormations(container, cards, language) {
     div.className = "card card-formation";
     if (card.type?.id) div.dataset.type = card.type.id;
 
-    div.innerHTML = `
-      <h3>${getLocalized(card.title, language)}</h3>
-      <p class="institution">${getLocalized(card.institution, language)}</p>
-      <p class="formation-type">${card.type ? getLocalized(card.type, language) : ""}</p>
-      <p class="description">${getLocalized(card.description, language)}</p>
-      <p class="period">${getLocalized(card.dateText, language)}</p>
-    `;
+    let html = "";
+
+    if (card.title) {
+      html += `<h3>${getLocalized(card.title, language)}</h3>`;
+    }
+    if (card.institution) {
+      html += `<p class="institution">${getLocalized(
+        card.institution,
+        language,
+      )}</p>`;
+    }
+    if (card.type) {
+      html += `<p class="formation-type">${getLocalized(
+        card.type,
+        language,
+      )}</p>`;
+    }
+    if (card.description) {
+      html += `<p class="description">${getLocalized(
+        card.description,
+        language,
+      )}</p>`;
+    }
+    if (card.iconTechnologies) {
+      html += `<h6 class="title-technologies"></h6>`;
+
+      let techsDiv = `<div class="technologies-portfolio">`;
+      card.iconTechnologies.forEach((tech) => {
+        techsDiv += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
+      });
+      html += techsDiv + `</div>`;
+    }
+    if (card.dateText) {
+      html += `<p class="period">${getLocalized(card.dateText, language)}</p>`;
+    }
+
+    div.innerHTML = html;
     fragment.appendChild(div);
   });
   container.appendChild(fragment);
@@ -561,54 +588,28 @@ function setupTechnologies(container, cards, iconSize, language = "pt-BR") {
   container.appendChild(fragment);
 }
 
-function setupSkills(container, cards, iconSize) {
-  if (!cards) return;
-  const fragment = document.createDocumentFragment();
-  cards.forEach((card) => {
-    if (card.iconTechnologies) {
-      const stackList = [];
-      const stackNames = [];
-      card.iconTechnologies.forEach((tech) => {
-        if (!stackList.includes(tech.stack.id)) {
-          stackList.push(tech.stack.id);
-          stackNames.push(getLocalized(tech.stack, "en-US"));
-        }
+function loadAllTechnologies(language = "pt-BR") {
+  return Promise.all([
+    fetch("assets/json/cards/projects.json").then((res) =>
+      res.ok ? res.json() : Promise.reject(res.status),
+    ),
+    fetch("assets/json/cards/formation.json").then((res) =>
+      res.ok ? res.json() : Promise.reject(res.status),
+    ),
+  ])
+    .then(([projectsData, formationsData]) => {
+      const container = document.getElementById("technologiesContainer");
+      if (!container) return;
 
-        stackNames.forEach((stack) => {
-          const stackDiv = document.createElement("div");
-          stackDiv.className = "tech-stack-group";
-          stackDiv.innerHTML = `<h3>${stack}</h3>`;
-          fragment.appendChild(stackDiv);
+      // Coleta todas as tecnologias dos projetos e formações
+      const allCards = [];
+      if (projectsData.cards) allCards.push(...projectsData.cards);
+      if (formationsData.cards) allCards.push(...formationsData.cards);
 
-          const techNameList = [];
-          const techIconList = [];
-          const techStyleList = [];
-          if (tech.name) {
-            techNameList.push(tech.name);
-            techIconList.push(tech.icon);
-            techStyleList.push(tech.style);
-          }
-
-          techIconList.forEach((icon, index) => {
-            const div = document.createElement("div");
-            div.className = "card tech-cards";
-            div.innerHTML = `
-              <i class="${faClass(
-                techStyleList[index],
-                icon,
-                iconSize,
-              )} icon" title="${techNameList[index]}"></i>
-            `;
-            const p = document.createElement("p");
-            p.textContent = techNameList[index];
-            div.appendChild(p);
-            stackDiv.appendChild(div);
-          });
-        });
-      });
-    }
-  });
-  container.appendChild(fragment);
+      // Chama setupTechnologies com todos os cards
+      setupTechnologies(container, allCards, "3x", language);
+    })
+    .catch((err) => console.error("Erro ao carregar tecnologias:", err));
 }
 
 function filterProjectsByTechnology(tech) {

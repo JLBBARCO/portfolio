@@ -9,15 +9,77 @@
         "en-US": "Adolpho de Oliveira Franco State School",
         "pt-BR": "Colégio Estadual Adolpho de Oliveira Franco"
       },
-      "description": {
-        "en-US": "Course focused on software development, systems analysis, and project management",
-        "pt-BR": "Curso focado no desenvolvimento de software, análise de sistemas e gerenciamento de projetos"
-      },
       "type": {
         "id": "technicalCourse",
         "en-US": "Technical Course",
         "pt-BR": "Curso Técnico"
       },
+      "description": {
+        "en-US": "Course focused on software development, systems analysis, and project management",
+        "pt-BR": "Curso focado no desenvolvimento de software, análise de sistemas e gerenciamento de projetos"
+      },
+      "titleTechnologies": {
+        "en-US": "Technologies",
+        "pt-BR": "Tecnologias"
+      },
+      "iconTechnologies": [
+        {
+          "icon": "fa-html5",
+          "name": "HTML5",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-css3",
+          "name": "CSS3",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+        },
+        {
+          "icon": "fa-mysql",
+          "name": "MySQL",
+          "style": "fa-brands",
+          "stack": {
+            "id": "dataBase",
+            "en-US": "Data Base",
+            "pt-BR": "Banco de Dados"
+          }
+        },
+        {
+          "icon": "fa-vscode",
+          "name": "VS Code",
+          "style": "fa-brands",
+          "stack": {
+            "id": "platforms",
+            "en-US": "Platforms",
+            "pt-BR": "Plataformas"
+          }
+        }
+      ],
       "dateText": {
         "en-US": "2023 - 2025",
         "pt-BR": "2023 - 2025"
@@ -37,9 +99,9 @@
         "pt-BR": "Curso de fluência em inglês"
       },
       "type": {
-        "id": "englishCourse",
-        "en-US": "English Course",
-        "pt-BR": "Curso de Inglês"
+        "id": "languageCourse",
+        "en-US": "Language Course",
+        "pt-BR": "Curso de Idioma"
       },
       "dateText": {
         "en-US": "2022 - 2026",
@@ -64,6 +126,68 @@
         "en-US": "Online Course",
         "pt-BR": "Curso Online"
       },
+      "titleTechnologies": {
+        "en-US": "Technologies",
+        "pt-BR": "Tecnologias"
+      },
+      "iconTechnologies": [
+        {
+          "icon": "fa-html5",
+          "name": "HTML5",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-css3",
+          "name": "CSS3",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+        },
+        {
+          "icon": "fa-git-alt",
+          "name": "Git",
+          "style": "fa-brands",
+          "stack": {
+            "id": "platforms",
+            "en-US": "Platforms",
+            "pt-BR": "Plataformas"
+          }
+        },
+        {
+          "icon": "fa-github",
+          "name": "GitHub",
+          "style": "fa-brands",
+          "stack": {
+            "id": "platforms",
+            "en-US": "Platforms",
+            "pt-BR": "Plataformas"
+          }
+        }
+      ],
       "dateText": {
         "en-US": "2023 - Present",
         "pt-BR": "2023 - Presente"

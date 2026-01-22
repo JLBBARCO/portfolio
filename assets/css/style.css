@@ -23,21 +23,33 @@
 
 /* Default Settings */
 :root {
-  --primary-bg: #121212;
-  --secondary-bg: #1e1e1e;
-  --secondary-bg-transparent: #1e1e1eaa;
-  --text-primary: #ffffff;
-  --text-secondary: #b3b3b3;
+  --primary-bg: #f0f0f0;
+  --secondary-bg: #ffffff;
+  --secondary-bg-transparent: #ffffffaa;
+  --text-primary: #121212;
+  --text-secondary: #4d4d4d;
   --accent: #238a9f;
   --accent-transparent: #238a9faa;
   --hover-accent: #0d4c68;
-  --card-bg: #252525;
+  --card-bg: #e0e0e0;
   --transition: all 0.3s ease;
   --font0: "Overlock", sans-serif;
   --font1: "Caveat", sans-serif;
   --font2: "Audiowide", sans-serif;
   --font3: "MedievalSharp", sans-serif;
   --shadow: 0 0 15px var(--hover-accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-bg: #121212;
+    --secondary-bg: #1e1e1e;
+    --secondary-bg-transparent: #1e1e1eaa;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --card-bg: #252525;
+  }
+
 }
 
 * {
@@ -641,6 +653,16 @@ button .icon:hover {
   background-color: var(--accent);
   color: var(--primary-bg);
   box-shadow: var(--shadow);
+}
+
+/* Estilos para títulos de seções reutilizáveis */
+.title-technologies,
+.title-links,
+h3 {
+  font-family: var(--font3);
+  font-size: 1.5em;
+  margin: 10px;
+  text-align: center;
 }
 
 .btn {

@@ -26,25 +26,41 @@
           "icon": "fa-html5",
           "name": "HTML5",
           "style": "fa-brands",
-          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         },
         {
           "icon": "fa-css3",
           "name": "CSS3",
           "style": "fa-brands",
-          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         },
         {
           "icon": "fa-js",
           "name": "JavaScript",
           "style": "fa-brands",
-          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         },
         {
           "icon": "fa-font-awesome",
           "name": "Font Awesome",
           "style": "fa-brands",
-          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         }
       ],
       "titleLinks": {
@@ -53,8 +69,8 @@
       },
       "linkRepository": "https://github.com/jlbbarco/colegio-adolpho/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkSite": "https://colegio-adolpho.vercel.app/",
-      "linkSiteTarget": "target='_blank' rel='noopener noreferrer'"
+      "linkDemo": "https://colegio-adolpho.vercel.app/",
+      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
     },
     {
       "projectTitle": "Passwords Manager",
@@ -79,7 +95,7 @@
           "icon": "fa-python",
           "name": "Python",
           "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end" }
+          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
         },
         {
           "icon": "fa-mysql",
@@ -119,19 +135,31 @@
           "icon": "fa-html5",
           "name": "HTML5",
           "style": "fa-brands",
-          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         },
         {
           "icon": "fa-css3",
           "name": "CSS3",
           "style": "fa-brands",
-          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         },
         {
           "icon": "fa-js",
           "name": "JavaScript",
           "style": "fa-brands",
-          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         }
       ],
       "titleLinks": {
@@ -140,8 +168,8 @@
       },
       "linkRepository": "https://github.com/jlbbarco/Salsa/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkSite": "https://tecnoverde.vercel.app",
-      "linkSiteTarget": "target='_blank' rel='noopener noreferrer'"
+      "linkDemo": "https://tecnoverde.vercel.app",
+      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
     },
     {
       "projectTitle": "Image Converter",
@@ -163,19 +191,31 @@
           "icon": "fa-html5",
           "name": "HTML5",
           "style": "fa-brands",
-          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         },
         {
           "icon": "fa-css3",
           "name": "CSS3",
           "style": "fa-brands",
-          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         },
         {
           "icon": "fa-js",
           "name": "JavaScript",
           "style": "fa-brands",
-          "stack": { "id": "frontEnd", "en-US": "Front-end" }
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         }
       ],
       "titleLinks": {
@@ -184,8 +224,8 @@
       },
       "linkRepository": "https://github.com/jlbbarco/image-conversor/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkSite": "https://image-converter-seven-chi.vercel.app/",
-      "linkSiteTarget": "target='_blank' rel='noopener noreferrer'"
+      "linkDemo": "https://image-converter-seven-chi.vercel.app/",
+      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
     },
     {
       "projectTitle": "Unit Converter",
@@ -233,7 +273,7 @@
           "icon": "fa-python",
           "name": "Python",
           "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end" }
+          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
         }
       ],
       "titleLinks": {
