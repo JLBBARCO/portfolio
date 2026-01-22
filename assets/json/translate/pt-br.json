@@ -1,9 +1,16 @@
 {
+  "link1": "Projetos",
+  "link2": "Tecnologias",
+  "link3": "Sobre mim",
+  "link4": "Formações",
+  "link5": "Mais",
+  "link6": "Contato",
   "webTitle": "Portfólio de JLBBARCO",
   "welcome_title": "Bem-vindo ao meu portfólio",
   "welcome_message": "Sou desenvolvedor fullstack apaixonado por criar soluções web inovadoras.",
   "projectsTitle": "Projetos",
   "technologiesTitle": "Tecnologias",
+  "linksTitle": "Links",
   "aboutMeTitle": "Sobre mim",
   "aboutMeText": "Tenho {{age}} anos e sou desenvolvedor front-end com experiência em HTML5, CSS3, JavaScript e Python. Gosto de criar interfaces responsivas e funcionais. Minha língua mãe é português, mas eu aprendi inglês por meio de cursos e prática.",
   "downloadCVTitle": "Baixar CV",
@@ -19,11 +26,5 @@
   "moreTitle": "Mais sobre este site",
   "lastUpdate": "Última atualização: {{date}}",
   "skip_link": "Pular para o conteúdo principal",
-  "contactTitle": "Contato",
-  "link1": "Projetos",
-  "link2": "Tecnologias",
-  "link3": "Sobre mim",
-  "link4": "Formações",
-  "link5": "Mais",
-  "link6": "Contato"
+  "contactTitle": "Contato"
 }
