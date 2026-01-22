@@ -341,7 +341,7 @@ function setupProjects(container, cards, iconSize, language) {
       card.iconTechnologies.forEach((tech) => {
         if (tech.name) techCount[tech.name] = (techCount[tech.name] || 0) + 1;
 
-        if (tech.stack.id && tech.name != techId) {
+        if (tech.stack.id && tech.name !== techId) {
           techId[tech.name] = tech.stack.id;
           techName[tech.name] = getLocalized(tech.stack, language);
         }
@@ -723,3 +723,59 @@ function nextProjects() {
     .getElementById("projectsContainer")
     ?.scrollBy({ left: 300, behavior: "smooth" });
 }
+
+function getAverageColor(imgElement) {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  canvas.width = imgElement.width;
+  canvas.height = imgElement.height;
+  context.drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
+
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  let r = 0,
+    g = 0,
+    b = 0;
+  const totalPixels = data.length / 4;
+
+  for (let i = 0; i < data.length; i += 4) {
+    r += data[i];
+    g += data[i + 1];
+    b += data[i + 2];
+  }
+
+  r = Math.round(r / totalPixels);
+  g = Math.round(g / totalPixels);
+  b = Math.round(b / totalPixels);
+
+  return { r, g, b };
+}
+
+function setCSSVariables(color) {
+  const root = document.documentElement;
+
+  // Cor principal
+  root.style.setProperty("--accent", `rgb(${color.r}, ${color.g}, ${color.b})`);
+
+  // Cor principal com transparência
+  root.style.setProperty(
+    "--accent-transparent",
+    `rgba(${color.r}, ${color.g}, ${color.b}, 0.67)`,
+  );
+
+  // Cor principal com transparência
+  root.style.setProperty(
+    "--hover-accent",
+    `rgb(${color.r - 30}, ${color.g - 30}, ${color.b - 30})`,
+  );
+}
+
+window.onload = () => {
+  const img = document.getElementById("profile");
+  img.onload = () => {
+    const avgColor = getAverageColor(img);
+    setCSSVariables(avgColor);
+  };
+};
