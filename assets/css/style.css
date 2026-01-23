@@ -31,6 +31,9 @@
   --accent: ;
   --accent-transparent: ;
   --hover-accent: ;
+  /* --accent: #7c4dff;
+  --accent-transparent: #7c4dffaa;
+  --hover-accent: #9670ff; */
   --card-bg: #e0e0e0;
   --transition: all 0.3s ease;
   --font0: "Overlock", sans-serif;
@@ -189,6 +192,25 @@ menu button:focus {
   outline: none;
 }
 
+.nav-menu {
+  flex: 1 0 25vw;
+  display: flex;
+  padding: 0 50px;
+  justify-content: center;
+}
+
+.nav-menu button {
+  display: block;
+  background: none;
+  border: none;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.nav-menu button:focus {
+  outline: none;
+}
+
 .nav-links {
   display: none;
   flex-direction: column;
@@ -277,8 +299,7 @@ section {
 .container-portfolio {
   position: relative;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: column nowrap;
   overflow-x: auto;
   scroll-behavior: smooth;
   width: 100%;
@@ -541,7 +562,7 @@ section {
 
 .container-formations {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column nowrap;
   align-items: center;
   justify-content: space-around;
 }
@@ -561,6 +582,38 @@ section {
   height: auto;
   border-radius: 8px 8px 0 0;
   margin-bottom: 15px;
+}
+
+.container-formations .certificates {
+  margin: 15px;
+  text-align: center;
+}
+
+.container-formations .certificates ul {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.container-formations li {
+  text-align: center;
+}
+
+.container-formations .certificates a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.container-formations .certificates a:hover {
+  color: var(--hover-accent);
+  text-decoration: underline;
+}
+
+.container-formations .certificates a::after {
+  content: " 🔗";
 }
 
 .container-contact {
@@ -605,12 +658,6 @@ section {
 }
 
 /* Hover effect */
-main .icon:hover {
-  color: var(--hover-accent);
-  transform: scale(1.2);
-  transition: var(--transition);
-}
-
 a .icon:hover {
   color: var(--hover-accent);
 }

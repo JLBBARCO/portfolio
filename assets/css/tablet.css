@@ -136,9 +136,11 @@ main .container {
 
 /* Melhorar scroll do carrossel */
 .container-portfolio {
+  flex-flow: row nowrap;
   width: 100%;
   scroll-behavior: smooth;
   scrollbar-width: thin;
+  scroll-timeline: inherit;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -159,6 +161,10 @@ main .container {
 
 .container-portfolio::-webkit-scrollbar-thumb:hover {
   background: var(--hover-accent);
+}
+
+.container-formations {
+  flex-flow: row wrap;
 }
 
 .container-formations .card {

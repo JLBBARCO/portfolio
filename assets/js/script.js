@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
       savedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
     const locale = currentLang === "pt" ? "pt-BR" : "en-US";
 
-    const pProjects = jsonCardsFetch(
+    const pProjects = setupProjects(
       "assets/json/cards/projects.json",
       "projectsContainer",
       "2x",
@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "contactContainer",
       "2x",
     );
-    const pFormations = jsonCardsFetch(
+    const pFormations = setupFormations(
       "assets/json/cards/formation.json",
       "formationsContainer",
       "2x",
@@ -310,211 +310,243 @@ function getLocalized(value, language) {
   );
 }
 
-function jsonCardsFetch(
-  fileURL,
-  containerId,
-  iconSize = "3x",
-  language = "pt-BR",
-) {
+function setupProjects(fileURL, containerId, iconSize, language) {
   return fetch(fileURL)
     .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
     .then((data) => {
       const container = document.getElementById(containerId);
-      const cards = data.cards || data.cardsIcons;
-      if (!container || !Array.isArray(cards)) return;
+      if (!container || !data.cards) return;
+      const cards = data.cards;
+      const techCount = {};
+      const techId = {};
+      const techName = {};
+      cards.forEach((card) => {
+        if (card.iconTechnologies) {
+          card.iconTechnologies.forEach((tech) => {
+            if (tech.name)
+              techCount[tech.name] = (techCount[tech.name] || 0) + 1;
 
-      if (containerId === "projectsContainer") {
-        setupProjects(container, cards, iconSize, language);
-      } else if (containerId === "formationsContainer") {
-        setupFormations(container, cards, iconSize, language);
+            if (tech.stack.id && tech.name !== techId) {
+              techId[tech.name] = tech.stack.id;
+              techName[tech.name] = getLocalized(tech.stack, language);
+            }
+          });
+        }
+      });
+
+      if (Object.keys(techCount).length > 1) {
+        const filterContainer = document.createElement("div");
+        filterContainer.className = "filter-container";
+        const btnAll = document.createElement("button");
+        btnAll.className = "filter-button active";
+        btnAll.dataset.filter = "all";
+        btnAll.textContent = language === "pt-BR" ? "Todos" : "All";
+        btnAll.onclick = () => filterProjectsByTechnology("all");
+        filterContainer.appendChild(btnAll);
+
+        // Ordena alfabeticamente os botões de filtro
+        const sortedTechs = Object.entries(techCount).sort(([nameA], [nameB]) =>
+          nameA.localeCompare(nameB),
+        );
+
+        sortedTechs.forEach(([name, count]) => {
+          const btn = document.createElement("button");
+          btn.className = "filter-button";
+          btn.dataset.filter = name;
+          btn.textContent = `${name} (${count})`;
+          btn.onclick = () => filterProjectsByTechnology(name);
+          filterContainer.appendChild(btn);
+        });
+        container.parentNode.insertBefore(filterContainer, container);
       }
+
+      const prevBtn = document.createElement("button");
+      prevBtn.className = "btn prev";
+      prevBtn.innerHTML = '<i class="fa-solid fa-angle-left"></i>';
+      prevBtn.onclick = prevProjects;
+
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "btn next";
+      nextBtn.innerHTML = '<i class="fa-solid fa-angle-right"></i>';
+      nextBtn.onclick = nextProjects;
+
+      container.parentNode.insertBefore(prevBtn, container);
+      container.parentNode.appendChild(nextBtn);
+
+      const fragment = document.createDocumentFragment();
+      cards.forEach((card) => {
+        const div = document.createElement("div");
+        div.className = "card card-projects";
+        if (card.iconTechnologies) {
+          div.dataset.technologies = card.iconTechnologies
+            .map((t) => t.name)
+            .filter(Boolean)
+            .join(",");
+        }
+
+        let html = "";
+        if (card.image) {
+          html += `<picture class="img-card">`;
+          if (card.imageMobile)
+            html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
+          html += `<img src="${card.image}" alt="${getLocalized(card.descriptionImage, language)}" loading="lazy"></picture>`;
+        }
+        if (card.title)
+          html += `<h3>${getLocalized(card.title, language)}</h3>`;
+        if (card.institution)
+          html += `<p class="institution">${getLocalized(card.institution, language)}</p>`;
+        if (card.description)
+          html += `<p>${getLocalized(card.description, language)}</p>`;
+
+        if (card.iconTechnologies) {
+          if (card.titleTechnologies)
+            html += `<h4 class="title-technologies"></h4>`;
+          html += `<div class="technologies-portfolio">`;
+          card.iconTechnologies.forEach((tech) => {
+            html += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
+          });
+          html += `</div>`;
+        }
+
+        if (card.linkRepository || card.linkDemo) {
+          html += `<h4 class="title-links"></h4><div class="links-portfolio">`;
+        }
+        if (card.linkRepository)
+          html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github fa-${iconSize} icon"></i></a>`;
+        if (card.linkDemo)
+          html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-share-from-square fa-${iconSize} icon"></i></a>`;
+        html += `</div>`;
+
+        div.innerHTML = html;
+        fragment.appendChild(div);
+      });
+      container.appendChild(fragment);
     })
     .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
 }
 
-function setupProjects(container, cards, iconSize, language) {
-  const techCount = {};
-  const techId = {};
-  const techName = {};
-  cards.forEach((card) => {
-    if (card.iconTechnologies) {
-      card.iconTechnologies.forEach((tech) => {
-        if (tech.name) techCount[tech.name] = (techCount[tech.name] || 0) + 1;
+function setupFormations(fileURL, containerId, iconSize = "3x", language) {
+  return fetch(fileURL)
+    .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+    .then((data) => {
+      const container = document.getElementById(containerId);
+      if (!container || !data.cards) return;
+      const cards = data.cards;
+      // Se apenas 3 parâmetros forem passados, ajusta language
+      if (typeof iconSize === "string" && !language) {
+        language = iconSize;
+        iconSize = "3x";
+      }
 
-        if (tech.stack.id && tech.name !== techId) {
-          techId[tech.name] = tech.stack.id;
-          techName[tech.name] = getLocalized(tech.stack, language);
+      const typeCount = {};
+      const typeNames = {};
+      cards.forEach((card) => {
+        if (card.type?.id) {
+          typeCount[card.type.id] = (typeCount[card.type.id] || 0) + 1;
+          typeNames[card.type.id] = getLocalized(card.type, language);
         }
       });
-    }
-  });
 
-  if (Object.keys(techCount).length > 1) {
-    const filterContainer = document.createElement("div");
-    filterContainer.className = "filter-container";
-    const btnAll = document.createElement("button");
-    btnAll.className = "filter-button active";
-    btnAll.dataset.filter = "all";
-    btnAll.textContent = language === "pt-BR" ? "Todos" : "All";
-    btnAll.onclick = () => filterProjectsByTechnology("all");
-    filterContainer.appendChild(btnAll);
+      if (Object.keys(typeCount).length > 1) {
+        const filterContainer = document.createElement("div");
+        filterContainer.className = "filter-container";
+        const btnAll = document.createElement("button");
+        btnAll.className = "filter-button active";
+        btnAll.dataset.filter = "all";
+        btnAll.textContent = language === "pt-BR" ? "Todos" : "All";
+        btnAll.onclick = () => filterFormationsByType("all");
+        filterContainer.appendChild(btnAll);
 
-    Object.entries(techCount).forEach(([name, count]) => {
-      const btn = document.createElement("button");
-      btn.className = "filter-button";
-      btn.dataset.filter = name;
-      btn.textContent = `${name} (${count})`;
-      btn.onclick = () => filterProjectsByTechnology(name);
-      filterContainer.appendChild(btn);
-    });
-    container.parentNode.insertBefore(filterContainer, container);
-  }
+        // Ordena alfabeticamente os botões de filtro
+        const sortedTypes = Object.entries(typeCount).sort(
+          ([, countA], [, countB]) =>
+            typeNames[
+              Object.keys(typeCount).find((k) => typeCount[k] === countA)
+            ].localeCompare(
+              typeNames[
+                Object.keys(typeCount).find((k) => typeCount[k] === countB)
+              ],
+            ),
+        );
 
-  const prevBtn = document.createElement("button");
-  prevBtn.className = "btn prev";
-  prevBtn.innerHTML = '<i class="fa-solid fa-angle-left"></i>';
-  prevBtn.onclick = prevProjects;
+        Object.entries(typeCount)
+          .sort(([idA], [idB]) => typeNames[idA].localeCompare(typeNames[idB]))
+          .forEach(([id, count]) => {
+            const btn = document.createElement("button");
+            btn.className = "filter-button";
+            btn.dataset.filter = id;
+            btn.textContent = `${typeNames[id]} (${count})`;
+            btn.onclick = () => filterFormationsByType(id);
+            filterContainer.appendChild(btn);
+          });
+        container.parentNode.insertBefore(filterContainer, container);
+      }
 
-  const nextBtn = document.createElement("button");
-  nextBtn.className = "btn next";
-  nextBtn.innerHTML = '<i class="fa-solid fa-angle-right"></i>';
-  nextBtn.onclick = nextProjects;
+      const fragment = document.createDocumentFragment();
+      cards.forEach((card) => {
+        const div = document.createElement("div");
+        div.className = "card card-formation";
+        if (card.type?.id) div.dataset.type = card.type.id;
 
-  container.parentNode.insertBefore(prevBtn, container);
-  container.parentNode.appendChild(nextBtn);
+        let html = "";
 
-  const fragment = document.createDocumentFragment();
-  cards.forEach((card) => {
-    const div = document.createElement("div");
-    div.className = "card card-projects";
-    if (card.iconTechnologies) {
-      div.dataset.technologies = card.iconTechnologies
-        .map((t) => t.name)
-        .filter(Boolean)
-        .join(",");
-    }
+        if (card.title) {
+          html += `<h3>${getLocalized(card.title, language)}</h3>`;
+        }
+        if (card.institution) {
+          html += `<p class="institution">${getLocalized(
+            card.institution,
+            language,
+          )}</p>`;
+        }
+        if (card.type) {
+          html += `<p class="formation-type">${getLocalized(
+            card.type,
+            language,
+          )}</p>`;
+        }
+        if (card.description) {
+          html += `<p class="description">${getLocalized(
+            card.description,
+            language,
+          )}</p>`;
+        }
+        if (card.iconTechnologies) {
+          html += `<h6 class="title-technologies"></h6>`;
 
-    let html = "";
-    if (card.image) {
-      html += `<picture class="img-card">`;
-      if (card.imageMobile)
-        html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
-      html += `<img src="${card.image}" alt="${getLocalized(card.descriptionImage, language)}" loading="lazy"></picture>`;
-    }
-    if (card.title) html += `<h3>${getLocalized(card.title, language)}</h3>`;
-    if (card.institution)
-      html += `<p class="institution">${getLocalized(card.institution, language)}</p>`;
-    if (card.description)
-      html += `<p>${getLocalized(card.description, language)}</p>`;
+          let techsDiv = `<div class="technologies-portfolio">`;
+          card.iconTechnologies.forEach((tech) => {
+            techsDiv += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
+          });
+          html += techsDiv + `</div>`;
+        }
+        if (card.certificates && Array.isArray(card.certificates)) {
+          html += `<details class="certificates"><summary>${
+            language === "pt-BR" ? "Certificados" : "Certificates"
+          }</summary><ul>`;
+          card.certificates.forEach((cert) => {
+            html += `<li>`;
+            if (cert.url) {
+              html += `<a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="certificate-link">`;
+            }
+            html += `${getLocalized(cert.name, language)}`;
+            if (cert.url) {
+              html += `</a>`;
+            }
+            html += `</li>`;
+          });
+          html += `</ul></details>`;
+        }
+        if (card.dateText) {
+          html += `<p class="period">${getLocalized(card.dateText, language)}</p>`;
+        }
 
-    if (card.iconTechnologies) {
-      if (card.titleTechnologies)
-        html += `<h4 class="title-technologies"></h4>`;
-      html += `<div class="technologies-portfolio">`;
-      card.iconTechnologies.forEach((tech) => {
-        html += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
+        div.innerHTML = html;
+        fragment.appendChild(div);
       });
-      html += `</div>`;
-    }
-
-    if (card.linkRepository || card.linkDemo) {
-      html += `<h4 class="title-links"></h4><div class="links-portfolio">`;
-    }
-    if (card.linkRepository)
-      html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github fa-${iconSize} icon"></i></a>`;
-    if (card.linkDemo)
-      html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-share-from-square fa-${iconSize} icon"></i></a>`;
-    html += `</div>`;
-
-    div.innerHTML = html;
-    fragment.appendChild(div);
-  });
-  container.appendChild(fragment);
-}
-
-function setupFormations(container, cards, iconSize = "3x", language) {
-  // Se apenas 3 parâmetros forem passados, ajusta language
-  if (typeof iconSize === "string" && !language) {
-    language = iconSize;
-    iconSize = "3x";
-  }
-
-  const typeCount = {};
-  const typeNames = {};
-  cards.forEach((card) => {
-    if (card.type?.id) {
-      typeCount[card.type.id] = (typeCount[card.type.id] || 0) + 1;
-      typeNames[card.type.id] = getLocalized(card.type, language);
-    }
-  });
-
-  if (Object.keys(typeCount).length > 1) {
-    const filterContainer = document.createElement("div");
-    filterContainer.className = "filter-container";
-    const btnAll = document.createElement("button");
-    btnAll.className = "filter-button active";
-    btnAll.dataset.filter = "all";
-    btnAll.textContent = language === "pt-BR" ? "Todos" : "All";
-    btnAll.onclick = () => filterFormationsByType("all");
-    filterContainer.appendChild(btnAll);
-
-    Object.entries(typeCount).forEach(([id, count]) => {
-      const btn = document.createElement("button");
-      btn.className = "filter-button";
-      btn.dataset.filter = id;
-      btn.textContent = `${typeNames[id]} (${count})`;
-      btn.onclick = () => filterFormationsByType(id);
-      filterContainer.appendChild(btn);
-    });
-    container.parentNode.insertBefore(filterContainer, container);
-  }
-
-  const fragment = document.createDocumentFragment();
-  cards.forEach((card) => {
-    const div = document.createElement("div");
-    div.className = "card card-formation";
-    if (card.type?.id) div.dataset.type = card.type.id;
-
-    let html = "";
-
-    if (card.title) {
-      html += `<h3>${getLocalized(card.title, language)}</h3>`;
-    }
-    if (card.institution) {
-      html += `<p class="institution">${getLocalized(
-        card.institution,
-        language,
-      )}</p>`;
-    }
-    if (card.type) {
-      html += `<p class="formation-type">${getLocalized(
-        card.type,
-        language,
-      )}</p>`;
-    }
-    if (card.description) {
-      html += `<p class="description">${getLocalized(
-        card.description,
-        language,
-      )}</p>`;
-    }
-    if (card.iconTechnologies) {
-      html += `<h6 class="title-technologies"></h6>`;
-
-      let techsDiv = `<div class="technologies-portfolio">`;
-      card.iconTechnologies.forEach((tech) => {
-        techsDiv += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
-      });
-      html += techsDiv + `</div>`;
-    }
-    if (card.dateText) {
-      html += `<p class="period">${getLocalized(card.dateText, language)}</p>`;
-    }
-
-    div.innerHTML = html;
-    fragment.appendChild(div);
-  });
-  container.appendChild(fragment);
+      container.appendChild(fragment);
+    })
+    .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
 }
 
 function setupTechnologies(container, cards, iconSize, language = "pt-BR") {
@@ -549,8 +581,15 @@ function setupTechnologies(container, cards, iconSize, language = "pt-BR") {
 
   const fragment = document.createDocumentFragment();
 
+  // Ordena os stacks alfabeticamente
+  const sortedStacks = Object.values(stackMap).sort((a, b) => {
+    const titleA = getLocalized(a.stack, language) || a.stack.id;
+    const titleB = getLocalized(b.stack, language) || b.stack.id;
+    return titleA.localeCompare(titleB);
+  });
+
   // Renderiza cada stack com suas tecnologias
-  Object.values(stackMap).forEach((stackGroup) => {
+  sortedStacks.forEach((stackGroup) => {
     const stackDiv = document.createElement("div");
     stackDiv.className = "tech-stack-group";
 
@@ -565,9 +604,14 @@ function setupTechnologies(container, cards, iconSize, language = "pt-BR") {
     const iconsContainer = document.createElement("div");
     iconsContainer.className = "technologies-portfolio";
 
+    // Ordena as tecnologias alfabeticamente
+    const sortedTechs = [...stackGroup.technologies].sort((a, b) =>
+      (a.name || "").localeCompare(b.name || ""),
+    );
+
     // Renderiza as tecnologias deste stack (sem duplicatas)
     const renderedTechs = new Set();
-    stackGroup.technologies.forEach((tech) => {
+    sortedTechs.forEach((tech) => {
       if (renderedTechs.has(tech.name)) return; // Pula se já foi renderizado
       renderedTechs.add(tech.name);
 
@@ -725,12 +769,30 @@ function nextProjects() {
 }
 
 function getAverageColor(imgElement) {
+  // Espera a imagem carregar completamente
+  if (
+    !imgElement ||
+    imgElement.naturalWidth === 0 ||
+    imgElement.naturalHeight === 0
+  ) {
+    console.warn("Imagem não carregada corretamente");
+    return { r: 124, g: 77, b: 255 }; // Cor padrão (accent color)
+  }
+
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
+  if (!context) return { r: 124, g: 77, b: 255 };
 
-  canvas.width = imgElement.width;
-  canvas.height = imgElement.height;
-  context.drawImage(imgElement, 0, 0, imgElement.width, imgElement.height);
+  // Usa as dimensões naturais da imagem
+  canvas.width = imgElement.naturalWidth;
+  canvas.height = imgElement.naturalHeight;
+
+  try {
+    context.drawImage(imgElement, 0, 0);
+  } catch (e) {
+    console.warn("Erro ao desenhar imagem no canvas:", e);
+    return { r: 124, g: 77, b: 255 };
+  }
 
   const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
@@ -765,17 +827,42 @@ function setCSSVariables(color) {
     `rgba(${color.r}, ${color.g}, ${color.b}, 0.67)`,
   );
 
-  // Cor principal com transparência
+  // Cor principal com ajuste de hover (escurece um pouco)
+  const hoverR = Math.max(0, color.r - 30);
+  const hoverG = Math.max(0, color.g - 30);
+  const hoverB = Math.max(0, color.b - 30);
   root.style.setProperty(
     "--hover-accent",
-    `rgb(${color.r - 30}, ${color.g - 30}, ${color.b - 30})`,
+    `rgb(${hoverR}, ${hoverG}, ${hoverB})`,
   );
 }
 
-window.onload = () => {
+function initializeProfileImage() {
   const img = document.getElementById("profile");
-  img.onload = () => {
+  if (!img) return;
+
+  function applyAverageColor() {
     const avgColor = getAverageColor(img);
     setCSSVariables(avgColor);
-  };
-};
+  }
+
+  // Se a imagem já está carregada (cached)
+  if (img.complete && img.naturalHeight !== 0) {
+    applyAverageColor();
+  } else {
+    // Aguarda o carregamento da imagem
+    img.addEventListener("load", applyAverageColor);
+    // Fallback: se a imagem falhar, usa cores padrão
+    img.addEventListener("error", () => {
+      console.warn("Erro ao carregar a imagem do perfil");
+      setCSSVariables({ r: 124, g: 77, b: 255 });
+    });
+  }
+}
+
+// Executa quando o DOM está pronto
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeProfileImage);
+} else {
+  initializeProfileImage();
+}
