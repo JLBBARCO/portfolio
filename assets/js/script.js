@@ -520,6 +520,23 @@ function setupFormations(fileURL, containerId, iconSize = "3x", language) {
           });
           html += techsDiv + `</div>`;
         }
+        if (card.certificates && Array.isArray(card.certificates)) {
+          html += `<details class="certificates"><summary>${
+            language === "pt-BR" ? "Certificados" : "Certificates"
+          }</summary><ul>`;
+          card.certificates.forEach((cert) => {
+            html += `<li>`;
+            if (cert.url) {
+              html += `<a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="certificate-link">`;
+            }
+            html += `${getLocalized(cert.name, language)}`;
+            if (cert.url) {
+              html += `</a>`;
+            }
+            html += `</li>`;
+          });
+          html += `</ul></details>`;
+        }
         if (card.dateText) {
           html += `<p class="period">${getLocalized(card.dateText, language)}</p>`;
         }

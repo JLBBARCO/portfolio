@@ -28,9 +28,12 @@
   --secondary-bg-transparent: #ffffffaa;
   --text-primary: #121212;
   --text-secondary: #4d4d4d;
-  --accent: #7c4dff;
+  --accent: ;
+  --accent-transparent: ;
+  --hover-accent: ;
+  /* --accent: #7c4dff;
   --accent-transparent: #7c4dffaa;
-  --hover-accent: #9670ff;
+  --hover-accent: #9670ff; */
   --card-bg: #e0e0e0;
   --transition: all 0.3s ease;
   --font0: "Overlock", sans-serif;
@@ -579,6 +582,38 @@ section {
   height: auto;
   border-radius: 8px 8px 0 0;
   margin-bottom: 15px;
+}
+
+.container-formations .certificates {
+  margin: 15px;
+  text-align: center;
+}
+
+.container-formations .certificates ul {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.container-formations li {
+  text-align: center;
+}
+
+.container-formations .certificates a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.container-formations .certificates a:hover {
+  color: var(--hover-accent);
+  text-decoration: underline;
+}
+
+.container-formations .certificates a::after {
+  content: " 🔗";
 }
 
 .container-contact {

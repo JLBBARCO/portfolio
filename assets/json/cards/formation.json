@@ -21,7 +21,16 @@
       "dateText": {
         "en-US": "2022 - 2026",
         "pt-BR": "2022 - 2026"
-      }
+      },
+      "certificates": [
+        {
+          "name": {
+            "en-US": "Certificate of Completion - Intermediate Level",
+            "pt-BR": "Certificado de Conclusão - Nível Intermediário"
+          },
+          "url": ""
+        }
+      ]
     },
     {
       "title": {
@@ -106,7 +115,23 @@
       "dateText": {
         "en-US": "2023 - 2025",
         "pt-BR": "2023 - 2025"
-      }
+      },
+      "certificates": [
+        {
+          "name": {
+            "en-US": "Certificate of Completion - High School",
+            "pt-BR": "Certificado de Conclusão - Ensino Médio"
+          },
+          "url": ""
+        },
+        {
+          "name": {
+            "en-US": "Certificate of Completion - Technical Course in System Analysis and Development",
+            "pt-BR": "Certificado de Conclusão - Curso Técnico em Análise e Desenvolvimento de Sistemas"
+          },
+          "url": ""
+        }
+      ]
     },
     {
       "title": {
@@ -191,7 +216,37 @@
       "dateText": {
         "en-US": "2023 - Present",
         "pt-BR": "2023 - Presente"
-      }
+      },
+      "certificates": [
+        {
+          "name": {
+            "en-US": "Certificate of Completion - HTML5 & CSS3 [200 hours]",
+            "pt-BR": "Certificado de Conclusão - HTML5 & CSS3 [200 horas]"
+          },
+          "url": ""
+        },
+        {
+          "name": {
+            "en-US": "Certificate of Completion - JavaScript [40 hours]",
+            "pt-BR": "Certificado de Conclusão - JavaScript [40 horas]"
+          },
+          "url": ""
+        },
+        {
+          "name": {
+            "en-US": "Certificate of Completion - Git & GitHub [20 hours]",
+            "pt-BR": "Certificado de Conclusão - Git & GitHub [20 horas]"
+          },
+          "url": ""
+        },
+        {
+          "name": {
+            "en-US": "Certificate of Completion - Python [120 hours]",
+            "pt-BR": "Certificado de Conclusão - Python [120 horas]"
+          },
+          "url": ""
+        }
+      ]
     }
   ],
   "buttons": [{ "filterAll": { "en-US": "All", "pt-BR": "Todos" } }]
