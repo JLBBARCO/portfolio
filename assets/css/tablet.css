@@ -136,7 +136,7 @@ main .container {
 
 /* Melhorar scroll do carrossel */
 .container-portfolio {
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
   width: 100%;
   scroll-behavior: smooth;
   scrollbar-width: thin;
