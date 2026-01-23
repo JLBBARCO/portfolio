@@ -2,6 +2,29 @@
   "cards": [
     {
       "title": {
+        "en-US": "English Fluency Course",
+        "pt-BR": "Curso de Fluência em Inglês"
+      },
+      "institution": {
+        "en-US": "Athus Languages",
+        "pt-BR": "Athus Idiomas"
+      },
+      "description": {
+        "en-US": "English fluency course",
+        "pt-BR": "Curso de fluência em inglês"
+      },
+      "type": {
+        "id": "languageCourse",
+        "en-US": "Language Course",
+        "pt-BR": "Curso de Idioma"
+      },
+      "dateText": {
+        "en-US": "2022 - 2026",
+        "pt-BR": "2022 - 2026"
+      }
+    },
+    {
+      "title": {
         "en-US": "System Analysis and Development (SAD)",
         "pt-BR": "Análise e Desenvolvimento de Sistemas (ADS)"
       },
@@ -83,29 +106,6 @@
       "dateText": {
         "en-US": "2023 - 2025",
         "pt-BR": "2023 - 2025"
-      }
-    },
-    {
-      "title": {
-        "en-US": "English Fluency Course",
-        "pt-BR": "Curso de Fluência em Inglês"
-      },
-      "institution": {
-        "en-US": "Athus Languages",
-        "pt-BR": "Athus Idiomas"
-      },
-      "description": {
-        "en-US": "English fluency course",
-        "pt-BR": "Curso de fluência em inglês"
-      },
-      "type": {
-        "id": "languageCourse",
-        "en-US": "Language Course",
-        "pt-BR": "Curso de Idioma"
-      },
-      "dateText": {
-        "en-US": "2022 - 2026",
-        "pt-BR": "2022 - 2026"
       }
     },
     {

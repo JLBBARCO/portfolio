@@ -1,93 +1,18 @@
 {
   "cards": [
     {
-      "projectTitle": "Adolpho College",
-      "image": "assets/img/adolpho-college.png",
+      "projectTitle": "Unit Converter",
+      "image": "assets/img/unit-converter.png",
       "descriptionImage": {
-        "en-US": "Image of Adolpho College Website UI",
-        "pt-BR": "Imagem da UI do website do Colégio Adolpho"
+        "en-US": "Image of Unit Converter UI",
+        "pt-BR": "Imagem da UI do Conversor de Unidades"
       },
-      "imageMobile": "assets/img/adolpho-college-mobile.png",
+      "imageMobile": "assets/img/unit-converter-mobile.png",
       "imageType": "image/png",
-      "title": {
-        "en-US": "Adolpho College",
-        "pt-BR": "Colégio Adolpho"
-      },
+      "title": { "en-US": "Unit Converter", "pt-BR": "Conversor de unidades" },
       "description": {
-        "en-US": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news",
-        "pt-BR": "Site do Colégio Estadual Adolpho de Oliveira Franco, com informações sobre a instituição, cursos e notícias"
-      },
-      "titleTechnologies": {
-        "en-US": "Technologies",
-        "pt-BR": "Tecnologias"
-      },
-      "iconTechnologies": [
-        {
-          "icon": "fa-html5",
-          "name": "HTML5",
-          "style": "fa-brands",
-          "stack": {
-            "id": "frontEnd",
-            "en-US": "Front-end",
-            "pt-BR": "Front-end"
-          }
-        },
-        {
-          "icon": "fa-css3",
-          "name": "CSS3",
-          "style": "fa-brands",
-          "stack": {
-            "id": "frontEnd",
-            "en-US": "Front-end",
-            "pt-BR": "Front-end"
-          }
-        },
-        {
-          "icon": "fa-js",
-          "name": "JavaScript",
-          "style": "fa-brands",
-          "stack": {
-            "id": "frontEnd",
-            "en-US": "Front-end",
-            "pt-BR": "Front-end"
-          }
-        },
-        {
-          "icon": "fa-font-awesome",
-          "name": "Font Awesome",
-          "style": "fa-brands",
-          "stack": {
-            "id": "frontEnd",
-            "en-US": "Front-end",
-            "pt-BR": "Front-end"
-          }
-        }
-      ],
-      "titleLinks": {
-        "en-US": "Links",
-        "pt-BR": "Links"
-      },
-      "linkRepository": "https://github.com/jlbbarco/colegio-adolpho/",
-      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkDemo": "https://colegio-adolpho.vercel.app/",
-      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
-    },
-    {
-      "projectTitle": "Passwords Manager",
-      "image": "assets/img/passwords-manager.png",
-      "descriptionImage": {
-        "en-US": "Image of Passwords Manager UI",
-        "pt-BR": "Imagem da UI do Gerenciador de Senhas"
-      },
-      "imageMobile": "assets/img/passwords-manager-mobile.png",
-      "imageType": "image/png",
-      "title": {
-        "en-US": "Passwords Manager",
-        "pt-BR": "Gerenciador de Senhas"
-      },
-      "description": {
-        "en-US": "A system to save your simple passwords. Don't save your important passwords because this program doesn't have encryption",
-        "pt-BR": "Um sistema que salva suas senhas simples. Não salve suas importantes senhas, porque este programa não possui um sistema de criptografia"
+        "en-US": "A tool to convert between different units of measurement",
+        "pt-BR": "Uma ferramenta para converter entre diferentes unidades de medida."
       },
       "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
       "iconTechnologies": [
@@ -96,23 +21,13 @@
           "name": "Python",
           "style": "fa-brands",
           "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
-        },
-        {
-          "icon": "fa-mysql",
-          "name": "MySQL",
-          "style": "fa-brands",
-          "stack": {
-            "id": "dataBase",
-            "en-US": "Data Base",
-            "pt-BR": "Banco de Dados"
-          }
         }
       ],
       "titleLinks": {
         "en-US": "Links",
         "pt-BR": "Links"
       },
-      "linkRepository": "https://github.com/jlbbarco/passwords-manager/",
+      "linkRepository": "https://github.com/jlbbarco/unit_converter/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
     },
     {
@@ -172,6 +87,127 @@
       "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
     },
     {
+      "projectTitle": "Adolpho College",
+      "image": "assets/img/adolpho-college.png",
+      "descriptionImage": {
+        "en-US": "Image of Adolpho College Website UI",
+        "pt-BR": "Imagem da UI do website do Colégio Adolpho"
+      },
+      "imageMobile": "assets/img/adolpho-college-mobile.png",
+      "imageType": "image/png",
+      "title": {
+        "en-US": "Adolpho College",
+        "pt-BR": "Colégio Adolpho"
+      },
+      "description": {
+        "en-US": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news",
+        "pt-BR": "Site do Colégio Estadual Adolpho de Oliveira Franco, com informações sobre a instituição, cursos e notícias"
+      },
+      "titleTechnologies": {
+        "en-US": "Technologies",
+        "pt-BR": "Tecnologias"
+      },
+      "iconTechnologies": [
+        {
+          "icon": "fa-html5",
+          "name": "HTML5",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-css3",
+          "name": "CSS3",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        }
+      ],
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
+      "linkRepository": "https://github.com/jlbbarco/colegio-adolpho/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkDemo": "https://colegio-adolpho.vercel.app/",
+      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
+      "projectTitle": "Passwords Manager",
+      "image": "assets/img/passwords-manager.png",
+      "descriptionImage": {
+        "en-US": "Image of Passwords Manager UI",
+        "pt-BR": "Imagem da UI do Gerenciador de Senhas"
+      },
+      "imageMobile": "assets/img/passwords-manager-mobile.png",
+      "imageType": "image/png",
+      "title": {
+        "en-US": "Passwords Manager",
+        "pt-BR": "Gerenciador de Senhas"
+      },
+      "description": {
+        "en-US": "A system to save your simple passwords. Don't save your important passwords because this program doesn't have encryption",
+        "pt-BR": "Um sistema que salva suas senhas simples. Não salve suas importantes senhas, porque este programa não possui um sistema de criptografia"
+      },
+      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "iconTechnologies": [
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+        }
+      ],
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
+      "linkRepository": "https://github.com/jlbbarco/passwords-manager/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
+      "projectTitle": "Total Score",
+      "title": {
+        "en-US": "Total Score",
+        "pt-BR": "Pontuação Total"
+      },
+      "description": {
+        "en-US": "Repository of summation tests to discover your test score based on your answers and the answer key. The files accept only extensions .csv and .tsv",
+        "pt-BR": "Repositório de testes de soma para descobrir sua pontuação com base nas respostas e na chave de respostas. Os arquivos aceitam apenas extensões .csv e .tsv"
+      },
+      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
+      "iconTechnologies": [
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+        }
+      ],
+      "titleLinks": {
+        "en-US": "Links",
+        "pt-BR": "Links"
+      },
+      "linkRepository": "https://github.com/jlbbarco/total-score/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
+    },
+    {
       "projectTitle": "Image Converter",
       "image": "assets/img/image-converter.png",
       "descriptionImage": {
@@ -226,62 +262,6 @@
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
       "linkDemo": "https://image-converter-seven-chi.vercel.app/",
       "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
-    },
-    {
-      "projectTitle": "Unit Converter",
-      "image": "assets/img/unit-converter.png",
-      "descriptionImage": {
-        "en-US": "Image of Unit Converter UI",
-        "pt-BR": "Imagem da UI do Conversor de Unidades"
-      },
-      "imageMobile": "assets/img/unit-converter-mobile.png",
-      "imageType": "image/png",
-      "title": { "en-US": "Unit Converter", "pt-BR": "Conversor de unidades" },
-      "description": {
-        "en-US": "A tool to convert between different units of measurement",
-        "pt-BR": "Uma ferramenta para converter entre diferentes unidades de medida."
-      },
-      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
-      "iconTechnologies": [
-        {
-          "icon": "fa-python",
-          "name": "Python",
-          "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
-        }
-      ],
-      "titleLinks": {
-        "en-US": "Links",
-        "pt-BR": "Links"
-      },
-      "linkRepository": "https://github.com/jlbbarco/unit_converter/",
-      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
-    },
-    {
-      "projectTitle": "Total Score",
-      "title": {
-        "en-US": "Total Score",
-        "pt-BR": "Pontuação Total"
-      },
-      "description": {
-        "en-US": "Repository of summation tests to discover your test score based on your answers and the answer key. The files accept only extensions .csv and .tsv",
-        "pt-BR": "Repositório de testes de soma para descobrir sua pontuação com base nas respostas e na chave de respostas. Os arquivos aceitam apenas extensões .csv e .tsv"
-      },
-      "titleTechnologies": { "en-US": "Technologies", "pt-BR": "Tecnologias" },
-      "iconTechnologies": [
-        {
-          "icon": "fa-python",
-          "name": "Python",
-          "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
-        }
-      ],
-      "titleLinks": {
-        "en-US": "Links",
-        "pt-BR": "Links"
-      },
-      "linkRepository": "https://github.com/jlbbarco/total-score/",
-      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
     }
   ],
   "buttons": [{ "filterAll": { "en-US": "All", "pt-BR": "Todos" } }]

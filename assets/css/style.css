@@ -28,9 +28,9 @@
   --secondary-bg-transparent: #ffffffaa;
   --text-primary: #121212;
   --text-secondary: #4d4d4d;
-  --accent: ;
-  --accent-transparent: ;
-  --hover-accent: ;
+  --accent: #7c4dff;
+  --accent-transparent: #7c4dffaa;
+  --hover-accent: #9670ff;
   --card-bg: #e0e0e0;
   --transition: all 0.3s ease;
   --font0: "Overlock", sans-serif;
@@ -189,6 +189,25 @@ menu button:focus {
   outline: none;
 }
 
+.nav-menu {
+  flex: 1 0 25vw;
+  display: flex;
+  padding: 0 50px;
+  justify-content: center;
+}
+
+.nav-menu button {
+  display: block;
+  background: none;
+  border: none;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.nav-menu button:focus {
+  outline: none;
+}
+
 .nav-links {
   display: none;
   flex-direction: column;
@@ -277,8 +296,7 @@ section {
 .container-portfolio {
   position: relative;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: column nowrap;
   overflow-x: auto;
   scroll-behavior: smooth;
   width: 100%;
@@ -541,7 +559,7 @@ section {
 
 .container-formations {
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column nowrap;
   align-items: center;
   justify-content: space-around;
 }
@@ -605,12 +623,6 @@ section {
 }
 
 /* Hover effect */
-main .icon:hover {
-  color: var(--hover-accent);
-  transform: scale(1.2);
-  transition: var(--transition);
-}
-
 a .icon:hover {
   color: var(--hover-accent);
 }
