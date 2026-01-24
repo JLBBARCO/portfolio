@@ -401,7 +401,11 @@ function setupProjects(fileURL, containerId, iconSize, language) {
         if (card.iconTechnologies) {
           html += `<h4 id="technologiesTitle" class="title-technologies"></h4>`;
           html += `<div class="technologies-portfolio">`;
-          card.iconTechnologies.forEach((tech) => {
+          // Ordena os ícones de tecnologia alfabeticamente
+          const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
+            (a.name || "").localeCompare(b.name || ""),
+          );
+          sortedTechs.forEach((tech) => {
             html += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
           });
           html += `</div>`;
@@ -514,7 +518,11 @@ function setupFormations(fileURL, containerId, iconSize = "3x", language) {
           html += `<h4 id="technologiesTitle" class="title-technologies"></h4>`;
 
           let techsDiv = `<div class="technologies-portfolio">`;
-          card.iconTechnologies.forEach((tech) => {
+          // Ordena os ícones de tecnologia alfabeticamente
+          const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
+            (a.name || "").localeCompare(b.name || ""),
+          );
+          sortedTechs.forEach((tech) => {
             techsDiv += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
           });
           html += techsDiv + `</div>`;

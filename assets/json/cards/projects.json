@@ -171,10 +171,22 @@
           "name": "Python",
           "style": "fa-brands",
           "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
         }
       ],
       "linkRepository": "https://github.com/jlbbarco/passwords-manager/",
-      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkDemo": "https://passwords-manager-psi.vercel.app",
+      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
     },
     {
       "projectTitle": "Total Score",
