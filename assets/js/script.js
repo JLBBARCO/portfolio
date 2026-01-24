@@ -399,8 +399,7 @@ function setupProjects(fileURL, containerId, iconSize, language) {
           html += `<p>${getLocalized(card.description, language)}</p>`;
 
         if (card.iconTechnologies) {
-          if (card.titleTechnologies)
-            html += `<h4 class="title-technologies"></h4>`;
+          html += `<h4 id="technologiesTitle" class="title-technologies"></h4>`;
           html += `<div class="technologies-portfolio">`;
           card.iconTechnologies.forEach((tech) => {
             html += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
@@ -409,7 +408,7 @@ function setupProjects(fileURL, containerId, iconSize, language) {
         }
 
         if (card.linkRepository || card.linkDemo) {
-          html += `<h4 class="title-links"></h4><div class="links-portfolio">`;
+          html += `<h4 id="linksTitle" class="title-links"></h4><div class="links-portfolio">`;
         }
         if (card.linkRepository)
           html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github fa-${iconSize} icon"></i></a>`;
@@ -512,7 +511,7 @@ function setupFormations(fileURL, containerId, iconSize = "3x", language) {
           )}</p>`;
         }
         if (card.iconTechnologies) {
-          html += `<h6 class="title-technologies"></h6>`;
+          html += `<h4 id="technologiesTitle" class="title-technologies"></h4>`;
 
           let techsDiv = `<div class="technologies-portfolio">`;
           card.iconTechnologies.forEach((tech) => {
@@ -866,3 +865,31 @@ if (document.readyState === "loading") {
 } else {
   initializeProfileImage();
 }
+
+const container = document.querySelector(".container-portfolio");
+
+container.addEventListener(
+  "wheel",
+  function (e) {
+    // Previne o scroll vertical padrão
+    e.preventDefault();
+
+    const atStart = container.scrollLeft === 0;
+    const atEnd =
+      container.scrollLeft + container.clientWidth >= container.scrollWidth;
+
+    if ((!atEnd && e.deltaY > 0) || (!atStart && e.deltaY < 0)) {
+      // Enquanto não chegou ao fim/início, rola no eixo X
+      const scrollSpeed = 2; // ajuste aqui: 1 = normal, 2 = mais rápido, 0.5 = mais lento
+      container.scrollLeft += e.deltaY * scrollSpeed;
+    } else {
+      // Quando chega ao fim/início, deixa rolar no eixo Y da página
+      window.scrollBy({
+        top: e.deltaY,
+        left: 0,
+        behavior: "auto",
+      });
+    }
+  },
+  { passive: false },
+);

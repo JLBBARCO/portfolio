@@ -12,7 +12,7 @@
   "technologiesTitle": "Tecnologias",
   "linksTitle": "Links",
   "aboutMeTitle": "Sobre mim",
-  "aboutMeText": "Tenho {{age}} anos e sou desenvolvedor front-end com experiência em HTML5, CSS3, JavaScript e Python. Gosto de criar interfaces responsivas e funcionais. Minha língua mãe é português, mas eu aprendi inglês por meio de cursos e prática.",
+  "aboutMeText": "Tenho {{age}} anos e sou desenvolvedor fullstack com experiência em HTML5, CSS3, JavaScript e Python. Gosto de criar interfaces responsivas e funcionais. Minha língua mãe é português, mas aprendi inglês por meio de cursos e prática.",
   "downloadCVTitle": "Baixar CV",
   "formationsTitle": "Formações",
   "moreTitle": "Mais sobre este site",

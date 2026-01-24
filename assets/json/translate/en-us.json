@@ -12,7 +12,7 @@
   "technologiesTitle": "Technologies",
   "linksTitle": "Links",
   "aboutMeTitle": "About Me",
-  "aboutMeText": "I'm {{age}} years old and I'm a front-end developer with experience in HTML5, CSS3, JavaScript and Python. I like creating responsive and functional interfaces. My mother language is Portuguese, and I can speak English through courses and practices.",
+  "aboutMeText": "I'm {{age}} years old and I'm a fullstack developer with experience in HTML5, CSS3, JavaScript and Python. I like creating responsive and functional interfaces. My mother language is Portuguese, and I can speak English through courses and practices.",
   "downloadCVTitle": "Download CV",
   "formationsTitle": "Formations",
   "moreTitle": "More About This Site",
