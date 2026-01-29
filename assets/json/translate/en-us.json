@@ -12,7 +12,7 @@
   "technologiesTitle": "Technologies",
   "linksTitle": "Links",
   "aboutMeTitle": "About Me",
-  "aboutMeText": "I'm {{age}} years old and I'm a front-end developer with experience in HTML5, CSS3, JavaScript and Python. I like creating responsive and functional interfaces. My mother language is Portuguese, and I can speak English through courses and practices.",
+  "aboutMeText": "My name is Jose Luiz Bruiani Barco and I have a {{age}} years. I am a full-stack developer with experience in <span class='emphasis'>HTML5, CSS3, JavaScript, and Python</span>, creating responsive interfaces and functional applications. I am passionate about transforming ideas into practical and intuitive digital solutions. In addition to Portuguese, I also communicate in English, which allows me to collaborate on international projects and keep up with global technological trends",
   "downloadCVTitle": "Download CV",
   "formationsTitle": "Formations",
   "moreTitle": "More About This Site",
