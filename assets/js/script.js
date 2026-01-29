@@ -3,25 +3,50 @@ const windowWidth = 990;
 // Helper para normalizar classes do Font Awesome
 function faClass(style, icon, size) {
   let styleClass = style || "solid";
-  if (styleClass && !styleClass.startsWith("fa-")) {
+  if (styleClass && !styleClass.startsWith("fa-"))
     styleClass = `fa-${styleClass}`;
-  }
   let iconClass = icon || "";
-  if (iconClass && !iconClass.startsWith("fa-")) {
-    iconClass = `fa-${iconClass}`;
-  }
+  if (iconClass && !iconClass.startsWith("fa-")) iconClass = `fa-${iconClass}`;
   let sizeClass = size || "";
-  if (sizeClass && !sizeClass.startsWith("fa-")) {
-    sizeClass = `fa-${sizeClass}`;
-  }
+  if (sizeClass && !sizeClass.startsWith("fa-")) sizeClass = `fa-${sizeClass}`;
   return [styleClass, iconClass, sizeClass].filter(Boolean).join(" ");
 }
 
-// Variável global para controle de tamanho de fonte
+// Controle de tamanho de fonte
 let fontSize = 1;
 
+// fetch com fallback (reaproveitado)
+function fetchAny(...paths) {
+  return new Promise((resolve, reject) => {
+    let i = 0;
+    function next() {
+      if (i >= paths.length)
+        return reject(new Error("All fetch attempts failed"));
+      fetch(paths[i])
+        .then((res) => {
+          if (res.ok) resolve(res);
+          else {
+            i++;
+            next();
+          }
+        })
+        .catch(() => {
+          i++;
+          next();
+        });
+    }
+    next();
+  });
+}
+
+function fetchJsonWithFallback(path) {
+  const basename = path.split("/").pop();
+  return fetchAny(path, basename).then((res) =>
+    res.ok ? res.json() : Promise.reject(res.status),
+  );
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  // Verifica se o usuário prefere modo escuro e escuta mudanças
   const faviconLink = document.getElementById("favicon");
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -34,21 +59,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const newHref = isDark
       ? "assets/favicon/code-light.svg"
       : "assets/favicon/code-dark.svg";
-    // Adiciona cache-buster para forçar atualização do favicon
     faviconLink.href = newHref + "?v=" + Date.now();
   }
 
-  // Define favicon inicial
   updateFavicon(prefersDark.matches);
-
-  // Ouve mudanças de preferência de cor
   if (typeof prefersDark.addEventListener === "function") {
     prefersDark.addEventListener("change", updateFavicon);
   } else if (typeof prefersDark.addListener === "function") {
     prefersDark.addListener(updateFavicon);
   }
 
-  // Recupera o tamanho da fonte do cookie
   const savedFontSize = document.cookie
     .split("; ")
     .find((row) => row.startsWith("fontSize="))
@@ -56,29 +76,23 @@ document.addEventListener("DOMContentLoaded", () => {
   if (savedFontSize) {
     document.body.style.fontSize = savedFontSize;
     const parsed = parseFloat(savedFontSize);
-    if (!isNaN(parsed)) {
-      fontSize = parsed;
-    }
+    if (!isNaN(parsed)) fontSize = parsed;
   }
 
-  // Estado inicial do menu
   resize();
   window.addEventListener("resize", resize);
 
-  // Evento de clique no botão do menu
   const menuButton = document.getElementById("menu-button");
   if (menuButton) {
     const menuIcon = document.getElementById("menuIcon");
     if (menuIcon) {
       menuIcon.classList.remove("fa-xmark", "fa-close", "fa-menu");
-      if (!menuIcon.classList.contains("fa-bars")) {
+      if (!menuIcon.classList.contains("fa-bars"))
         menuIcon.classList.add("fa-bars");
-      }
     }
     menuButton.addEventListener("click", toggleMenu);
   }
 
-  // Eventos de acessibilidade
   const accessibilityButton = document.getElementById("accessibility-button");
   const increaseFontButton = document.getElementById("increase-font");
   const decreaseFontButton = document.getElementById("decrease-font");
@@ -92,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
     decreaseFontButton.addEventListener("click", decreaseFont);
   if (resetFontButton) resetFontButton.addEventListener("click", resetFont);
 
-  // Fecha o menu de acessibilidade ao clicar fora
   document.addEventListener("click", (event) => {
     const accessibilityMenu = document.getElementById("accessibility-menu");
     if (accessibilityMenu && accessibilityMenu.style.display === "flex") {
@@ -107,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Função para carregar todo o conteúdo dinâmico
   function loadDynamicContent() {
     const containers = [
       "projectsContainer",
@@ -126,7 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (el) el.innerHTML = "";
     });
 
-    // Limpa elementos auxiliares (filtros e botões de navegação)
     document
       .querySelectorAll(".filter-container, .btn.prev, .btn.next")
       .forEach((el) => el.remove());
@@ -162,7 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
       locale,
     );
 
-    // Carrega e renderiza tecnologias dos projetos e formações
     const pTechnologies = loadAllTechnologies(locale);
 
     Promise.all([pProjects, pIcons, pLinks, pFormations, pTechnologies])
@@ -177,7 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   loadDynamicContent();
-
   window.addEventListener("languageChanged", loadDynamicContent);
   showLastUpdate("lastUpdate");
 });
@@ -187,9 +196,7 @@ function calcularIdade() {
   const hoje = new Date();
   let idade = hoje.getFullYear() - nascimento.getFullYear();
   const mes = hoje.getMonth() - nascimento.getMonth();
-  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
-    idade--;
-  }
+  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) idade--;
   return idade;
 }
 
@@ -197,7 +204,6 @@ function resize() {
   const navLinks = document.querySelector(".nav-links");
   const menuButton = document.getElementById("menu-button");
   if (!navLinks) return;
-
   if (window.innerWidth > windowWidth) {
     navLinks.style.display = "flex";
     if (menuButton) menuButton.setAttribute("aria-expanded", "true");
@@ -213,7 +219,7 @@ function toggleMenu() {
   const menuButton = document.getElementById("menu-button");
   if (!navLinks) return;
 
-  const isVisible = navLinks.style.display === "grid";
+  const isVisible = window.getComputedStyle(navLinks).display !== "none";
   navLinks.style.display = isVisible ? "none" : "grid";
 
   if (menuIcon) {
@@ -242,7 +248,6 @@ function updateFontSize(newSize) {
   document.body.style.fontSize = fontSize + "em";
   document.cookie = `fontSize=${fontSize}em; path=/; max-age=31536000`;
 }
-
 function increaseFont() {
   updateFontSize(fontSize + 0.1);
 }
@@ -254,8 +259,7 @@ function resetFont() {
 }
 
 function setIcons(fileURL, containerID, iconSize = "3x") {
-  return fetch(fileURL)
-    .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+  return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerID);
       if (!container || !data.icons) return;
@@ -273,8 +277,7 @@ function setIcons(fileURL, containerID, iconSize = "3x") {
 }
 
 function jsonLinksFetch(fileURL, containerId, iconSize = "2x") {
-  return fetch(fileURL)
-    .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+  return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container || !Array.isArray(data.cards)) return;
@@ -311,8 +314,7 @@ function getLocalized(value, language) {
 }
 
 function setupProjects(fileURL, containerId, iconSize, language) {
-  return fetch(fileURL)
-    .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+  return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container || !data.cards) return;
@@ -323,12 +325,12 @@ function setupProjects(fileURL, containerId, iconSize, language) {
       cards.forEach((card) => {
         if (card.iconTechnologies) {
           card.iconTechnologies.forEach((tech) => {
-            if (tech.name)
+            if (tech.name) {
               techCount[tech.name] = (techCount[tech.name] || 0) + 1;
-
-            if (tech.stack.id && tech.name !== techId) {
-              techId[tech.name] = tech.stack.id;
-              techName[tech.name] = getLocalized(tech.stack, language);
+              if (tech.stack && tech.stack.id && !techId[tech.name]) {
+                techId[tech.name] = tech.stack.id;
+                techName[tech.name] = getLocalized(tech.stack, language);
+              }
             }
           });
         }
@@ -344,11 +346,9 @@ function setupProjects(fileURL, containerId, iconSize, language) {
         btnAll.onclick = () => filterProjectsByTechnology("all");
         filterContainer.appendChild(btnAll);
 
-        // Ordena alfabeticamente os botões de filtro
         const sortedTechs = Object.entries(techCount).sort(([nameA], [nameB]) =>
           nameA.localeCompare(nameB),
         );
-
         sortedTechs.forEach(([name, count]) => {
           const btn = document.createElement("button");
           btn.className = "filter-button";
@@ -359,6 +359,11 @@ function setupProjects(fileURL, containerId, iconSize, language) {
         });
         container.parentNode.insertBefore(filterContainer, container);
       }
+
+      // remove prev/next duplicados antes de inserir (caso loadDynamicContent já tenha rodado)
+      container.parentNode
+        .querySelectorAll(".btn.prev, .btn.next")
+        .forEach((el) => el.remove());
 
       const prevBtn = document.createElement("button");
       prevBtn.className = "btn prev";
@@ -401,7 +406,6 @@ function setupProjects(fileURL, containerId, iconSize, language) {
         if (card.iconTechnologies) {
           html += `<h4 id="technologiesTitle" class="title-technologies"></h4>`;
           html += `<div class="technologies-portfolio">`;
-          // Ordena os ícones de tecnologia alfabeticamente
           const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
             (a.name || "").localeCompare(b.name || ""),
           );
@@ -413,12 +417,12 @@ function setupProjects(fileURL, containerId, iconSize, language) {
 
         if (card.linkRepository || card.linkDemo) {
           html += `<h4 id="linksTitle" class="title-links"></h4><div class="links-portfolio">`;
+          if (card.linkRepository)
+            html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github fa-${iconSize} icon"></i></a>`;
+          if (card.linkDemo)
+            html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-share-from-square fa-${iconSize} icon"></i></a>`;
+          html += `</div>`;
         }
-        if (card.linkRepository)
-          html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github fa-${iconSize} icon"></i></a>`;
-        if (card.linkDemo)
-          html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-share-from-square fa-${iconSize} icon"></i></a>`;
-        html += `</div>`;
 
         div.innerHTML = html;
         fragment.appendChild(div);
@@ -429,13 +433,11 @@ function setupProjects(fileURL, containerId, iconSize, language) {
 }
 
 function setupFormations(fileURL, containerId, iconSize = "3x", language) {
-  return fetch(fileURL)
-    .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+  return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container || !data.cards) return;
       const cards = data.cards;
-      // Se apenas 3 parâmetros forem passados, ajusta language
       if (typeof iconSize === "string" && !language) {
         language = iconSize;
         iconSize = "3x";
@@ -460,18 +462,6 @@ function setupFormations(fileURL, containerId, iconSize = "3x", language) {
         btnAll.onclick = () => filterFormationsByType("all");
         filterContainer.appendChild(btnAll);
 
-        // Ordena alfabeticamente os botões de filtro
-        const sortedTypes = Object.entries(typeCount).sort(
-          ([, countA], [, countB]) =>
-            typeNames[
-              Object.keys(typeCount).find((k) => typeCount[k] === countA)
-            ].localeCompare(
-              typeNames[
-                Object.keys(typeCount).find((k) => typeCount[k] === countB)
-              ],
-            ),
-        );
-
         Object.entries(typeCount)
           .sort(([idA], [idB]) => typeNames[idA].localeCompare(typeNames[idB]))
           .forEach(([id, count]) => {
@@ -492,33 +482,17 @@ function setupFormations(fileURL, containerId, iconSize = "3x", language) {
         if (card.type?.id) div.dataset.type = card.type.id;
 
         let html = "";
-
-        if (card.title) {
+        if (card.title)
           html += `<h3>${getLocalized(card.title, language)}</h3>`;
-        }
-        if (card.institution) {
-          html += `<p class="institution">${getLocalized(
-            card.institution,
-            language,
-          )}</p>`;
-        }
-        if (card.type) {
-          html += `<p class="formation-type">${getLocalized(
-            card.type,
-            language,
-          )}</p>`;
-        }
-        if (card.description) {
-          html += `<p class="description">${getLocalized(
-            card.description,
-            language,
-          )}</p>`;
-        }
+        if (card.institution)
+          html += `<p class="institution">${getLocalized(card.institution, language)}</p>`;
+        if (card.type)
+          html += `<p class="formation-type">${getLocalized(card.type, language)}</p>`;
+        if (card.description)
+          html += `<p class="description">${getLocalized(card.description, language)}</p>`;
         if (card.iconTechnologies) {
           html += `<h4 id="technologiesTitle" class="title-technologies"></h4>`;
-
           let techsDiv = `<div class="technologies-portfolio">`;
-          // Ordena os ícones de tecnologia alfabeticamente
           const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
             (a.name || "").localeCompare(b.name || ""),
           );
@@ -528,25 +502,19 @@ function setupFormations(fileURL, containerId, iconSize = "3x", language) {
           html += techsDiv + `</div>`;
         }
         if (card.certificates && Array.isArray(card.certificates)) {
-          html += `<details class="certificates"><summary>${
-            language === "pt-BR" ? "Certificados" : "Certificates"
-          }</summary><ul>`;
+          html += `<details class="certificates"><summary>${language === "pt-BR" ? "Certificados" : "Certificates"}</summary><ul>`;
           card.certificates.forEach((cert) => {
             html += `<li>`;
-            if (cert.url) {
+            if (cert.url)
               html += `<a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="certificate-link">`;
-            }
             html += `${getLocalized(cert.name, language)}`;
-            if (cert.url) {
-              html += `</a>`;
-            }
+            if (cert.url) html += `</a>`;
             html += `</li>`;
           });
           html += `</ul></details>`;
         }
-        if (card.dateText) {
+        if (card.dateText)
           html += `<p class="period">${getLocalized(card.dateText, language)}</p>`;
-        }
 
         div.innerHTML = html;
         fragment.appendChild(div);
@@ -557,71 +525,49 @@ function setupFormations(fileURL, containerId, iconSize = "3x", language) {
 }
 
 function setupTechnologies(container, cards, iconSize, language = "pt-BR") {
-  if (!Array.isArray(cards)) return;
-
-  // Agrupa tecnologias por stack e elimina duplicatas
+  if (!container || !Array.isArray(cards)) return;
   const stackMap = {};
-
   cards.forEach((card) => {
     if (card.iconTechnologies && Array.isArray(card.iconTechnologies)) {
       card.iconTechnologies.forEach((tech) => {
         if (!tech.stack) return;
-
         const stackId = tech.stack.id;
-        if (!stackMap[stackId]) {
-          stackMap[stackId] = {
-            stack: tech.stack,
-            technologies: [],
-          };
-        }
-
-        // Verifica se a tecnologia já existe neste stack (evita duplicatas)
+        if (!stackMap[stackId])
+          stackMap[stackId] = { stack: tech.stack, technologies: [] };
         const exists = stackMap[stackId].technologies.some(
           (t) => t.name === tech.name,
         );
-        if (!exists) {
-          stackMap[stackId].technologies.push(tech);
-        }
+        if (!exists) stackMap[stackId].technologies.push(tech);
       });
     }
   });
 
   const fragment = document.createDocumentFragment();
-
-  // Ordena os stacks alfabeticamente
   const sortedStacks = Object.values(stackMap).sort((a, b) => {
     const titleA = getLocalized(a.stack, language) || a.stack.id;
     const titleB = getLocalized(b.stack, language) || b.stack.id;
     return titleA.localeCompare(titleB);
   });
 
-  // Renderiza cada stack com suas tecnologias
   sortedStacks.forEach((stackGroup) => {
     const stackDiv = document.createElement("div");
     stackDiv.className = "tech-stack-group";
-
-    // Cria o título do stack usando en-US ou pt-BR
     const stackTitle =
       getLocalized(stackGroup.stack, language) || stackGroup.stack.id;
     const h3 = document.createElement("h3");
     h3.textContent = stackTitle;
     stackDiv.appendChild(h3);
 
-    // Cria container para os ícones
     const iconsContainer = document.createElement("div");
     iconsContainer.className = "technologies-portfolio";
 
-    // Ordena as tecnologias alfabeticamente
     const sortedTechs = [...stackGroup.technologies].sort((a, b) =>
       (a.name || "").localeCompare(b.name || ""),
     );
-
-    // Renderiza as tecnologias deste stack (sem duplicatas)
     const renderedTechs = new Set();
     sortedTechs.forEach((tech) => {
-      if (renderedTechs.has(tech.name)) return; // Pula se já foi renderizado
+      if (renderedTechs.has(tech.name)) return;
       renderedTechs.add(tech.name);
-
       const div = document.createElement("div");
       div.className = "card tech-cards";
       const classes = faClass(tech.style, tech.icon, iconSize);
@@ -641,23 +587,15 @@ function setupTechnologies(container, cards, iconSize, language = "pt-BR") {
 
 function loadAllTechnologies(language = "pt-BR") {
   return Promise.all([
-    fetch("assets/json/cards/projects.json").then((res) =>
-      res.ok ? res.json() : Promise.reject(res.status),
-    ),
-    fetch("assets/json/cards/formation.json").then((res) =>
-      res.ok ? res.json() : Promise.reject(res.status),
-    ),
+    fetchJsonWithFallback("assets/json/cards/projects.json"),
+    fetchJsonWithFallback("assets/json/cards/formation.json"),
   ])
     .then(([projectsData, formationsData]) => {
       const container = document.getElementById("technologiesContainer");
       if (!container) return;
-
-      // Coleta todas as tecnologias dos projetos e formações
       const allCards = [];
       if (projectsData.cards) allCards.push(...projectsData.cards);
       if (formationsData.cards) allCards.push(...formationsData.cards);
-
-      // Chama setupTechnologies com todos os cards
       setupTechnologies(container, allCards, "3x", language);
     })
     .catch((err) => console.error("Erro ao carregar tecnologias:", err));
@@ -731,8 +669,6 @@ async function showLastUpdate(elementId) {
     const commits = await res.json();
     if (!Array.isArray(commits) || !commits.length) return;
     const date = new Date(commits[0].commit.author.date);
-
-    // Armazena a data bruta para uso posterior
     window.__lastUpdateRawDate = date;
 
     const formatted = date.toLocaleDateString(
@@ -755,9 +691,9 @@ async function showLastUpdate(elementId) {
     }
 
     const el = document.getElementById(elementId);
-    if (el) el.textContent = `Última atualização: ${formatted}`;
-
-    // Dispara evento para informar que a data foi atualizada
+    if (el) {
+      el.textContent = `${document.documentElement.lang === "en-US" ? "Last Update: " : "Última atualização: "}${formatted}`;
+    }
     window.dispatchEvent(new Event("lastUpdateReady"));
   } catch (err) {
     console.error("Erro GitHub API:", err);
@@ -776,68 +712,53 @@ function nextProjects() {
 }
 
 function getAverageColor(imgElement) {
-  // Espera a imagem carregar completamente
   if (
     !imgElement ||
     imgElement.naturalWidth === 0 ||
     imgElement.naturalHeight === 0
   ) {
     console.warn("Imagem não carregada corretamente");
-    return { r: 124, g: 77, b: 255 }; // Cor padrão (accent color)
+    return { r: 124, g: 77, b: 255 };
   }
-
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
   if (!context) return { r: 124, g: 77, b: 255 };
-
-  // Usa as dimensões naturais da imagem
   canvas.width = imgElement.naturalWidth;
   canvas.height = imgElement.naturalHeight;
-
   try {
     context.drawImage(imgElement, 0, 0);
   } catch (e) {
     console.warn("Erro ao desenhar imagem no canvas:", e);
     return { r: 124, g: 77, b: 255 };
   }
-
   const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
-
   let r = 0,
     g = 0,
     b = 0;
   const totalPixels = data.length / 4;
-
   for (let i = 0; i < data.length; i += 4) {
     r += data[i];
     g += data[i + 1];
     b += data[i + 2];
   }
-
-  r = Math.round(r / totalPixels);
-  g = Math.round(g / totalPixels);
-  b = Math.round(b / totalPixels);
-
-  return { r, g, b };
+  return {
+    r: Math.round(r / totalPixels),
+    g: Math.round(g / totalPixels),
+    b: Math.round(b / totalPixels),
+  };
 }
 
 function setCSSVariables(color) {
   const root = document.documentElement;
-
-  // Cor principal
   root.style.setProperty("--accent", `rgb(${color.r}, ${color.g}, ${color.b})`);
-
-  // Cor principal com transparência
   root.style.setProperty(
     "--accent-transparent",
     `rgba(${color.r}, ${color.g}, ${color.b}, 0.67)`,
   );
-
-  // Cor principal com ajuste de hover (escurece um pouco)
-  const hoverR = Math.max(0, color.r - 30);
-  const hoverG = Math.max(0, color.g - 30);
-  const hoverB = Math.max(0, color.b - 30);
+  const hoverR = Math.max(0, color.r - 30),
+    hoverG = Math.max(0, color.g - 30),
+    hoverB = Math.max(0, color.b - 30);
   root.style.setProperty(
     "--hover-accent",
     `rgb(${hoverR}, ${hoverG}, ${hoverB})`,
@@ -847,19 +768,13 @@ function setCSSVariables(color) {
 function initializeProfileImage() {
   const img = document.getElementById("profile");
   if (!img) return;
-
   function applyAverageColor() {
     const avgColor = getAverageColor(img);
     setCSSVariables(avgColor);
   }
-
-  // Se a imagem já está carregada (cached)
-  if (img.complete && img.naturalHeight !== 0) {
-    applyAverageColor();
-  } else {
-    // Aguarda o carregamento da imagem
+  if (img.complete && img.naturalHeight !== 0) applyAverageColor();
+  else {
     img.addEventListener("load", applyAverageColor);
-    // Fallback: se a imagem falhar, usa cores padrão
     img.addEventListener("error", () => {
       console.warn("Erro ao carregar a imagem do perfil");
       setCSSVariables({ r: 124, g: 77, b: 255 });
@@ -867,7 +782,6 @@ function initializeProfileImage() {
   }
 }
 
-// Executa quando o DOM está pronto
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializeProfileImage);
 } else {
@@ -875,29 +789,21 @@ if (document.readyState === "loading") {
 }
 
 const container = document.querySelector(".container-portfolio");
-
-container.addEventListener(
-  "wheel",
-  function (e) {
-    // Previne o scroll vertical padrão
-    e.preventDefault();
-
-    const atStart = container.scrollLeft === 0;
-    const atEnd =
-      container.scrollLeft + container.clientWidth >= container.scrollWidth;
-
-    if ((!atEnd && e.deltaY > 0) || (!atStart && e.deltaY < 0)) {
-      // Enquanto não chegou ao fim/início, rola no eixo X
-      const scrollSpeed = 2; // ajuste aqui: 1 = normal, 2 = mais rápido, 0.5 = mais lento
-      container.scrollLeft += e.deltaY * scrollSpeed;
-    } else {
-      // Quando chega ao fim/início, deixa rolar no eixo Y da página
-      window.scrollBy({
-        top: e.deltaY,
-        left: 0,
-        behavior: "auto",
-      });
-    }
-  },
-  { passive: false },
-);
+if (container) {
+  container.addEventListener(
+    "wheel",
+    function (e) {
+      e.preventDefault();
+      const atStart = container.scrollLeft === 0;
+      const atEnd =
+        container.scrollLeft + container.clientWidth >= container.scrollWidth;
+      if ((!atEnd && e.deltaY > 0) || (!atStart && e.deltaY < 0)) {
+        const scrollSpeed = 2;
+        container.scrollLeft += e.deltaY * scrollSpeed;
+      } else {
+        window.scrollBy({ top: e.deltaY, left: 0, behavior: "auto" });
+      }
+    },
+    { passive: false },
+  );
+}

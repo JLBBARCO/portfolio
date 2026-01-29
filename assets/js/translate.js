@@ -23,38 +23,85 @@ function setCookie(name, value, days = 365) {
   document.cookie = name + "=" + value + ";" + expires + ";path=/";
 }
 
-// Função para carregar os arquivos de tradução
+// fetch com fallback: tenta múltiplos caminhos até obter sucesso
+function fetchAny(...paths) {
+  return new Promise((resolve, reject) => {
+    let i = 0;
+    function next() {
+      if (i >= paths.length) return reject(new Error("No path found"));
+      fetch(paths[i])
+        .then((res) => {
+          if (res.ok) resolve(res);
+          else {
+            i++;
+            next();
+          }
+        })
+        .catch(() => {
+          i++;
+          next();
+        });
+    }
+    next();
+  });
+}
+
+function fetchJsonWithFallback(path) {
+  const basename = path.split("/").pop();
+  return fetchAny(path, basename).then((res) =>
+    res.ok ? res.json() : Promise.reject(res.status),
+  );
+}
+
+// Sanitizador simples — permite apenas <span class="emphasis"> e texto.
+// Remove outros elementos/atributos para evitar injeção.
+function sanitizeTranslationHTML(html) {
+  const template = document.createElement("template");
+  template.innerHTML = html;
+
+  const all = template.content.querySelectorAll("*");
+  all.forEach((el) => {
+    const tag = el.tagName.toLowerCase();
+    if (tag === "span") {
+      if (!el.classList.contains("emphasis")) {
+        const textNode = document.createTextNode(el.textContent);
+        el.replaceWith(textNode);
+      } else {
+        el.className = "emphasis";
+        Array.from(el.attributes).forEach((attr) => {
+          if (attr.name !== "class") el.removeAttribute(attr.name);
+        });
+      }
+    } else {
+      const textNode = document.createTextNode(el.textContent);
+      el.replaceWith(textNode);
+    }
+  });
+
+  return template.innerHTML;
+}
+
+// Carrega as traduções (com fallback)
 async function loadTranslations() {
   try {
-    const [enResponse, ptResponse] = await Promise.all([
-      fetch("assets/json/translate/en-us.json"),
-      fetch("assets/json/translate/pt-br.json"),
+    const [en, pt] = await Promise.all([
+      fetchJsonWithFallback("assets/json/translate/en-us.json"),
+      fetchJsonWithFallback("assets/json/translate/pt-br.json"),
     ]);
 
-    if (!enResponse.ok) {
-      throw new Error(`Error fetching en translations: ${enResponse.status}`);
-    }
-    if (!ptResponse.ok) {
-      throw new Error(`Error fetching pt translations: ${ptResponse.status}`);
-    }
+    translations.en = en;
+    translations.pt = pt;
 
-    translations.en = await enResponse.json();
-    translations.pt = await ptResponse.json();
-
-    // Preserve templates so we can reformat {{date}} when language changes
+    // Preserve templates para reformatar {{date}}
     window.__translationTemplates = {
       en: translations.en?.lastUpdate || "Last Update: {{date}}",
       pt: translations.pt?.lastUpdate || "Última atualização: {{date}}",
     };
 
-    // Verifica se há linguagem salva em cookie
     const savedLanguage = getCookie("language");
     if (savedLanguage && (savedLanguage === "pt" || savedLanguage === "en")) {
       currentLanguage = savedLanguage;
-    }
-
-    // Se não houver cookie, tenta usar a linguagem do navegador (pt/en)
-    if (!savedLanguage) {
+    } else {
       const navLang = (
         navigator.language ||
         navigator.userLanguage ||
@@ -63,57 +110,54 @@ async function loadTranslations() {
       currentLanguage = navLang.startsWith("pt") ? "pt" : "en";
     }
 
-    // Aplica a tradução padrão
     applyTranslations(currentLanguage);
-
-    // Atualiza o seletor de idioma com a linguagem salva
     updateLanguageSelector();
-
-    // Define o link do CV (se existir), caso contrário esconde o link
     setCVLink(currentLanguage);
 
-    // Se já tivermos uma data obtida (showLastUpdate pode rodar antes das traduções),
-    // aplica a data às traduções agora usando a data bruta (ISO)
     if (window.__lastUpdateRawDate) {
       window.setTranslationDate?.(window.__lastUpdateRawDate);
     }
 
-    // Notifica que as traduções foram carregadas para outros scripts
     window.dispatchEvent(new Event("translationsReady"));
   } catch (error) {
     console.error("Erro ao carregar traduções:", error);
   }
 }
 
-// Função para obter a tradução de uma chave
 function t(key) {
   return translations[currentLanguage]?.[key] || key;
 }
 
-// Função para aplicar traduções ao DOM
-function applyTranslations(language) {
-  // Normaliza o código da linguagem (ex: pt-BR -> pt)
-  currentLanguage = language.startsWith("pt") ? "pt" : "en";
+// Aplica texto/HTML com preservação controlada de spans internos.
+// Evita duplicar <span class="emphasis"> se a tradução já tiver essa tag.
+function setTextPreserveSpans(element, text) {
+  // Substitui placeholders de idade: aceita {{age}} e {{year}}
+  const age = typeof calcularIdade === "function" ? calcularIdade() : "";
+  if (typeof text === "string") {
+    text = text.replace(/\{\{age\}\}/g, age).replace(/\{\{year\}\}/g, age);
+  }
 
-  // Atualiza atributo lang do HTML (usa códigos de localidade) e salva a linguagem em cookie
-  document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en-US";
-  setCookie("language", currentLanguage);
-  updateLanguageSelector();
+  const childElements = Array.from(element.children || []);
+  const onlySpans =
+    childElements.length > 0 &&
+    childElements.every((c) => c.tagName.toLowerCase() === "span");
 
-  // Helper: atualiza texto preservando spans (ex: bandeiras dentro de opções)
-  function setTextPreserveSpans(element, text) {
-    // substitui placeholder de idade se existir
-    const age = calcularIdade();
-    if (typeof text === "string") {
-      text = text.replace(/\{\{age\}\}/g, age);
+  const hasHTML = typeof text === "string" && /<[^>]+>/.test(text);
+
+  if (hasHTML) {
+    const safeHTML = sanitizeTranslationHTML(text);
+    const translationHasEmphasis =
+      /<span[^>]*class=['"]?emphasis['"]?[^>]*>/i.test(text);
+
+    if (onlySpans && !translationHasEmphasis) {
+      const preservedHTML = childElements.map((s) => s.outerHTML).join(" ");
+      element.innerHTML = safeHTML + (preservedHTML ? " " + preservedHTML : "");
+    } else {
+      element.innerHTML = safeHTML;
     }
-    const childElements = Array.from(element.children || []);
-    const onlySpans =
-      childElements.length === 0 ||
-      childElements.every((c) => c.tagName.toLowerCase() === "span");
-
+  } else {
     if (onlySpans) {
-      const spans = childElements; // either empty or array of spans
+      const spans = childElements;
       if (spans.length > 0) {
         const spansHTML = spans.map((s) => s.outerHTML).join(" ");
         element.innerHTML = text + (spansHTML ? " " + spansHTML : "");
@@ -121,22 +165,24 @@ function applyTranslations(language) {
         element.textContent = text;
       }
     } else {
-      // elemento possui filhos além de <span> — não sobrescrever a estrutura, apenas
-      // atualizar texto direto (remove nós de texto anteriores)
-      // procura primeiro nó de texto ou cria um
       let textNode = Array.from(element.childNodes).find(
         (n) => n.nodeType === Node.TEXT_NODE,
       );
       if (textNode) {
         textNode.nodeValue = text;
       } else {
-        // insere no início
         element.insertBefore(document.createTextNode(text), element.firstChild);
       }
     }
   }
+}
 
-  // Atualiza elementos com data-i18n
+function applyTranslations(language) {
+  currentLanguage = language.startsWith("pt") ? "pt" : "en";
+  document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en-US";
+  setCookie("language", currentLanguage);
+  updateLanguageSelector();
+
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     const key = element.getAttribute("data-i18n");
     const translation = t(key);
@@ -144,35 +190,24 @@ function applyTranslations(language) {
     if (tag === "INPUT" || tag === "TEXTAREA") {
       element.value = translation;
       element.placeholder = translation;
-    } else if (tag === "BUTTON") {
-      setTextPreserveSpans(element, translation);
     } else {
       setTextPreserveSpans(element, translation);
     }
   });
 
-  // Atualiza elementos com ID de tradução (welcome_title, welcome_message, etc)
   if (translations[currentLanguage]) {
     Object.keys(translations[currentLanguage]).forEach((key) => {
       const element = document.getElementById(key);
       if (element) {
-        // Se for o título da página, atualiza também document.title
-        if (key === "webTitle") {
-          document.title = t(key);
-        }
+        if (key === "webTitle") document.title = t(key);
         setTextPreserveSpans(element, t(key));
-        // Para maior acessibilidade, garanta que anchors recebam aria-labels
-        if (element.tagName === "A") {
-          element.setAttribute("aria-label", t(key));
-        }
+        if (element.tagName === "A") element.setAttribute("aria-label", t(key));
       }
     });
   }
 
-  // Preenche títulos reutilizáveis após atualizar as traduções
   fillReusableTitles();
 
-  // Dispara evento para atualizar cards dinâmicos sem recarregar a página
   window.dispatchEvent(
     new CustomEvent("languageChanged", {
       detail: { language: document.documentElement.lang },
@@ -180,21 +215,12 @@ function applyTranslations(language) {
   );
 }
 
-// Função para atualizar o seletor de idioma
 function updateLanguageSelector() {
   const languageMenu = document.getElementById("language-menu");
-  if (languageMenu) {
-    if (currentLanguage === "pt") {
-      languageMenu.value = "pt-BR";
-    } else if (currentLanguage === "en") {
-      languageMenu.value = "en-US";
-    }
-  }
+  if (!languageMenu) return;
+  languageMenu.value = currentLanguage === "pt" ? "pt-BR" : "en-US";
 }
 
-// A função calcularIdade() é definida no script.js e está disponível globalmente.
-
-// Verifica e define link para o CV (PDF). Se o arquivo não existir, oculta o link
 function setCVLink(language) {
   const downloadCV = document.getElementById("linkDownloadCV");
   if (!downloadCV) return;
@@ -203,8 +229,7 @@ function setCVLink(language) {
       ? "assets/documents/Curriculo_Jose_Luiz_Bruiani_Barco_pt-BR.pdf"
       : "assets/documents/Resume_Jose_Luiz_Bruiani_Barco_en-US.pdf";
 
-  // Verifica se o arquivo existe via HEAD (se falhar, oculta o link)
-  fetch(linkToCV, { method: "HEAD" })
+  fetchAny(linkToCV, linkToCV.split("/").pop())
     .then((resp) => {
       if (resp.ok) {
         downloadCV.style.display = "";
@@ -219,8 +244,6 @@ function setCVLink(language) {
     });
 }
 
-// Função para definir a data de última atualização nas traduções
-// Aceita uma data bruta (ISO string ou Date) e aplica formatação por idioma
 window.setTranslationDate = function (rawDate) {
   if (!rawDate && window.__lastUpdateRawDate)
     rawDate = window.__lastUpdateRawDate;
@@ -242,7 +265,6 @@ window.setTranslationDate = function (rawDate) {
     }),
   };
 
-  // Use templates (preservadas em loadTranslations) para evitar perder {{date}}
   const templateEn =
     window.__translationTemplates?.en ||
     translations.en?.lastUpdate ||
@@ -263,13 +285,9 @@ window.setTranslationDate = function (rawDate) {
     formatted.pt,
   );
 
-  // Atualiza elemento #lastUpdate com a tradução no idioma atual
   const el = document.getElementById("lastUpdate");
-  if (el) {
-    el.textContent = translations[currentLanguage]?.lastUpdate || "";
-  }
+  if (el) el.textContent = translations[currentLanguage]?.lastUpdate || "";
 
-  // Substitui {{date}} em nós de texto do DOM com a data formatada do idioma atual
   const currentFormatted =
     currentLanguage === "pt" ? formatted.pt : formatted.en;
   const walker = document.createTreeWalker(
@@ -279,71 +297,45 @@ window.setTranslationDate = function (rawDate) {
   );
   const nodes = [];
   while (walker.nextNode()) {
-    if (
-      walker.currentNode.nodeValue &&
-      walker.currentNode.nodeValue.includes("{{date}}")
-    ) {
+    if (walker.currentNode.nodeValue?.includes("{{date}}"))
       nodes.push(walker.currentNode);
-    }
   }
   nodes.forEach((n) => {
     n.nodeValue = n.nodeValue.replace(/\{\{date\}\}/g, currentFormatted);
   });
 };
 
-/**
- * Função para mudar de idioma.
- * Renomeada de 'language' para 'changeLanguage' para evitar conflitos com variáveis globais ou propriedades do DOM.
- */
 function changeLanguage() {
   const languageMenu = document.getElementById("language-menu");
   if (!languageMenu) return;
   const selectedLanguage = languageMenu.value;
-
   applyTranslations(selectedLanguage);
   setCVLink(currentLanguage);
-
-  // Reaplica a data formatada ao trocar idioma (se já obtida)
-  if (window.__lastUpdateRawDate) {
+  if (window.__lastUpdateRawDate)
     window.setTranslationDate(window.__lastUpdateRawDate);
-  }
 }
 
-// Carrega as traduções quando o DOM está pronto
-/**
- * Função para preencher títulos reutilizáveis (símbolos)
- * Usa classes como .title-technologies, .title-links para aplicar traduções
- */
 function fillReusableTitles() {
-  // Mapa de classes para chaves de tradução
   const titleMap = {
     "title-technologies": "technologiesTitle",
     "title-links": "linksTitle",
   };
-
   Object.entries(titleMap).forEach(([className, translationKey]) => {
     const elements = document.querySelectorAll(`.${className}`);
     const translation = t(translationKey);
-    elements.forEach((el) => {
-      el.textContent = translation;
-    });
+    elements.forEach((el) => (el.textContent = translation));
   });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Aguarda que o conteúdo dinâmico seja carregado (evento disparado em script.js)
-  // ou usa um fallback curto para evitar bloqueio se o evento não chegar.
   let loaded = false;
   function onceLoad() {
     if (loaded) return;
     loaded = true;
     loadTranslations();
   }
-
   window.addEventListener("dynamicContentReady", onceLoad, { once: true });
-  // Fallback: se o evento não for disparado em 500ms, carrega mesmo assim
   setTimeout(onceLoad, 500);
 });
 
-// Preenche títulos reutilizáveis quando o conteúdo dinâmico estiver pronto
 window.addEventListener("dynamicContentReady", fillReusableTitles);

@@ -162,8 +162,8 @@
         "pt-BR": "Gerenciador de Senhas"
       },
       "description": {
-        "en-US": "A system to save your simple passwords. Don't save your important passwords because this program doesn't have encryption",
-        "pt-BR": "Um sistema que salva suas senhas simples. Não salve suas importantes senhas, porque este programa não possui um sistema de criptografia"
+        "en-US": "A system to save your simple passwords. <span class='emphasis'>Don't save your important passwords because this program doesn't have encryption</span>",
+        "pt-BR": "Um sistema que salva suas senhas simples. <span class='emphasis'>Não salve suas importantes senhas, pois este programa não possui um sistema de criptografia</span>"
       },
       "iconTechnologies": [
         {
@@ -171,16 +171,6 @@
           "name": "Python",
           "style": "fa-brands",
           "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
-        },
-        {
-          "icon": "fa-js",
-          "name": "JavaScript",
-          "style": "fa-brands",
-          "stack": {
-            "id": "frontEnd",
-            "en-US": "Front-end",
-            "pt-BR": "Front-end"
-          }
         }
       ],
       "linkRepository": "https://github.com/jlbbarco/passwords-manager/",
@@ -195,8 +185,8 @@
         "pt-BR": "Pontuação Total"
       },
       "description": {
-        "en-US": "Repository of summation tests to discover your test score based on your answers and the answer key. The files accept only extensions .csv and .tsv",
-        "pt-BR": "Repositório de testes de soma para descobrir sua pontuação com base nas respostas e na chave de respostas. Os arquivos aceitam apenas extensões .csv e .tsv"
+        "en-US": "Repository of summation tests to discover your test score based on your answers and the answer key. <span class='emphasis'>The files accept only extensions .csv and .tsv</span>",
+        "pt-BR": "Repositório de testes de soma para descobrir sua pontuação com base nas respostas e na chave de respostas. <span class='emphasis'>Os arquivos aceitam apenas extensões .csv e .tsv</span>"
       },
       "iconTechnologies": [
         {
@@ -220,8 +210,8 @@
       "imageType": "image/png",
       "title": { "en-US": "Image Converter", "pt-BR": "Conversor de imagens" },
       "description": {
-        "en-US": "Website to convert images to PNG, JPEG and WEBP formats",
-        "pt-BR": "Site para converter imagens para os formatos PNG, JPEG e WEBP"
+        "en-US": "Website to convert images to <span class='emphasis'>PNG, JPEG and WEBP</span> formats",
+        "pt-BR": "Site para converter imagens para os formatos <span class='emphasis'>PNG, JPEG e WEBP</span>"
       },
       "iconTechnologies": [
         {
