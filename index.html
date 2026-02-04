@@ -9,7 +9,8 @@
   <link rel="stylesheet" href="assets/css/tablet.css" media="(min-width: 724px)" />
   <link rel="stylesheet" href="assets/css/pc.css" media="(min-width: 990px)" />
   <script src="https://kit.fontawesome.com/4a1e49a1ca.js" crossorigin="anonymous"></script>
-  <link rel="shortcut icon" href="assets/favicon/code-light.svg" type="image/x-icon" id="favicon">
+  <!-- Inicialmente use o ícone dark para reduzir flash enquanto o script ajusta conforme preferência -->
+  <link rel="shortcut icon" href="assets/favicon/code-dark.svg" type="image/x-icon" id="favicon">
 </head>
 
 <body data-github-owner="JLBBARCO" data-github-repo="portfolio">
@@ -66,7 +67,7 @@
           <div class="cv">
             <h3 id="downloadCVTitle"></h3>
             <a type="application/pdf" id="linkDownloadCV" href="#" aria-label="Download CV" style="display:none">
-              <i class="fa-solid fa-download fa-2x icon"></i>
+              <i class="fa-solid fa-download icon"></i>
             </a>
           </div>
         </div>
@@ -78,7 +79,7 @@
     </section>
     <section id="More">
       <h2 id="moreTitle"></h2>
-      <article id="techsThisSite" class="container"></article>
+      <article id="techsThisSite"></article>
       <p id="lastUpdate"></p>
     </section>
     <section id="Contact">
@@ -91,17 +92,17 @@
   <footer>
     <article id="accessibility">
       <button id="accessibility-button" aria-expanded="false" aria-controls="accessibility-menu">
-        <i class="fa-solid fa-universal-access fa-3x icon"></i>
+        <i class="fa-solid fa-universal-access icon"></i>
       </button>
       <div id="accessibility-menu" aria-hidden="true">
         <button id="increase-font" aria-label="Aumentar fonte">
-          <i class="fa-solid fa-increase-font fa-3x icon"></i>
+          <i class="fa-solid fa-increase-font icon"></i>
         </button>
         <button id="decrease-font" aria-label="Diminuir fonte">
-          <i class="fa-solid fa-decrease-font fa-3x icon"></i>
+          <i class="fa-solid fa-decrease-font icon"></i>
         </button>
         <button id="reset-font" aria-label="Redefinir fonte">
-          <i class="fa-solid fa-text-slash fa-3x icon"></i>
+          <i class="fa-solid fa-text-slash icon"></i>
         </button>
       </div>
     </article>

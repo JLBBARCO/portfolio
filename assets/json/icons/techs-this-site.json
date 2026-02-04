@@ -3,38 +3,32 @@
     {
       "name": "HTML5",
       "class": "fa-html5",
-      "style": "fa-brands",
-      "size": "fa-3x"
+      "style": "fa-brands"
     },
     {
       "name": "CSS3",
       "class": "fa-css3",
-      "style": "fa-brands",
-      "size": "fa-3x"
+      "style": "fa-brands"
     },
     {
       "name": "JavaScript",
       "class": "fa-js",
-      "style": "fa-brands",
-      "size": "fa-3x"
+      "style": "fa-brands"
     },
     {
       "name": "Font Awesome",
       "class": "fa-font-awesome",
-      "style": "fa-brands",
-      "size": "fa-3x"
+      "style": "fa-brands"
     },
     {
       "name": "Git",
       "class": "fa-git-alt",
-      "style": "fa-brands",
-      "size": "fa-3x"
+      "style": "fa-brands"
     },
     {
       "name": "GitHub",
       "class": "fa-github",
-      "style": "fa-brands",
-      "size": "fa-3x"
+      "style": "fa-brands"
     }
   ]
 }

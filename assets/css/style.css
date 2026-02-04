@@ -28,9 +28,9 @@
   --secondary-bg-transparent: #ffffffaa;
   --text-primary: #121212;
   --text-secondary: #4d4d4d;
-  --accent: ;
-  --accent-transparent: ;
-  --hover-accent: ;
+  --accent: #7c4dff;
+  --accent-transparent: #7c4dffaa;
+  --hover-accent: #4c1dff;
   --card-bg: #e0e0e0;
   --transition: all 0.3s ease;
   --font0: "Overlock", sans-serif;
@@ -38,6 +38,8 @@
   --font2: "Audiowide", sans-serif;
   --font3: "MedievalSharp", sans-serif;
   --shadow: 0 0 15px var(--hover-accent);
+  --icon-size: 1.5em;
+  --navbar-height: 80px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -49,7 +51,6 @@
     --text-secondary: #b3b3b3;
     --card-bg: #252525;
   }
-
 }
 
 * {
@@ -60,6 +61,7 @@
 html {
   scroll-behavior: smooth;
   scrollbar-color: var(--accent) var(--secondary-bg);
+  scroll-padding-top: var(--navbar-height);
 }
 
 body {
@@ -78,12 +80,6 @@ a {
 
 a:hover {
   text-decoration: underline;
-}
-
-.icon {
-  width: 24px;
-  height: auto;
-  color: var(--text-primary);
 }
 
 h1,
@@ -116,7 +112,7 @@ span.emphasis {
   color: var(--accent);
 }
 
-/* Header  */
+/* Header */
 header {
   display: flex;
   flex-flow: row nowrap;
@@ -127,8 +123,10 @@ header {
   top: 0;
   z-index: 1000;
   width: 100%;
+  height: var(--navbar-height);
   background-color: var(--secondary-bg);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
 }
 
 nav {
@@ -175,25 +173,6 @@ nav a:hover {
   z-index: 9999;
 }
 
-menu {
-  flex: 1 0 25vw;
-  display: flex;
-  padding: 0 50px;
-  justify-content: center;
-}
-
-menu button {
-  display: block;
-  background: none;
-  border: none;
-  transition: var(--transition);
-  cursor: pointer;
-}
-
-menu button:focus {
-  outline: none;
-}
-
 .nav-menu {
   flex: 1 0 25vw;
   display: flex;
@@ -224,10 +203,6 @@ menu button:focus {
   border-top: 1px solid var(--accent);
   text-align: center;
   padding: 1rem;
-}
-
-.nav-links a {
-  padding: 0.5rem;
 }
 
 .nav-links a {
@@ -270,15 +245,6 @@ main {
   margin: 50px;
 }
 
-main .icon {
-  transition: var(--transition);
-}
-
-main .icon:hover {
-  color: var(--hover-accent);
-  transform: scale(1.2);
-}
-
 main .container {
   width: 100%;
 }
@@ -292,6 +258,7 @@ section {
   text-align: center;
   width: 100%;
   min-height: 75vh;
+  scroll-margin-top: var(--navbar-height);
 }
 
 .portfolio {
@@ -516,8 +483,9 @@ section {
 #techsThisSite {
   display: flex;
   flex-flow: row wrap;
-  justify-content: center;
+  justify-content: space-evenly;
   margin: 25px auto;
+  width: 100%;
 }
 
 .cv {
@@ -533,6 +501,7 @@ section {
   right: 0;
   top: 50%;
   transform: translateY(-50%);
+  z-index: 999;
 }
 
 #accessibility button {
@@ -621,16 +590,22 @@ section {
   width: 100%;
 }
 
-/* SVG Icon Styling */
+/* SVG Icon Styling - CORRIGIDO */
 .icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  margin: 1rem;
+  font-size: var(--icon-size);
   color: var(--text-primary);
   flex-shrink: 0;
+  transition: var(--transition);
+  width: auto;
+  height: auto;
+}
+
+.icon:hover {
+  color: var(--hover-accent);
+  transform: scale(1.2);
 }
 
 .icon-container {
@@ -641,10 +616,12 @@ section {
   height: auto;
 }
 
+/* SVG específicos - tamanho padronizado */
 .icon svg {
-  width: 100%;
-  height: 100%;
+  width: 1em;
+  height: 1em;
   display: block;
+  flex-shrink: 0;
 }
 
 .icon svg path,
@@ -667,8 +644,7 @@ button .icon:hover {
   color: var(--hover-accent);
 }
 
-/* Adicione ao final do seu style.css */
-
+/* Filter Styles */
 .filter-container {
   display: flex;
   flex-wrap: wrap;
@@ -703,10 +679,9 @@ button .icon:hover {
   box-shadow: var(--shadow);
 }
 
-/* Estilos para títulos de seções reutilizáveis */
+/* Títulos reutilizáveis */
 .title-technologies,
-.title-links,
-h3 {
+.title-links {
   font-family: var(--font3);
   font-size: 1.5em;
   margin: 10px;

@@ -92,6 +92,22 @@
           "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
         },
         {
+          "icon": "fa-java",
+          "name": "Java",
+          "style": "fa-brands",
+          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+        },
+        {
+          "icon": "fa-react",
+          "name": "React",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
           "icon": "fa-mysql",
           "name": "MySQL",
           "style": "fa-brands",
