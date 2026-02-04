@@ -5,12 +5,12 @@ body {
 }
 
 .icon {
-  width: 48px;
-  height: 48px;
+  font-size: 2.5em;
 }
 
 section {
   padding: 50px;
+  scroll-margin-top: 120px;
 }
 
 nav h1 {
@@ -25,6 +25,7 @@ nav h1 {
   padding: 0;
   border: none;
   background: none;
+  display: flex !important;
 }
 
 #menu-button {
@@ -147,7 +148,7 @@ main .container {
   justify-content: center;
 }
 
-/* Melhorar scroll do carrossel */
+/* Carousel scroll */
 .container-portfolio {
   width: 100%;
   scroll-behavior: smooth;
@@ -156,7 +157,7 @@ main .container {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Esconder scrollbar do navegador mas manter funcionalidade */
+/* Scrollbar styling */
 .container-portfolio::-webkit-scrollbar {
   height: 8px;
 }

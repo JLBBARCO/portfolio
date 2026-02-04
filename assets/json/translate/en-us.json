@@ -12,7 +12,7 @@
   "technologiesTitle": "Technologies",
   "linksTitle": "Links",
   "aboutMeTitle": "About Me",
-  "aboutMeText": "My name is Jose Luiz Bruiani Barco and I have a {{age}} years. I am a full-stack developer with experience in <span class='emphasis'>HTML5, CSS3, JavaScript, and Python</span>, creating responsive interfaces and functional applications. I am passionate about transforming ideas into practical and intuitive digital solutions. In addition to Portuguese, I also communicate in English, which allows me to collaborate on international projects and keep up with global technological trends",
+  "aboutMeText": "My name is Jose Luiz Bruiani Barco and I am {{age}} years old. I am a full-stack developer with experience in <span class='emphasis'>HTML5, CSS3, JavaScript, and Python</span>, creating responsive interfaces and functional applications. I am passionate about transforming ideas into practical and intuitive digital solutions. In addition to Portuguese, I also communicate in English, which allows me to collaborate on international projects and keep up with global technological trends",
   "downloadCVTitle": "Download CV",
   "formationsTitle": "Formations",
   "moreTitle": "More About This Site",

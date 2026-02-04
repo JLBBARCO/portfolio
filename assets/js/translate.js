@@ -23,35 +23,8 @@ function setCookie(name, value, days = 365) {
   document.cookie = name + "=" + value + ";" + expires + ";path=/";
 }
 
-// fetch com fallback: tenta múltiplos caminhos até obter sucesso
-function fetchAny(...paths) {
-  return new Promise((resolve, reject) => {
-    let i = 0;
-    function next() {
-      if (i >= paths.length) return reject(new Error("No path found"));
-      fetch(paths[i])
-        .then((res) => {
-          if (res.ok) resolve(res);
-          else {
-            i++;
-            next();
-          }
-        })
-        .catch(() => {
-          i++;
-          next();
-        });
-    }
-    next();
-  });
-}
-
-function fetchJsonWithFallback(path) {
-  const basename = path.split("/").pop();
-  return fetchAny(path, basename).then((res) =>
-    res.ok ? res.json() : Promise.reject(res.status),
-  );
-}
+// Observação: fetchAny / fetchJsonWithFallback são definidos em script.js.
+// Removi as duplicatas daqui para evitar sobrescrita acidental.
 
 // Sanitizador simples — permite apenas <span class="emphasis"> e texto.
 // Remove outros elementos/atributos para evitar injeção.
@@ -84,6 +57,7 @@ function sanitizeTranslationHTML(html) {
 // Carrega as traduções (com fallback)
 async function loadTranslations() {
   try {
+    // usa fetchJsonWithFallback (definida em script.js)
     const [en, pt] = await Promise.all([
       fetchJsonWithFallback("assets/json/translate/en-us.json"),
       fetchJsonWithFallback("assets/json/translate/pt-br.json"),
@@ -114,15 +88,78 @@ async function loadTranslations() {
     updateLanguageSelector();
     setCVLink(currentLanguage);
 
-    if (window.__lastUpdateRawDate) {
-      window.setTranslationDate?.(window.__lastUpdateRawDate);
-    }
-
     window.dispatchEvent(new Event("translationsReady"));
   } catch (error) {
     console.error("Erro ao carregar traduções:", error);
   }
 }
+
+window.setTranslationDate = function (rawDate) {
+  if (!rawDate && window.__lastUpdateRawDate)
+    rawDate = window.__lastUpdateRawDate;
+  if (!rawDate) return;
+
+  const date = rawDate instanceof Date ? rawDate : new Date(rawDate);
+
+  // ✅ CORRIGIDO - Validação adequada de data
+  if (isNaN(date.getTime())) {
+    console.warn("Data inválida fornecida:", rawDate);
+    return;
+  }
+
+  const formatted = {
+    en: date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+    pt: date.toLocaleDateString("pt-BR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+  };
+
+  const templateEn =
+    window.__translationTemplates?.en ||
+    translations.en?.lastUpdate ||
+    "Last Update: {{date}}";
+  const templatePt =
+    window.__translationTemplates?.pt ||
+    translations.pt?.lastUpdate ||
+    "Última atualização: {{date}}";
+
+  if (!translations.en) translations.en = {};
+  if (!translations.pt) translations.pt = {};
+
+  translations.en.lastUpdate = templateEn.replace(
+    /\{\{date\}\}/g,
+    formatted.en,
+  );
+  translations.pt.lastUpdate = templatePt.replace(
+    /\{\{date\}\}/g,
+    formatted.pt,
+  );
+
+  const el = document.getElementById("lastUpdate");
+  if (el) el.textContent = translations[currentLanguage]?.lastUpdate || "";
+
+  const currentFormatted =
+    currentLanguage === "pt" ? formatted.pt : formatted.en;
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT,
+    null,
+  );
+  const nodes = [];
+  while (walker.nextNode()) {
+    if (walker.currentNode.nodeValue?.includes("{{date}}"))
+      nodes.push(walker.currentNode);
+  }
+  nodes.forEach((n) => {
+    n.nodeValue = n.nodeValue.replace(/\{\{date\}\}/g, currentFormatted);
+  });
+};
 
 function t(key) {
   return translations[currentLanguage]?.[key] || key;
@@ -229,6 +266,7 @@ function setCVLink(language) {
       ? "assets/documents/Curriculo_Jose_Luiz_Bruiani_Barco_pt-BR.pdf"
       : "assets/documents/Resume_Jose_Luiz_Bruiani_Barco_en-US.pdf";
 
+  // usa fetchAny (definida em script.js)
   fetchAny(linkToCV, linkToCV.split("/").pop())
     .then((resp) => {
       if (resp.ok) {
@@ -243,67 +281,6 @@ function setCVLink(language) {
       downloadCV.style.display = "none";
     });
 }
-
-window.setTranslationDate = function (rawDate) {
-  if (!rawDate && window.__lastUpdateRawDate)
-    rawDate = window.__lastUpdateRawDate;
-  if (!rawDate) return;
-
-  const date = rawDate instanceof Date ? rawDate : new Date(rawDate);
-  if (isNaN(date)) return;
-
-  const formatted = {
-    en: date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }),
-    pt: date.toLocaleDateString("pt-BR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }),
-  };
-
-  const templateEn =
-    window.__translationTemplates?.en ||
-    translations.en?.lastUpdate ||
-    "Last Update: {{date}}";
-  const templatePt =
-    window.__translationTemplates?.pt ||
-    translations.pt?.lastUpdate ||
-    "Última atualização: {{date}}";
-
-  translations.en = translations.en || {};
-  translations.pt = translations.pt || {};
-  translations.en.lastUpdate = templateEn.replace(
-    /\{\{date\}\}/g,
-    formatted.en,
-  );
-  translations.pt.lastUpdate = templatePt.replace(
-    /\{\{date\}\}/g,
-    formatted.pt,
-  );
-
-  const el = document.getElementById("lastUpdate");
-  if (el) el.textContent = translations[currentLanguage]?.lastUpdate || "";
-
-  const currentFormatted =
-    currentLanguage === "pt" ? formatted.pt : formatted.en;
-  const walker = document.createTreeWalker(
-    document.body,
-    NodeFilter.SHOW_TEXT,
-    null,
-  );
-  const nodes = [];
-  while (walker.nextNode()) {
-    if (walker.currentNode.nodeValue?.includes("{{date}}"))
-      nodes.push(walker.currentNode);
-  }
-  nodes.forEach((n) => {
-    n.nodeValue = n.nodeValue.replace(/\{\{date\}\}/g, currentFormatted);
-  });
-};
 
 function changeLanguage() {
   const languageMenu = document.getElementById("language-menu");

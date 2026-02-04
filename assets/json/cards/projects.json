@@ -76,7 +76,8 @@
             "id": "frontEnd",
             "en-US": "Front-end",
             "pt-BR": "Front-end"
-          }
+          },
+          "filter": "no"
         },
         {
           "icon": "fa-js",
@@ -130,7 +131,8 @@
             "id": "frontEnd",
             "en-US": "Front-end",
             "pt-BR": "Front-end"
-          }
+          },
+          "filter": "no"
         },
         {
           "icon": "fa-js",
@@ -245,11 +247,10 @@
           }
         }
       ],
-      "linkRepository": "https://github.com/jlbbarco/image-conversor/",
+      "linkRepository": "https://github.com/jlbbarco/image-converter/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
-      "linkDemo": "https://image-converter-seven-chi.vercel.app/",
+      "linkDemo": "https://image-converter-psi.vercel.app",
       "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
     }
-  ],
-  "buttons": [{ "filterAll": { "en-US": "All", "pt-BR": "Todos" } }]
+  ]
 }

@@ -15,7 +15,7 @@ function faClass(style, icon, size) {
 // Controle de tamanho de fonte
 let fontSize = 1;
 
-// fetch com fallback (reaproveitado)
+// fetch com fallback
 function fetchAny(...paths) {
   return new Promise((resolve, reject) => {
     let i = 0;
@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const faviconLink = document.getElementById("favicon");
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 
+  // Corrigido: usar ícone escuro quando for tema escuro e claro quando for tema claro
   function updateFavicon(eventOrBool) {
     const isDark =
       typeof eventOrBool === "boolean"
@@ -57,11 +58,12 @@ document.addEventListener("DOMContentLoaded", () => {
         : (eventOrBool?.matches ?? prefersDark.matches);
     if (!faviconLink) return;
     const newHref = isDark
-      ? "assets/favicon/code-light.svg"
-      : "assets/favicon/code-dark.svg";
+      ? "assets/favicon/code-dark.svg"
+      : "assets/favicon/code-light.svg";
     faviconLink.href = newHref + "?v=" + Date.now();
   }
 
+  // Define o favicon inicial de acordo com preferência atual
   updateFavicon(prefersDark.matches);
   if (typeof prefersDark.addEventListener === "function") {
     prefersDark.addEventListener("change", updateFavicon);
@@ -153,23 +155,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const pProjects = setupProjects(
       "assets/json/cards/projects.json",
       "projectsContainer",
-      "2x",
       locale,
     );
     const pIcons = setIcons(
       "assets/json/icons/techs-this-site.json",
       "techsThisSite",
-      "3x",
     );
     const pLinks = jsonLinksFetch(
       "assets/json/cards/contact.json",
       "contactContainer",
-      "2x",
     );
     const pFormations = setupFormations(
       "assets/json/cards/formation.json",
       "formationsContainer",
-      "2x",
       locale,
     );
 
@@ -177,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     Promise.all([pProjects, pIcons, pLinks, pFormations, pTechnologies])
       .then(() => {
-        addNewIcons("assets/json/icons/svg.json", "3x");
+        addNewIcons("assets/json/icons/svg.json");
         window.dispatchEvent(new Event("dynamicContentReady"));
       })
       .catch((err) => {
@@ -220,7 +218,7 @@ function toggleMenu() {
   if (!navLinks) return;
 
   const isVisible = window.getComputedStyle(navLinks).display !== "none";
-  navLinks.style.display = isVisible ? "none" : "grid";
+  navLinks.style.display = isVisible ? "none" : "flex";
 
   if (menuIcon) {
     menuIcon.classList.toggle("fa-bars", isVisible);
@@ -248,17 +246,20 @@ function updateFontSize(newSize) {
   document.body.style.fontSize = fontSize + "em";
   document.cookie = `fontSize=${fontSize}em; path=/; max-age=31536000`;
 }
+
 function increaseFont() {
   updateFontSize(fontSize + 0.1);
 }
+
 function decreaseFont() {
   updateFontSize(fontSize - 0.1);
 }
+
 function resetFont() {
   updateFontSize(1);
 }
 
-function setIcons(fileURL, containerID, iconSize = "3x") {
+function setIcons(fileURL, containerID) {
   return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerID);
@@ -267,7 +268,7 @@ function setIcons(fileURL, containerID, iconSize = "3x") {
       data.icons.forEach((icon) => {
         const div = document.createElement("div");
         div.className = "icon-container";
-        const classes = faClass(icon.style, icon.class || icon.name, iconSize);
+        const classes = faClass(icon.style, icon.class || icon.name);
         div.innerHTML = `<i class="${classes} icon" title="${icon.name || icon.class || ""}"></i>`;
         fragment.appendChild(div);
       });
@@ -276,7 +277,7 @@ function setIcons(fileURL, containerID, iconSize = "3x") {
     .catch((err) => console.error("Erro ao carregar ícones:", err));
 }
 
-function jsonLinksFetch(fileURL, containerId, iconSize = "2x") {
+function jsonLinksFetch(fileURL, containerId) {
   return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerId);
@@ -288,7 +289,7 @@ function jsonLinksFetch(fileURL, containerId, iconSize = "2x") {
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         a.className = "link-item";
-        const classes = faClass(card.style, card.icon, iconSize);
+        const classes = faClass(card.style, card.icon);
         a.innerHTML = `<i class="${classes} icon"></i>`;
         a.setAttribute("aria-label", card.name);
         a.title = card.name;
@@ -313,20 +314,25 @@ function getLocalized(value, language) {
   );
 }
 
-function setupProjects(fileURL, containerId, iconSize, language) {
+function setupProjects(fileURL, containerId, language) {
   return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container || !data.cards) return;
       const cards = data.cards;
       const techCount = {};
+      const techFilter = {};
       const techId = {};
       const techName = {};
+
       cards.forEach((card) => {
         if (card.iconTechnologies) {
           card.iconTechnologies.forEach((tech) => {
             if (tech.name) {
               techCount[tech.name] = (techCount[tech.name] || 0) + 1;
+              if (tech.filter === "no") {
+                techFilter[tech.name] = true;
+              }
               if (tech.stack && tech.stack.id && !techId[tech.name]) {
                 techId[tech.name] = tech.stack.id;
                 techName[tech.name] = getLocalized(tech.stack, language);
@@ -349,7 +355,9 @@ function setupProjects(fileURL, containerId, iconSize, language) {
         const sortedTechs = Object.entries(techCount).sort(([nameA], [nameB]) =>
           nameA.localeCompare(nameB),
         );
+
         sortedTechs.forEach(([name, count]) => {
+          if (techFilter[name]) return;
           const btn = document.createElement("button");
           btn.className = "filter-button";
           btn.dataset.filter = name;
@@ -360,7 +368,6 @@ function setupProjects(fileURL, containerId, iconSize, language) {
         container.parentNode.insertBefore(filterContainer, container);
       }
 
-      // remove prev/next duplicados antes de inserir (caso loadDynamicContent já tenha rodado)
       container.parentNode
         .querySelectorAll(".btn.prev, .btn.next")
         .forEach((el) => el.remove());
@@ -404,23 +411,23 @@ function setupProjects(fileURL, containerId, iconSize, language) {
           html += `<p>${getLocalized(card.description, language)}</p>`;
 
         if (card.iconTechnologies) {
-          html += `<h4 id="technologiesTitle" class="title-technologies"></h4>`;
+          html += `<h4 class="title-technologies"></h4>`;
           html += `<div class="technologies-portfolio">`;
           const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
             (a.name || "").localeCompare(b.name || ""),
           );
           sortedTechs.forEach((tech) => {
-            html += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
+            html += `<i class="${faClass(tech.style, tech.icon)} icon" title="${tech.name || ""}"></i>`;
           });
           html += `</div>`;
         }
 
         if (card.linkRepository || card.linkDemo) {
-          html += `<h4 id="linksTitle" class="title-links"></h4><div class="links-portfolio">`;
+          html += `<h4 class="title-links"></h4><div class="links-portfolio">`;
           if (card.linkRepository)
-            html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github fa-${iconSize} icon"></i></a>`;
+            html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github icon"></i></a>`;
           if (card.linkDemo)
-            html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-share-from-square fa-${iconSize} icon"></i></a>`;
+            html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-share-from-square icon"></i></a>`;
           html += `</div>`;
         }
 
@@ -432,16 +439,12 @@ function setupProjects(fileURL, containerId, iconSize, language) {
     .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
 }
 
-function setupFormations(fileURL, containerId, iconSize = "3x", language) {
+function setupFormations(fileURL, containerId, language) {
   return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container || !data.cards) return;
       const cards = data.cards;
-      if (typeof iconSize === "string" && !language) {
-        language = iconSize;
-        iconSize = "3x";
-      }
 
       const typeCount = {};
       const typeNames = {};
@@ -491,13 +494,13 @@ function setupFormations(fileURL, containerId, iconSize = "3x", language) {
         if (card.description)
           html += `<p class="description">${getLocalized(card.description, language)}</p>`;
         if (card.iconTechnologies) {
-          html += `<h4 id="technologiesTitle" class="title-technologies"></h4>`;
+          html += `<h4 class="title-technologies"></h4>`;
           let techsDiv = `<div class="technologies-portfolio">`;
           const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
             (a.name || "").localeCompare(b.name || ""),
           );
           sortedTechs.forEach((tech) => {
-            techsDiv += `<i class="${faClass(tech.style, tech.icon, iconSize)} icon" title="${tech.name || ""}"></i>`;
+            techsDiv += `<i class="${faClass(tech.style, tech.icon)} icon" title="${tech.name || ""}"></i>`;
           });
           html += techsDiv + `</div>`;
         }
@@ -524,9 +527,10 @@ function setupFormations(fileURL, containerId, iconSize = "3x", language) {
     .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
 }
 
-function setupTechnologies(container, cards, iconSize, language = "pt-BR") {
+function setupTechnologies(container, cards, language = "pt-BR") {
   if (!container || !Array.isArray(cards)) return;
   const stackMap = {};
+
   cards.forEach((card) => {
     if (card.iconTechnologies && Array.isArray(card.iconTechnologies)) {
       card.iconTechnologies.forEach((tech) => {
@@ -565,12 +569,13 @@ function setupTechnologies(container, cards, iconSize, language = "pt-BR") {
       (a.name || "").localeCompare(b.name || ""),
     );
     const renderedTechs = new Set();
+
     sortedTechs.forEach((tech) => {
       if (renderedTechs.has(tech.name)) return;
       renderedTechs.add(tech.name);
       const div = document.createElement("div");
       div.className = "card tech-cards";
-      const classes = faClass(tech.style, tech.icon, iconSize);
+      const classes = faClass(tech.style, tech.icon);
       div.innerHTML = `<i class="${classes} icon" title="${tech.name || ""}"></i>`;
       const p = document.createElement("p");
       p.textContent = tech.name || "";
@@ -596,14 +601,15 @@ function loadAllTechnologies(language = "pt-BR") {
       const allCards = [];
       if (projectsData.cards) allCards.push(...projectsData.cards);
       if (formationsData.cards) allCards.push(...formationsData.cards);
-      setupTechnologies(container, allCards, "3x", language);
+      setupTechnologies(container, allCards, language);
     })
     .catch((err) => console.error("Erro ao carregar tecnologias:", err));
 }
 
 function filterProjectsByTechnology(tech) {
   document.querySelectorAll(".card.card-projects").forEach((card) => {
-    const techs = card.dataset.technologies?.split(",") || [];
+    const techs =
+      card.dataset.technologies?.split(",")?.map((t) => t.trim()) || [];
     card.style.display =
       tech === "all" || techs.includes(tech) ? "flex" : "none";
   });
@@ -624,7 +630,7 @@ function updateFilterButtons(activeFilter) {
   });
 }
 
-function addNewIcons(linkFile, size = "3x") {
+function addNewIcons(linkFile) {
   fetch(linkFile)
     .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
     .then((data) => {
@@ -661,42 +667,64 @@ function addNewIcons(linkFile, size = "3x") {
 async function showLastUpdate(elementId) {
   const owner = document.body.dataset.githubOwner || "JLBBARCO";
   const repo = document.body.dataset.githubRepo || "portfolio";
+
   try {
-    const res = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`,
-    );
-    if (!res.ok) return;
+    const url = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`;
+
+    const res = await fetch(url, {
+      headers: {
+        Accept: "application/vnd.github.v3+json",
+      },
+    });
+
+    if (!res.ok) {
+      console.warn(`GitHub API retornou status ${res.status}`);
+      return;
+    }
+
     const commits = await res.json();
-    if (!Array.isArray(commits) || !commits.length) return;
-    const date = new Date(commits[0].commit.author.date);
+
+    if (!Array.isArray(commits) || commits.length === 0) {
+      console.warn("Nenhum commit encontrado");
+      return;
+    }
+
+    const commitDate = commits[0].commit?.author?.date;
+    if (!commitDate) {
+      console.warn("Data do commit não encontrada");
+      return;
+    }
+
+    const date = new Date(commitDate);
+
+    if (isNaN(date.getTime())) {
+      console.warn("Data inválida:", commitDate);
+      return;
+    }
+
     window.__lastUpdateRawDate = date;
 
-    const formatted = date.toLocaleDateString(
-      document.documentElement.lang || "pt-BR",
-      { year: "numeric", month: "long", day: "numeric" },
-    );
-
-    const walker = document.createTreeWalker(
-      document.body,
-      NodeFilter.SHOW_TEXT,
-      null,
-    );
-    while (walker.nextNode()) {
-      if (walker.currentNode.nodeValue?.includes("{{date}}")) {
-        walker.currentNode.nodeValue = walker.currentNode.nodeValue.replace(
-          /\{\{date\}\}/g,
-          formatted,
-        );
-      }
-    }
+    const lang = document.documentElement.lang || "pt-BR";
+    const formatted = date.toLocaleDateString(lang, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
     const el = document.getElementById(elementId);
     if (el) {
-      el.textContent = `${document.documentElement.lang === "en-US" ? "Last Update: " : "Última atualização: "}${formatted}`;
+      const prefix =
+        lang === "en-US" ? "Last Update: " : "Última atualização: ";
+      el.textContent = `${prefix}${formatted}`;
     }
+
+    if (window.setTranslationDate) {
+      window.setTranslationDate(date);
+    }
+
     window.dispatchEvent(new Event("lastUpdateReady"));
   } catch (err) {
-    console.error("Erro GitHub API:", err);
+    console.error("Erro ao buscar dados do GitHub:", err);
   }
 }
 
@@ -705,6 +733,7 @@ function prevProjects() {
     .getElementById("projectsContainer")
     ?.scrollBy({ left: -300, behavior: "smooth" });
 }
+
 function nextProjects() {
   document
     .getElementById("projectsContainer")
@@ -712,41 +741,61 @@ function nextProjects() {
 }
 
 function getAverageColor(imgElement) {
-  if (
-    !imgElement ||
-    imgElement.naturalWidth === 0 ||
-    imgElement.naturalHeight === 0
-  ) {
+  if (!imgElement) {
+    console.warn("Elemento de imagem não fornecido");
+    return { r: 124, g: 77, b: 255 };
+  }
+
+  if (imgElement.naturalWidth === 0 || imgElement.naturalHeight === 0) {
     console.warn("Imagem não carregada corretamente");
     return { r: 124, g: 77, b: 255 };
   }
+
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
-  if (!context) return { r: 124, g: 77, b: 255 };
+  if (!context) {
+    console.warn("Contexto canvas não disponível");
+    return { r: 124, g: 77, b: 255 };
+  }
+
   canvas.width = imgElement.naturalWidth;
   canvas.height = imgElement.naturalHeight;
+
   try {
     context.drawImage(imgElement, 0, 0);
   } catch (e) {
     console.warn("Erro ao desenhar imagem no canvas:", e);
     return { r: 124, g: 77, b: 255 };
   }
-  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imageData.data;
-  let r = 0,
-    g = 0,
-    b = 0;
-  const totalPixels = data.length / 4;
-  for (let i = 0; i < data.length; i += 4) {
-    r += data[i];
-    g += data[i + 1];
-    b += data[i + 2];
+
+  try {
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+    let r = 0,
+      g = 0,
+      b = 0;
+    const totalPixels = data.length / 4;
+
+    if (totalPixels === 0) {
+      console.warn("Imagem vazia ou inválida");
+      return { r: 124, g: 77, b: 255 };
+    }
+
+    for (let i = 0; i < data.length; i += 4) {
+      r += data[i];
+      g += data[i + 1];
+      b += data[i + 2];
+    }
+
+    return {
+      r: Math.round(r / totalPixels),
+      g: Math.round(g / totalPixels),
+      b: Math.round(b / totalPixels),
+    };
+  } catch (e) {
+    console.warn("Erro ao processar dados da imagem:", e);
+    return { r: 124, g: 77, b: 255 };
   }
-  return {
-    r: Math.round(r / totalPixels),
-    g: Math.round(g / totalPixels),
-    b: Math.round(b / totalPixels),
-  };
 }
 
 function setCSSVariables(color) {
@@ -768,12 +817,15 @@ function setCSSVariables(color) {
 function initializeProfileImage() {
   const img = document.getElementById("profile");
   if (!img) return;
+
   function applyAverageColor() {
     const avgColor = getAverageColor(img);
     setCSSVariables(avgColor);
   }
-  if (img.complete && img.naturalHeight !== 0) applyAverageColor();
-  else {
+
+  if (img.complete && img.naturalHeight !== 0) {
+    applyAverageColor();
+  } else {
     img.addEventListener("load", applyAverageColor);
     img.addEventListener("error", () => {
       console.warn("Erro ao carregar a imagem do perfil");
