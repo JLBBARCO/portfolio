@@ -11,7 +11,7 @@ body {
 section {
   min-height: 75dvh;
   padding: 50px;
-  scroll-margin-top: 100px;
+  scroll-margin-top: var(--navbar-height);
 }
 
 nav h1 {
@@ -39,17 +39,6 @@ main .container {
   overflow: auto;
 }
 
-.card-projects {
-  min-width: 400px;
-  max-width: 750px;
-}
-
-.container-technologies {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-}
-
 .tech-stack-group {
   width: auto;
 }
@@ -58,14 +47,7 @@ main .container {
   width: 45%;
 }
 
-.tech-cards {
-  margin: 10px auto;
-  padding: 25px;
-  width: auto;
-  height: auto;
-}
-
-.container-about-me {
+.text-with-image {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -114,7 +96,6 @@ main .container {
 .btn:hover {
   background-color: var(--accent-transparent);
   color: var(--primary-bg);
-  transform: scale(1.1);
 }
 
 .btn:active {
@@ -136,7 +117,7 @@ main .container {
 }
 
 /* Carousel scroll */
-.container-portfolio {
+.carrousel {
   flex-flow: row nowrap;
   width: 100%;
   scroll-behavior: smooth;
@@ -146,28 +127,19 @@ main .container {
 }
 
 /* Scrollbar styling */
-.container-portfolio::-webkit-scrollbar {
+.carrousel::-webkit-scrollbar {
   height: 8px;
 }
 
-.container-portfolio::-webkit-scrollbar-track {
+.carrousel::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.container-portfolio::-webkit-scrollbar-thumb {
+.carrousel::-webkit-scrollbar-thumb {
   background: var(--accent);
   border-radius: 4px;
 }
 
-.container-portfolio::-webkit-scrollbar-thumb:hover {
+.carrousel::-webkit-scrollbar-thumb:hover {
   background: var(--hover-accent);
-}
-
-.container-formations {
-  flex-flow: row wrap;
-}
-
-.container-formations .card {
-  max-width: 400px;
-  min-width: 300px;
 }

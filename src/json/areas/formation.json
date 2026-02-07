@@ -2,38 +2,6 @@
   "cards": [
     {
       "title": {
-        "en-US": "English Fluency Course",
-        "pt-BR": "Curso de Fluência em Inglês"
-      },
-      "institution": {
-        "en-US": "Athus Languages",
-        "pt-BR": "Athus Idiomas"
-      },
-      "description": {
-        "en-US": "English fluency course",
-        "pt-BR": "Curso de fluência em inglês"
-      },
-      "type": {
-        "id": "languageCourse",
-        "en-US": "Language Course",
-        "pt-BR": "Curso de Idioma"
-      },
-      "dateText": {
-        "en-US": "2022 - 2026",
-        "pt-BR": "2022 - 2026"
-      },
-      "certificates": [
-        {
-          "name": {
-            "en-US": "Certificate of Completion - Intermediate Level",
-            "pt-BR": "Certificado de Conclusão - Nível Intermediário"
-          },
-          "url": ""
-        }
-      ]
-    },
-    {
-      "title": {
         "en-US": "System Analysis and Development (SAD)",
         "pt-BR": "Análise e Desenvolvimento de Sistemas (ADS)"
       },
@@ -89,13 +57,21 @@
           "icon": "fa-python",
           "name": "Python",
           "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
         },
         {
           "icon": "fa-java",
           "name": "Java",
           "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
         },
         {
           "icon": "fa-react",
@@ -206,7 +182,11 @@
           "icon": "fa-python",
           "name": "Python",
           "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
         },
         {
           "icon": "fa-git-alt",
@@ -265,5 +245,12 @@
       ]
     }
   ],
-  "buttons": [{ "filterAll": { "en-US": "All", "pt-BR": "Todos" } }]
+  "buttons": [
+    {
+      "filterAll": {
+        "en-US": "All",
+        "pt-BR": "Todos"
+      }
+    }
+  ]
 }

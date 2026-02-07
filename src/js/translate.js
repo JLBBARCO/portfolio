@@ -23,9 +23,6 @@ function setCookie(name, value, days = 365) {
   document.cookie = name + "=" + value + ";" + expires + ";path=/";
 }
 
-// Observação: fetchAny / fetchJsonWithFallback são definidos em script.js.
-// Removi as duplicatas daqui para evitar sobrescrita acidental.
-
 // Sanitizador simples — permite apenas <span class="emphasis"> e texto.
 // Remove outros elementos/atributos para evitar injeção.
 function sanitizeTranslationHTML(html) {
@@ -59,8 +56,8 @@ async function loadTranslations() {
   try {
     // usa fetchJsonWithFallback (definida em script.js)
     const [en, pt] = await Promise.all([
-      fetchJsonWithFallback("assets/json/translate/en-us.json"),
-      fetchJsonWithFallback("assets/json/translate/pt-br.json"),
+      fetchJsonWithFallback("src/json/translate/en-us.json"),
+      fetchJsonWithFallback("src/json/translate/pt-br.json"),
     ]);
 
     translations.en = en;
@@ -263,8 +260,8 @@ function setCVLink(language) {
   if (!downloadCV) return;
   const linkToCV =
     language === "pt"
-      ? "assets/documents/Curriculo_Jose_Luiz_Bruiani_Barco_pt-BR.pdf"
-      : "assets/documents/Resume_Jose_Luiz_Bruiani_Barco_en-US.pdf";
+      ? "src/assets/documents/Curriculo_Jose_Luiz_Bruiani_Barco_pt-BR.pdf"
+      : "src/assets/documents/Resume_Jose_Luiz_Bruiani_Barco_en-US.pdf";
 
   // usa fetchAny (definida em script.js)
   fetchAny(linkToCV, linkToCV.split("/").pop())
@@ -282,14 +279,32 @@ function setCVLink(language) {
     });
 }
 
+// 🔧 CORREÇÃO: Função changeLanguage totalmente reescrita
 function changeLanguage() {
-  const languageMenu = document.getElementById("language-menu");
-  if (!languageMenu) return;
-  const selectedLanguage = languageMenu.value;
-  applyTranslations(selectedLanguage);
-  setCVLink(currentLanguage);
-  if (window.__lastUpdateRawDate)
+  const languageBtn = document.getElementById("languageBtn");
+  if (!languageBtn) return;
+
+  // Alternar entre pt e en baseado no idioma atual
+  const newLanguage = currentLanguage === "pt" ? "en" : "pt";
+  const newAriaLabel = newLanguage === "pt" ? "pt-br" : "en-us";
+
+  // Atualizar o atributo aria-label do botão
+  languageBtn.setAttribute("aria-label", newAriaLabel);
+
+  // Aplicar as novas traduções
+  applyTranslations(newLanguage);
+
+  // Atualizar o link do CV
+  setCVLink(newLanguage);
+
+  // Se a data foi carregada, atualizar a data também
+  if (window.__lastUpdateRawDate) {
     window.setTranslationDate(window.__lastUpdateRawDate);
+  }
+
+  console.log(
+    `Idioma alterado para: ${newLanguage === "pt" ? "Português" : "English"}`,
+  );
 }
 
 function fillReusableTitles() {

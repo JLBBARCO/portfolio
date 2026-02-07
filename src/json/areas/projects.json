@@ -2,7 +2,10 @@
   "cards": [
     {
       "projectTitle": "Random Generator",
-      "title": { "en-US": "Random Generator", "pt-BR": "Gerador Aleatório" },
+      "title": {
+        "en-US": "Random Generator",
+        "pt-BR": "Gerador Aleatório"
+      },
       "description": {
         "en-US": "A tool that generates random numbers and names based on user-defined criteria",
         "pt-BR": "Uma ferramenta que gera números e nomes aleatórios com base em critérios definidos pelo usuário"
@@ -12,7 +15,11 @@
           "icon": "fa-python",
           "name": "Python",
           "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
         }
       ],
       "linkRepository": "https://github.com/jlbbarco/random-generator/",
@@ -20,14 +27,17 @@
     },
     {
       "projectTitle": "Unit Converter",
-      "image": "assets/img/unit-converter.png",
+      "image": "src/assets/img/unit-converter.png",
       "descriptionImage": {
         "en-US": "Image of Unit Converter UI",
         "pt-BR": "Imagem da UI do Conversor de Unidades"
       },
-      "imageMobile": "assets/img/unit-converter-mobile.png",
+      "imageMobile": "src/assets/img/unit-converter-mobile.png",
       "imageType": "image/png",
-      "title": { "en-US": "Unit Converter", "pt-BR": "Conversor de unidades" },
+      "title": {
+        "en-US": "Unit Converter",
+        "pt-BR": "Conversor de unidades"
+      },
       "description": {
         "en-US": "A tool to convert between different units of measurement",
         "pt-BR": "Uma ferramenta para converter entre diferentes unidades de medida."
@@ -37,7 +47,11 @@
           "icon": "fa-python",
           "name": "Python",
           "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
         }
       ],
       "linkRepository": "https://github.com/jlbbarco/unit_converter/",
@@ -45,14 +59,17 @@
     },
     {
       "projectTitle": "GreenTech",
-      "image": "assets/img/greentech.png",
+      "image": "src/assets/img/greentech.png",
       "descriptionImage": {
         "en-US": "Image of Greentech Website",
         "pt-BR": "Imagem do Website Tecnoverde"
       },
-      "imageMobile": "assets/img/greentech-mobile.png",
+      "imageMobile": "src/assets/img/greentech-mobile.png",
       "imageType": "image/png",
-      "title": { "en-US": "Greentech", "pt-BR": "Tecnoverde" },
+      "title": {
+        "en-US": "Greentech",
+        "pt-BR": "Tecnoverde"
+      },
       "description": {
         "en-US": "A website for teaching the cultivation of Parsley",
         "pt-BR": "Um website para ensinar o cultivo de Salsa"
@@ -97,12 +114,12 @@
     },
     {
       "projectTitle": "Adolpho College",
-      "image": "assets/img/adolpho-college.png",
+      "image": "src/assets/img/adolpho-college.png",
       "descriptionImage": {
         "en-US": "Image of Adolpho College Website UI",
         "pt-BR": "Imagem da UI do website do Colégio Adolpho"
       },
-      "imageMobile": "assets/img/adolpho-college-mobile.png",
+      "imageMobile": "src/assets/img/adolpho-college-mobile.png",
       "imageType": "image/png",
       "title": {
         "en-US": "Adolpho College",
@@ -152,12 +169,12 @@
     },
     {
       "projectTitle": "Passwords Manager",
-      "image": "assets/img/passwords-manager.png",
+      "image": "src/assets/img/passwords-manager.png",
       "descriptionImage": {
         "en-US": "Image of Passwords Manager UI",
         "pt-BR": "Imagem da UI do Gerenciador de Senhas"
       },
-      "imageMobile": "assets/img/passwords-manager-mobile.png",
+      "imageMobile": "src/assets/img/passwords-manager-mobile.png",
       "imageType": "image/png",
       "title": {
         "en-US": "Passwords Manager",
@@ -172,7 +189,11 @@
           "icon": "fa-python",
           "name": "Python",
           "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
         }
       ],
       "linkRepository": "https://github.com/jlbbarco/passwords-manager/",
@@ -195,7 +216,31 @@
           "icon": "fa-python",
           "name": "Python",
           "style": "fa-brands",
-          "stack": { "id": "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" }
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
+        },
+        {
+          "icon": "fa-node-js",
+          "name": "Node.JS",
+          "style": "fa-brands",
+          "stack": {
+            "id": "platforms",
+            "en-US": "Platforms",
+            "pt-BR": "Platforms"
+          }
         }
       ],
       "linkRepository": "https://github.com/jlbbarco/total-score/",
@@ -203,14 +248,17 @@
     },
     {
       "projectTitle": "Image Converter",
-      "image": "assets/img/image-converter.png",
+      "image": "src/assets/img/image-converter.png",
       "descriptionImage": {
         "en-US": "Image of Image Converter UI",
         "pt-BR": "Imagem da UI do Conversor de Imagens"
       },
-      "imageMobile": "assets/img/image-converter-mobile.png",
+      "imageMobile": "src/assets/img/image-converter-mobile.png",
       "imageType": "image/png",
-      "title": { "en-US": "Image Converter", "pt-BR": "Conversor de imagens" },
+      "title": {
+        "en-US": "Image Converter",
+        "pt-BR": "Conversor de imagens"
+      },
       "description": {
         "en-US": "Website to convert images to <span class='emphasis'>PNG, JPEG and WEBP</span> formats",
         "pt-BR": "Site para converter imagens para os formatos <span class='emphasis'>PNG, JPEG e WEBP</span>"

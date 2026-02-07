@@ -2,7 +2,7 @@ const windowWidth = 990;
 
 // Helper para normalizar classes do Font Awesome
 function faClass(style, icon, size) {
-  let styleClass = style || "solid";
+  let styleClass = style || "fa-solid";
   if (styleClass && !styleClass.startsWith("fa-"))
     styleClass = `fa-${styleClass}`;
   let iconClass = icon || "";
@@ -50,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const faviconLink = document.getElementById("favicon");
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 
-  // Corrigido: usar ícone escuro quando for tema escuro e claro quando for tema claro
   function updateFavicon(eventOrBool) {
     const isDark =
       typeof eventOrBool === "boolean"
@@ -58,12 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
         : (eventOrBool?.matches ?? prefersDark.matches);
     if (!faviconLink) return;
     const newHref = isDark
-      ? "assets/favicon/code-dark.svg"
-      : "assets/favicon/code-light.svg";
+      ? "src/assets/favicon/code-dark.svg"
+      : "src/assets/favicon/code-light.svg";
     faviconLink.href = newHref + "?v=" + Date.now();
   }
 
-  // Define o favicon inicial de acordo com preferência atual
   updateFavicon(prefersDark.matches);
   if (typeof prefersDark.addEventListener === "function") {
     prefersDark.addEventListener("change", updateFavicon);
@@ -93,6 +91,11 @@ document.addEventListener("DOMContentLoaded", () => {
         menuIcon.classList.add("fa-bars");
     }
     menuButton.addEventListener("click", toggleMenu);
+  }
+
+  const languageBtn = document.getElementById("languageBtn");
+  if (languageBtn) {
+    languageBtn.addEventListener("click", changeLanguage);
   }
 
   const accessibilityButton = document.getElementById("accessibility-button");
@@ -126,10 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const containers = [
       "projectsContainer",
       "technologiesContainer",
-      "frontEndContainer",
-      "backEndContainer",
-      "databasesContainer",
-      "programsContainer",
       "techsThisSite",
       "contactContainer",
       "formationsContainer",
@@ -153,35 +152,80 @@ document.addEventListener("DOMContentLoaded", () => {
     const locale = currentLang === "pt" ? "pt-BR" : "en-US";
 
     const pProjects = setupProjects(
-      "assets/json/cards/projects.json",
+      "src/json/areas/projects.json",
       "projectsContainer",
       locale,
     );
-    const pIcons = setIcons(
-      "assets/json/icons/techs-this-site.json",
-      "techsThisSite",
-    );
-    const pLinks = jsonLinksFetch(
-      "assets/json/cards/contact.json",
-      "contactContainer",
-    );
     const pFormations = setupFormations(
-      "assets/json/cards/formation.json",
+      "src/json/areas/formation.json",
       "formationsContainer",
       locale,
+    );
+    const pIcons = setIconsTechsSite(
+      "src/json/areas/techs-this-site.json",
+      "techsThisSite",
+    );
+    const pLinks = setIconsContact(
+      "src/json/areas/contact.json",
+      "contactContainer",
     );
 
     const pTechnologies = loadAllTechnologies(locale);
 
     Promise.all([pProjects, pIcons, pLinks, pFormations, pTechnologies])
       .then(() => {
-        addNewIcons("assets/json/icons/svg.json");
+        setupCarouselButtons();
+        addNewIcons("src/assets/icons/svg.json");
         window.dispatchEvent(new Event("dynamicContentReady"));
       })
       .catch((err) => {
         console.warn("Erro no carregamento dinâmico:", err);
         window.dispatchEvent(new Event("dynamicContentReady"));
       });
+  }
+
+  function setupCarouselButtons() {
+    const carrosselContainer = document.querySelector(".carrousel");
+    if (!carrosselContainer) return;
+
+    // Remover botões antigos se existirem
+    carrosselContainer.parentNode
+      .querySelectorAll(".btn.prev, .btn.next")
+      .forEach((el) => el.remove());
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "btn prev";
+    prevBtn.innerHTML = '<i class="fa-solid fa-angle-left"></i>';
+    prevBtn.setAttribute("aria-label", "Previous projects");
+    prevBtn.onclick = prevProjects;
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "btn next";
+    nextBtn.innerHTML = '<i class="fa-solid fa-angle-right"></i>';
+    nextBtn.setAttribute("aria-label", "Next projects");
+    nextBtn.onclick = nextProjects;
+
+    carrosselContainer.parentNode.insertBefore(prevBtn, carrosselContainer);
+    carrosselContainer.parentNode.appendChild(nextBtn);
+
+    // Wheel scroll listener
+    carrosselContainer.addEventListener(
+      "wheel",
+      function (e) {
+        e.preventDefault();
+        const atStart = carrosselContainer.scrollLeft === 0;
+        const atEnd =
+          carrosselContainer.scrollLeft + carrosselContainer.clientWidth >=
+          carrosselContainer.scrollWidth - 10;
+        if ((!atEnd && e.deltaY > 0) || (!atStart && e.deltaY < 0)) {
+          const scrollSpeed = 2;
+          carrosselContainer.scrollLeft += e.deltaY * scrollSpeed;
+        } else {
+          window.scrollBy({ top: e.deltaY, left: 0, behavior: "auto" });
+        }
+      },
+      { passive: false },
+    );
   }
 
   loadDynamicContent();
@@ -259,7 +303,7 @@ function resetFont() {
   updateFontSize(1);
 }
 
-function setIcons(fileURL, containerID) {
+function setIconsTechsSite(fileURL, containerID) {
   return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerID);
@@ -268,36 +312,41 @@ function setIcons(fileURL, containerID) {
       data.icons.forEach((icon) => {
         const div = document.createElement("div");
         div.className = "icon-container";
-        const classes = faClass(icon.style, icon.class || icon.name);
+        const classes = faClass(icon.style, icon.class);
         div.innerHTML = `<i class="${classes} icon" title="${icon.name || icon.class || ""}"></i>`;
         fragment.appendChild(div);
       });
       container.appendChild(fragment);
     })
-    .catch((err) => console.error("Erro ao carregar ícones:", err));
+    .catch((err) =>
+      console.error("Erro ao carregar ícones techs-this-site:", err),
+    );
 }
 
-function jsonLinksFetch(fileURL, containerId) {
+function setIconsContact(fileURL, containerId) {
   return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container || !Array.isArray(data.cards)) return;
       const fragment = document.createDocumentFragment();
+
       data.cards.forEach((card) => {
         const a = document.createElement("a");
-        a.href = card.link || card.url;
+        a.href = card.url;
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         a.className = "link-item";
-        const classes = faClass(card.style, card.icon);
-        a.innerHTML = `<i class="${classes} icon"></i>`;
+
+        const iconClasses = faClass(card.style, card.icon);
+        a.innerHTML = `<i class="${iconClasses} icon"></i>`;
         a.setAttribute("aria-label", card.name);
         a.title = card.name;
+
         fragment.appendChild(a);
       });
       container.appendChild(fragment);
     })
-    .catch((err) => console.error("Erro ao carregar links:", err));
+    .catch((err) => console.error("Erro ao carregar contatos:", err));
 }
 
 function getLocalized(value, language) {
@@ -368,23 +417,6 @@ function setupProjects(fileURL, containerId, language) {
         container.parentNode.insertBefore(filterContainer, container);
       }
 
-      container.parentNode
-        .querySelectorAll(".btn.prev, .btn.next")
-        .forEach((el) => el.remove());
-
-      const prevBtn = document.createElement("button");
-      prevBtn.className = "btn prev";
-      prevBtn.innerHTML = '<i class="fa-solid fa-angle-left"></i>';
-      prevBtn.onclick = prevProjects;
-
-      const nextBtn = document.createElement("button");
-      nextBtn.className = "btn next";
-      nextBtn.innerHTML = '<i class="fa-solid fa-angle-right"></i>';
-      nextBtn.onclick = nextProjects;
-
-      container.parentNode.insertBefore(prevBtn, container);
-      container.parentNode.appendChild(nextBtn);
-
       const fragment = document.createDocumentFragment();
       cards.forEach((card) => {
         const div = document.createElement("div");
@@ -398,7 +430,7 @@ function setupProjects(fileURL, containerId, language) {
 
         let html = "";
         if (card.image) {
-          html += `<picture class="img-card">`;
+          html += `<picture>`;
           if (card.imageMobile)
             html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
           html += `<img src="${card.image}" alt="${getLocalized(card.descriptionImage, language)}" loading="lazy"></picture>`;
@@ -412,7 +444,7 @@ function setupProjects(fileURL, containerId, language) {
 
         if (card.iconTechnologies) {
           html += `<h4 class="title-technologies"></h4>`;
-          html += `<div class="technologies-portfolio">`;
+          html += `<div class="technologies">`;
           const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
             (a.name || "").localeCompare(b.name || ""),
           );
@@ -423,7 +455,7 @@ function setupProjects(fileURL, containerId, language) {
         }
 
         if (card.linkRepository || card.linkDemo) {
-          html += `<h4 class="title-links"></h4><div class="links-portfolio">`;
+          html += `<h4 class="title-links"></h4><div class="links">`;
           if (card.linkRepository)
             html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github icon"></i></a>`;
           if (card.linkDemo)
@@ -495,7 +527,7 @@ function setupFormations(fileURL, containerId, language) {
           html += `<p class="description">${getLocalized(card.description, language)}</p>`;
         if (card.iconTechnologies) {
           html += `<h4 class="title-technologies"></h4>`;
-          let techsDiv = `<div class="technologies-portfolio">`;
+          let techsDiv = `<div class="technologies">`;
           const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
             (a.name || "").localeCompare(b.name || ""),
           );
@@ -509,7 +541,7 @@ function setupFormations(fileURL, containerId, language) {
           card.certificates.forEach((cert) => {
             html += `<li>`;
             if (cert.url)
-              html += `<a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="certificate-link">`;
+              html += `<a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="certificate-link external">`;
             html += `${getLocalized(cert.name, language)}`;
             if (cert.url) html += `</a>`;
             html += `</li>`;
@@ -563,7 +595,7 @@ function setupTechnologies(container, cards, language = "pt-BR") {
     stackDiv.appendChild(h3);
 
     const iconsContainer = document.createElement("div");
-    iconsContainer.className = "technologies-portfolio";
+    iconsContainer.className = "block";
 
     const sortedTechs = [...stackGroup.technologies].sort((a, b) =>
       (a.name || "").localeCompare(b.name || ""),
@@ -592,8 +624,8 @@ function setupTechnologies(container, cards, language = "pt-BR") {
 
 function loadAllTechnologies(language = "pt-BR") {
   return Promise.all([
-    fetchJsonWithFallback("assets/json/cards/projects.json"),
-    fetchJsonWithFallback("assets/json/cards/formation.json"),
+    fetchJsonWithFallback("src/json/areas/projects.json"),
+    fetchJsonWithFallback("src/json/areas/formation.json"),
   ])
     .then(([projectsData, formationsData]) => {
       const container = document.getElementById("technologiesContainer");
@@ -838,24 +870,4 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializeProfileImage);
 } else {
   initializeProfileImage();
-}
-
-const container = document.querySelector(".container-portfolio");
-if (container) {
-  container.addEventListener(
-    "wheel",
-    function (e) {
-      e.preventDefault();
-      const atStart = container.scrollLeft === 0;
-      const atEnd =
-        container.scrollLeft + container.clientWidth >= container.scrollWidth;
-      if ((!atEnd && e.deltaY > 0) || (!atStart && e.deltaY < 0)) {
-        const scrollSpeed = 2;
-        container.scrollLeft += e.deltaY * scrollSpeed;
-      } else {
-        window.scrollBy({ top: e.deltaY, left: 0, behavior: "auto" });
-      }
-    },
-    { passive: false },
-  );
 }

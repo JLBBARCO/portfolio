@@ -10,7 +10,6 @@ body {
 
 section {
   padding: 50px;
-  scroll-margin-top: 120px;
 }
 
 nav h1 {
@@ -40,45 +39,11 @@ main .container {
   overflow: auto;
 }
 
-.card-projects {
-  min-width: 400px;
-  max-width: 750px;
-}
-
-.container-technologies {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  justify-content: space-around;
-  gap: 10px;
-  padding: 15px;
-}
-
-.container-technologies .container {
-  width: auto;
-}
-
-.container-technologies .tech-container {
-  gap: 20px;
-  padding: 25px;
-}
-
-.container-technologies .container h3 {
-  grid-column: span 2;
-}
-
 .techFrame {
   width: 45%;
 }
 
-.tech-cards {
-  margin: 10px;
-  padding: 15px;
-  width: auto;
-  height: auto;
-}
-
-.container-about-me {
+.text-with-image {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -127,7 +92,6 @@ main .container {
 .btn:hover {
   background-color: var(--accent-transparent);
   color: var(--primary-bg);
-  transform: scale(1.1);
 }
 
 .btn:active {
@@ -149,7 +113,7 @@ main .container {
 }
 
 /* Carousel scroll */
-.container-portfolio {
+.carrousel {
   width: 100%;
   scroll-behavior: smooth;
   overflow-x: auto;
@@ -158,24 +122,19 @@ main .container {
 }
 
 /* Scrollbar styling */
-.container-portfolio::-webkit-scrollbar {
+.carrousel::-webkit-scrollbar {
   height: 8px;
 }
 
-.container-portfolio::-webkit-scrollbar-track {
+.carrousel::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.container-portfolio::-webkit-scrollbar-thumb {
+.carrousel::-webkit-scrollbar-thumb {
   background: var(--accent);
   border-radius: 4px;
 }
 
-.container-portfolio::-webkit-scrollbar-thumb:hover {
+.carrousel::-webkit-scrollbar-thumb:hover {
   background: var(--hover-accent);
-}
-
-.container-formations .card {
-  max-width: 400px;
-  min-width: 300px;
 }
