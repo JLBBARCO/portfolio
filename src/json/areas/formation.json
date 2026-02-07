@@ -1,0 +1,256 @@
+{
+  "cards": [
+    {
+      "title": {
+        "en-US": "System Analysis and Development (SAD)",
+        "pt-BR": "Análise e Desenvolvimento de Sistemas (ADS)"
+      },
+      "institution": {
+        "en-US": "Adolpho de Oliveira Franco State School",
+        "pt-BR": "Colégio Estadual Adolpho de Oliveira Franco"
+      },
+      "type": {
+        "id": "technicalCourse",
+        "en-US": "Technical Course",
+        "pt-BR": "Curso Técnico"
+      },
+      "description": {
+        "en-US": "Course focused on software development, systems analysis, and project management",
+        "pt-BR": "Curso focado no desenvolvimento de software, análise de sistemas e gerenciamento de projetos"
+      },
+      "titleTechnologies": {
+        "en-US": "Technologies",
+        "pt-BR": "Tecnologias"
+      },
+      "iconTechnologies": [
+        {
+          "icon": "fa-html5",
+          "name": "HTML5",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-css3",
+          "name": "CSS3",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
+        },
+        {
+          "icon": "fa-java",
+          "name": "Java",
+          "style": "fa-brands",
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
+        },
+        {
+          "icon": "fa-react",
+          "name": "React",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-mysql",
+          "name": "MySQL",
+          "style": "fa-brands",
+          "stack": {
+            "id": "dataBase",
+            "en-US": "Data Base",
+            "pt-BR": "Banco de Dados"
+          }
+        },
+        {
+          "icon": "fa-vscode",
+          "name": "VS Code",
+          "style": "fa-brands",
+          "stack": {
+            "id": "platforms",
+            "en-US": "Platforms",
+            "pt-BR": "Plataformas"
+          }
+        }
+      ],
+      "dateText": {
+        "en-US": "2023 - 2025",
+        "pt-BR": "2023 - 2025"
+      },
+      "certificates": [
+        {
+          "name": {
+            "en-US": "Certificate of Completion - High School",
+            "pt-BR": "Certificado de Conclusão - Ensino Médio"
+          },
+          "url": ""
+        },
+        {
+          "name": {
+            "en-US": "Certificate of Completion - Technical Course in System Analysis and Development",
+            "pt-BR": "Certificado de Conclusão - Curso Técnico em Análise e Desenvolvimento de Sistemas"
+          },
+          "url": ""
+        }
+      ]
+    },
+    {
+      "title": {
+        "en-US": "Web Development Course",
+        "pt-BR": "Curso de Desenvolvimento Web"
+      },
+      "institution": {
+        "en-US": "Course in Video",
+        "pt-BR": "Curso em Vídeo"
+      },
+      "description": {
+        "en-US": "Course covering front-end and back-end web development technologies and best practices",
+        "pt-BR": "Curso que abrange tecnologias de desenvolvimento web (front-end e back-end) e melhores práticas"
+      },
+      "type": {
+        "id": "onlineCourse",
+        "en-US": "Online Course",
+        "pt-BR": "Curso Online"
+      },
+      "titleTechnologies": {
+        "en-US": "Technologies",
+        "pt-BR": "Tecnologias"
+      },
+      "iconTechnologies": [
+        {
+          "icon": "fa-html5",
+          "name": "HTML5",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-css3",
+          "name": "CSS3",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
+        },
+        {
+          "icon": "fa-git-alt",
+          "name": "Git",
+          "style": "fa-brands",
+          "stack": {
+            "id": "platforms",
+            "en-US": "Platforms",
+            "pt-BR": "Plataformas"
+          }
+        },
+        {
+          "icon": "fa-github",
+          "name": "GitHub",
+          "style": "fa-brands",
+          "stack": {
+            "id": "platforms",
+            "en-US": "Platforms",
+            "pt-BR": "Plataformas"
+          }
+        }
+      ],
+      "dateText": {
+        "en-US": "2023 - Present",
+        "pt-BR": "2023 - Presente"
+      },
+      "certificates": [
+        {
+          "name": {
+            "en-US": "Certificate of Completion - HTML5 & CSS3 [200 hours]",
+            "pt-BR": "Certificado de Conclusão - HTML5 & CSS3 [200 horas]"
+          },
+          "url": ""
+        },
+        {
+          "name": {
+            "en-US": "Certificate of Completion - JavaScript [40 hours]",
+            "pt-BR": "Certificado de Conclusão - JavaScript [40 horas]"
+          },
+          "url": ""
+        },
+        {
+          "name": {
+            "en-US": "Certificate of Completion - Git & GitHub [20 hours]",
+            "pt-BR": "Certificado de Conclusão - Git & GitHub [20 horas]"
+          },
+          "url": ""
+        },
+        {
+          "name": {
+            "en-US": "Certificate of Completion - Python [120 hours]",
+            "pt-BR": "Certificado de Conclusão - Python [120 horas]"
+          },
+          "url": ""
+        }
+      ]
+    }
+  ],
+  "buttons": [
+    {
+      "filterAll": {
+        "en-US": "All",
+        "pt-BR": "Todos"
+      }
+    }
+  ]
+}

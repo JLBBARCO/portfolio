@@ -5,12 +5,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title id="webTitle">JLBBARCO's Portfolio</title>
-  <link rel="stylesheet" href="assets/css/style.css" media="screen" />
-  <link rel="stylesheet" href="assets/css/tablet.css" media="(min-width: 724px)" />
-  <link rel="stylesheet" href="assets/css/pc.css" media="(min-width: 990px)" />
+  <link rel="stylesheet" href="src/css/style.css" media="screen" />
+  <link rel="stylesheet" href="src/css/tablet.css" media="(min-width: 724px)" />
+  <link rel="stylesheet" href="src/css/pc.css" media="(min-width: 990px)" />
   <script src="https://kit.fontawesome.com/4a1e49a1ca.js" crossorigin="anonymous"></script>
   <!-- Inicialmente use o ícone dark para reduzir flash enquanto o script ajusta conforme preferência -->
-  <link rel="shortcut icon" href="assets/favicon/code-dark.svg" type="image/x-icon" id="favicon">
+  <link rel="shortcut icon" href="src/assets/favicon/code-light.svg" type="image/x-icon" id="favicon">
+  <script src="src/js/script.js"></script>
+  <script src="src/js/translate.js"></script>
 </head>
 
 <body data-github-owner="JLBBARCO" data-github-repo="portfolio">
@@ -35,10 +37,9 @@
         <a href="#Contact" class="links" id="link6" data-i18n="link6">Contact</a>
       </div>
     </div>
-    <select name="language" id="language-menu" onchange="changeLanguage()" aria-label="Language menu">
-      <option value="en-US">En - US</option>
-      <option value="pt-BR">Pt - BR</option>
-    </select>
+    <button id="languageBtn" class="language" aria-label="pt-br">
+      <i class="fa-solid fa-globe icon"></i>
+    </button>
   </header>
   <main id="main">
     <section id="Home">
@@ -50,16 +51,16 @@
     </section>
     <section id="Projects" class="portfolio">
       <h2 id="projectsTitle" data-i18n="projectsTitle">Projects</h2>
-      <article id="projectsContainer" class="container container-portfolio"></article>
+      <article id="projectsContainer" class="carrousel"></article>
     </section>
     <section id="Technologies">
       <h2 id="technologiesTitle" data-i18n="technologiesTitle">Technologies</h2>
-      <article id="technologiesContainer" class="container container-technologies">
+      <article id="technologiesContainer" class="block">
       </article>
     </section>
     <section id="AboutMe">
       <h2 id="aboutMeTitle"></h2>
-      <article class="container container-about-me">
+      <article class="text-with-image">
         <img src="https://avatars.githubusercontent.com/u/159829462?v=4" alt="Avatar of JLBBARCO" id="profile"
           crossorigin="anonymous" class="person" loading="lazy" />
         <div class="text">
@@ -75,7 +76,7 @@
     </section>
     <section id="Formations">
       <h2 id="formationsTitle"></h2>
-      <article id="formationsContainer" class="container container-formations"></article>
+      <article id="formationsContainer" class="block"></article>
     </section>
     <section id="More">
       <h2 id="moreTitle"></h2>
@@ -84,8 +85,8 @@
     </section>
     <section id="Contact">
       <h2 id="contactTitle"></h2>
-      <div class="container container-contact">
-        <article id="contactContainer" class="contact-options"></article>
+      <div class="container-contact block">
+        <article id="contactContainer" class="block"></article>
       </div>
     </section>
   </main>
@@ -107,8 +108,6 @@
       </div>
     </article>
   </footer>
-  <script src="assets/js/script.js"></script>
-  <script src="assets/js/translate.js"></script>
 </body>
 
 </html>
