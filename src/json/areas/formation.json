@@ -94,6 +94,26 @@
           }
         },
         {
+          "icon": "fa-windows",
+          "name": "Windows",
+          "style": "fa-brands",
+          "stack": {
+            "id": "platforms",
+            "en-US": "Platforms",
+            "pt-BR": "Plataformas"
+          }
+        },
+        {
+          "icon": "fa-linux",
+          "name": "Linux",
+          "style": "fa-brands",
+          "stack": {
+            "id": "platforms",
+            "en-US": "Platforms",
+            "pt-BR": "Plataformas"
+          }
+        },
+        {
           "icon": "fa-vscode",
           "name": "VS Code",
           "style": "fa-brands",

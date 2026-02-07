@@ -302,6 +302,7 @@ section {
   justify-content: center;
   align-items: center;
   gap: 1em;
+  margin: 1em;
 }
 
 div.links {
