@@ -41,6 +41,7 @@ main .container {
 
 .tech-stack-group {
   width: auto;
+  max-width: 40dvw;
 }
 
 .techFrame {

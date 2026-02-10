@@ -39,6 +39,10 @@ main .container {
   overflow: auto;
 }
 
+.tech-stack-group {
+  max-width: 35dvw;
+}
+
 .techFrame {
   width: 45%;
 }

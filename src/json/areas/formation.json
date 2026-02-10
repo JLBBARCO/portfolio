@@ -124,10 +124,8 @@
           }
         }
       ],
-      "dateText": {
-        "en-US": "2023 - 2025",
-        "pt-BR": "2023 - 2025"
-      },
+      "dateInit": "2023",
+      "dateEnd": "2025",
       "certificates": [
         {
           "name": {
@@ -229,10 +227,7 @@
           }
         }
       ],
-      "dateText": {
-        "en-US": "2023 - Present",
-        "pt-BR": "2023 - Presente"
-      },
+      "dateInit": "2023",
       "certificates": [
         {
           "name": {

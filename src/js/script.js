@@ -42,8 +42,22 @@ function fetchAny(...paths) {
 function fetchJsonWithFallback(path) {
   const basename = path.split("/").pop();
   return fetchAny(path, basename).then((res) =>
-    res.ok ? res.json() : Promise.reject(res.status),
+    res.ok
+      ? res.json()
+      : Promise.reject(new Error(`Fetch failed with status: ${res.status}`)),
   );
+}
+
+// Função para trocar o idioma
+function changeLanguage() {
+  const savedLang = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("language="))
+    ?.split("=")[1];
+  const newLang = savedLang === "pt" ? "en" : "pt";
+  document.cookie = `language=${newLang}; path=/; max-age=31536000; SameSite=Lax`;
+  document.documentElement.lang = newLang === "pt" ? "pt-BR" : "en-US";
+  window.dispatchEvent(new Event("languageChanged"));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -188,8 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const carrosselContainer = document.querySelector(".carrousel");
     if (!carrosselContainer) return;
 
-    // Remover botões antigos se existirem
-    carrosselContainer.parentNode
+    const parent = carrosselContainer.parentNode;
+    parent
       .querySelectorAll(".btn.prev, .btn.next")
       .forEach((el) => el.remove());
 
@@ -205,23 +219,21 @@ document.addEventListener("DOMContentLoaded", () => {
     nextBtn.setAttribute("aria-label", "Next projects");
     nextBtn.onclick = nextProjects;
 
-    carrosselContainer.parentNode.insertBefore(prevBtn, carrosselContainer);
-    carrosselContainer.parentNode.appendChild(nextBtn);
+    parent.insertBefore(prevBtn, carrosselContainer);
+    parent.appendChild(nextBtn);
 
-    // Wheel scroll listener
     carrosselContainer.addEventListener(
       "wheel",
       function (e) {
-        e.preventDefault();
         const atStart = carrosselContainer.scrollLeft === 0;
         const atEnd =
           carrosselContainer.scrollLeft + carrosselContainer.clientWidth >=
           carrosselContainer.scrollWidth - 10;
+
         if ((!atEnd && e.deltaY > 0) || (!atStart && e.deltaY < 0)) {
+          e.preventDefault();
           const scrollSpeed = 2;
           carrosselContainer.scrollLeft += e.deltaY * scrollSpeed;
-        } else {
-          window.scrollBy({ top: e.deltaY, left: 0, behavior: "auto" });
         }
       },
       { passive: false },
@@ -288,7 +300,7 @@ function accessibilityToggle() {
 function updateFontSize(newSize) {
   fontSize = Math.max(0.6, Math.min(3.0, Math.round(newSize * 10) / 10));
   document.body.style.fontSize = fontSize + "em";
-  document.cookie = `fontSize=${fontSize}em; path=/; max-age=31536000`;
+  document.cookie = `fontSize=${fontSize}em; path=/; max-age=31536000; SameSite=Lax`;
 }
 
 function increaseFont() {
@@ -371,8 +383,6 @@ function setupProjects(fileURL, containerId, language) {
       const cards = data.cards;
       const techCount = {};
       const techFilter = {};
-      const techId = {};
-      const techName = {};
 
       cards.forEach((card) => {
         if (card.iconTechnologies) {
@@ -381,10 +391,6 @@ function setupProjects(fileURL, containerId, language) {
               techCount[tech.name] = (techCount[tech.name] || 0) + 1;
               if (tech.filter === "no") {
                 techFilter[tech.name] = true;
-              }
-              if (tech.stack && tech.stack.id && !techId[tech.name]) {
-                techId[tech.name] = tech.stack.id;
-                techName[tech.name] = getLocalized(tech.stack, language);
               }
             }
           });
@@ -510,8 +516,33 @@ function setupFormations(fileURL, containerId, language) {
         container.parentNode.insertBefore(filterContainer, container);
       }
 
+      function parseDate(dateStr) {
+        if (!dateStr) return 0;
+        const parts = dateStr.split("/");
+        if (parts.length === 2) {
+          const [month, year] = parts;
+          return new Date(parseInt(year), parseInt(month) - 1).getTime();
+        } else if (parts.length === 1) {
+          return new Date(parseInt(parts[0]), 0).getTime();
+        }
+        return 0;
+      }
+
+      const sortedCards = [...cards].sort((a, b) => {
+        const endA = parseDate(a.dateEnd);
+        const endB = parseDate(b.dateEnd);
+
+        if (endA !== endB) {
+          return endB - endA;
+        }
+
+        const initA = parseDate(a.dateInit);
+        const initB = parseDate(b.dateInit);
+        return initB - initA;
+      });
+
       const fragment = document.createDocumentFragment();
-      cards.forEach((card) => {
+      sortedCards.forEach((card) => {
         const div = document.createElement("div");
         div.className = "card card-formation";
         if (card.type?.id) div.dataset.type = card.type.id;
@@ -548,8 +579,13 @@ function setupFormations(fileURL, containerId, language) {
           });
           html += `</ul></details>`;
         }
-        if (card.dateText)
-          html += `<p class="period">${getLocalized(card.dateText, language)}</p>`;
+        if (card.dateInit) {
+          html += `<div class="period">${card.dateInit}`;
+          if (card.dateEnd) {
+            html += ` - ${card.dateEnd}`;
+          }
+          html += "</div>";
+        }
 
         div.innerHTML = html;
         fragment.appendChild(div);
@@ -664,7 +700,11 @@ function updateFilterButtons(activeFilter) {
 
 function addNewIcons(linkFile) {
   fetch(linkFile)
-    .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
+    .then((res) =>
+      res.ok
+        ? res.json()
+        : Promise.reject(new Error(`Fetch failed with status: ${res.status}`)),
+    )
     .then((data) => {
       if (!data.icons) return;
       data.icons.forEach((icon) => {

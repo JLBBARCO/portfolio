@@ -30,7 +30,9 @@
         }
       ],
       "linkRepository": "https://github.com/jlbbarco/unit_converter/",
-      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "dateInit": "2025",
+      "dateEnd": "2025"
     },
     {
       "projectTitle": "GreenTech",
@@ -85,7 +87,9 @@
       "linkRepository": "https://github.com/jlbbarco/Salsa/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
       "linkDemo": "https://tecnoverde.vercel.app",
-      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
+      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'",
+      "dateInit": "2025",
+      "dateEnd": "2025"
     },
     {
       "projectTitle": "Adolpho College",
@@ -140,7 +144,9 @@
       "linkRepository": "https://github.com/jlbbarco/colegio-adolpho/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
       "linkDemo": "https://colegio-adolpho.vercel.app/",
-      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
+      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'",
+      "dateInit": "2025",
+      "dateEnd": "2025"
     },
     {
       "projectTitle": "Passwords Manager",
@@ -174,7 +180,9 @@
       "linkRepository": "https://github.com/jlbbarco/passwords-manager/",
       "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
       "linkDemo": "https://passwords-manager-psi.vercel.app",
-      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'"
+      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'",
+      "dateInit": "2025",
+      "dateEnd": "2025"
     },
     {
       "projectTitle": "Total Score",
@@ -199,7 +207,43 @@
         }
       ],
       "linkRepository": "https://github.com/jlbbarco/total-score/",
-      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'"
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "dateInit": "2025",
+      "dateEnd": "2025"
+    },
+    {
+      "projectTitle": "RandomGenerator",
+      "image": "src/assets/img/random-generator.png",
+      "descriptionImage": {
+        "en-US": "Image of Passwords Manager UI",
+        "pt-BR": "Imagem da UI do Gerenciador de Senhas"
+      },
+      "imageMobile": "src/assets/img/random-generator-mobile.png",
+      "imageType": "image/png",
+      "title": {
+        "en-US": "Random Generator",
+        "pt-BR": "Gerador Aleatório"
+      },
+      "description": {
+        "en-US": "System with generate random names and numbers with quantity of user",
+        "pt-BR": "Sistema que gera nomes e números aleatórios de acordo com a quantidade que o usuário escolher"
+      },
+      "iconTechnologies": [
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
+        }
+      ],
+      "linkRepository": "https://github.com/jlbbarco/random-generator/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "dateInit": "2025",
+      "dateEnd": "2026"
     }
   ]
 }
