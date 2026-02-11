@@ -841,6 +841,8 @@ async function showLastUpdate(elementId) {
 }
 
 function prevProjects() {
+  let widthCard = document.querySelector;
+
   document
     .getElementById("projectsContainer")
     ?.scrollBy({ left: -300, behavior: "smooth" });

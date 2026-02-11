@@ -127,6 +127,11 @@ main .container {
   -webkit-overflow-scrolling: touch;
 }
 
+.carrousel .card {
+  min-width: 300px;
+  max-width: 400px;
+}
+
 /* Scrollbar styling */
 .carrousel::-webkit-scrollbar {
   height: 8px;
