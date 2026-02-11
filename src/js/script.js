@@ -375,6 +375,23 @@ function getLocalized(value, language) {
   );
 }
 
+/**
+ * Converte string de data (MM/AAAA ou AAAA) em timestamp.
+ * @param {string} dateStr
+ * @returns {number}
+ */
+function parseDate(dateStr) {
+  if (!dateStr) return 0;
+  const parts = dateStr.split("/");
+  if (parts.length === 2) {
+    const [month, year] = parts;
+    return new Date(parseInt(year, 10), parseInt(month, 10) - 1).getTime();
+  } else if (parts.length === 1) {
+    return new Date(parseInt(parts[0], 10), 0).getTime();
+  }
+  return 0;
+}
+
 function setupProjects(fileURL, containerId, language) {
   return fetchJsonWithFallback(fileURL)
     .then((data) => {
@@ -424,7 +441,21 @@ function setupProjects(fileURL, containerId, language) {
       }
 
       const fragment = document.createDocumentFragment();
-      cards.forEach((card) => {
+
+      const sortedCards = [...cards].sort((a, b) => {
+        const endA = parseDate(a.dateEnd);
+        const endB = parseDate(b.dateEnd);
+
+        if (endA !== endB) {
+          return endB - endA;
+        }
+
+        const initA = parseDate(a.dateInit);
+        const initB = parseDate(b.dateInit);
+        return initB - initA;
+      });
+
+      sortedCards.forEach((card) => {
         const div = document.createElement("div");
         div.className = "card card-projects";
         if (card.iconTechnologies) {
@@ -449,7 +480,9 @@ function setupProjects(fileURL, containerId, language) {
           html += `<p>${getLocalized(card.description, language)}</p>`;
 
         if (card.iconTechnologies) {
-          html += `<h4 class="title-technologies"></h4>`;
+          const techTitle =
+            language === "pt-BR" ? "Tecnologias" : "Technologies";
+          html += `<h4 class="title-technologies">${techTitle}</h4>`;
           html += `<div class="technologies">`;
           const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
             (a.name || "").localeCompare(b.name || ""),
@@ -461,12 +494,21 @@ function setupProjects(fileURL, containerId, language) {
         }
 
         if (card.linkRepository || card.linkDemo) {
-          html += `<h4 class="title-links"></h4><div class="links">`;
+          const linkTitle = language === "pt-BR" ? "Links" : "Links";
+          html += `<h4 class="title-links">${linkTitle}</h4><div class="links">`;
           if (card.linkRepository)
-            html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github icon"></i></a>`;
+            html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer" aria-label="Repository"><i class="fa-brands fa-github icon"></i></a>`;
           if (card.linkDemo)
-            html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-share-from-square icon"></i></a>`;
+            html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer" aria-label="Demo"><i class="fa-solid fa-share-from-square icon"></i></a>`;
           html += `</div>`;
+        }
+
+        if (card.dateInit) {
+          html += `<div class="date"><p>${card.dateInit}`;
+          if (card.dateEnd) {
+            html += ` - ${card.dateEnd}`;
+          }
+          html += "</p></div>";
         }
 
         div.innerHTML = html;
@@ -496,6 +538,7 @@ function setupFormations(fileURL, containerId, language) {
       if (Object.keys(typeCount).length > 1) {
         const filterContainer = document.createElement("div");
         filterContainer.className = "filter-container";
+
         const btnAll = document.createElement("button");
         btnAll.className = "filter-button active";
         btnAll.dataset.filter = "all";
@@ -513,19 +556,8 @@ function setupFormations(fileURL, containerId, language) {
             btn.onclick = () => filterFormationsByType(id);
             filterContainer.appendChild(btn);
           });
-        container.parentNode.insertBefore(filterContainer, container);
-      }
 
-      function parseDate(dateStr) {
-        if (!dateStr) return 0;
-        const parts = dateStr.split("/");
-        if (parts.length === 2) {
-          const [month, year] = parts;
-          return new Date(parseInt(year), parseInt(month) - 1).getTime();
-        } else if (parts.length === 1) {
-          return new Date(parseInt(parts[0]), 0).getTime();
-        }
-        return 0;
+        container.parentNode.insertBefore(filterContainer, container);
       }
 
       const sortedCards = [...cards].sort((a, b) => {
@@ -556,17 +588,23 @@ function setupFormations(fileURL, containerId, language) {
           html += `<p class="formation-type">${getLocalized(card.type, language)}</p>`;
         if (card.description)
           html += `<p class="description">${getLocalized(card.description, language)}</p>`;
-        if (card.iconTechnologies) {
-          html += `<h4 class="title-technologies"></h4>`;
+
+        if (card.iconTechnologies && Array.isArray(card.iconTechnologies)) {
+          const techTitle =
+            language === "pt-BR" ? "Tecnologias" : "Technologies";
+          html += `<h4 class="title-technologies">${techTitle}</h4>`;
+
           let techsDiv = `<div class="technologies">`;
           const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
             (a.name || "").localeCompare(b.name || ""),
           );
           sortedTechs.forEach((tech) => {
-            techsDiv += `<i class="${faClass(tech.style, tech.icon)} icon" title="${tech.name || ""}"></i>`;
+            const iconClass = faClass(tech.style, tech.icon);
+            techsDiv += `<i class="${iconClass} icon" title="${tech.name || ""}"></i>`;
           });
           html += techsDiv + `</div>`;
         }
+
         if (card.certificates && Array.isArray(card.certificates)) {
           html += `<details class="certificates"><summary>${language === "pt-BR" ? "Certificados" : "Certificates"}</summary><ul>`;
           card.certificates.forEach((cert) => {
@@ -579,6 +617,7 @@ function setupFormations(fileURL, containerId, language) {
           });
           html += `</ul></details>`;
         }
+
         if (card.dateInit) {
           html += `<div class="period">${card.dateInit}`;
           if (card.dateEnd) {
@@ -590,6 +629,7 @@ function setupFormations(fileURL, containerId, language) {
         div.innerHTML = html;
         fragment.appendChild(div);
       });
+
       container.appendChild(fragment);
     })
     .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
@@ -801,6 +841,8 @@ async function showLastUpdate(elementId) {
 }
 
 function prevProjects() {
+  let widthCard = document.querySelector;
+
   document
     .getElementById("projectsContainer")
     ?.scrollBy({ left: -300, behavior: "smooth" });

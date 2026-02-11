@@ -620,11 +620,11 @@ button .icon:hover {
   overflow-x: auto;
   width: 100%;
   gap: 2em;
+  padding: 10px 25px
 }
 
 .carrousel .card {
-  min-width: 300px;
-  max-width: 400px;
+  max-width: 75dvw;
   flex-shrink: 0;
 }
 
