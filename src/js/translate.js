@@ -38,82 +38,78 @@ function sanitizeTranslationHTML(html) {
 }
 
 // Carrega as traduções (com fallback)
-async function loadTranslations() {
-  try {
-    // primeiro tente carregar um único arquivo com ambas as línguas.
-    // o formato esperado é:
-    // { "en": { ... }, "pt": { ... } }
-    let en, pt;
-    try {
-      const combined = await fetchJsonWithFallback(
-        "src/json/translate/strings.json",
-      );
+function loadTranslations() {
+  // returns promise
+  return fetchJsonWithFallback("src/json/translate/strings.json")
+    .then((combined) => {
       if (combined && combined.en && combined.pt) {
-        en = combined.en;
-        pt = combined.pt;
-      } else {
-        throw new Error("combined file missing expected keys");
+        return [combined.en, combined.pt];
       }
-    } catch (e) {
-      // se não existir ou estiver malformado, recorra aos arquivos separados
-      [en, pt] = await Promise.all([
+      throw new Error("combined file missing expected keys");
+    })
+    .catch(() => {
+      // fallback to separate files
+      return Promise.all([
         fetchJsonWithFallback("src/json/translate/en-us.json"),
         fetchJsonWithFallback("src/json/translate/pt-br.json"),
       ]);
-    }
+    })
+    .then(([en, pt]) => {
+      translations.en = en;
+      translations.pt = pt;
 
-    translations.en = en;
-    translations.pt = pt;
+      // sincroniza chaves (preenchendo com a outra língua quando faltar)
+      const allKeys = new Set([
+        ...Object.keys(translations.en || {}),
+        ...Object.keys(translations.pt || {}),
+      ]);
+      allKeys.forEach((k) => {
+        if (!(k in translations.en))
+          translations.en[k] = translations.pt[k] || "";
+        if (!(k in translations.pt))
+          translations.pt[k] = translations.en[k] || "";
+      });
 
-    // sincroniza chaves (preenchendo com a outra língua quando faltar)
-    const allKeys = new Set([
-      ...Object.keys(translations.en || {}),
-      ...Object.keys(translations.pt || {}),
-    ]);
-    allKeys.forEach((k) => {
-      if (!(k in translations.en))
-        translations.en[k] = translations.pt[k] || "";
-      if (!(k in translations.pt))
-        translations.pt[k] = translations.en[k] || "";
+      let savedLanguage;
+      try {
+        savedLanguage = localStorage.getItem("language");
+      } catch (err) {
+        console.warn("localStorage unavailable when reading language:", err);
+        savedLanguage = null;
+      }
+      if (savedLanguage === "pt" || savedLanguage === "en") {
+        currentLanguage = savedLanguage;
+      } else {
+        const navLang = (
+          navigator.language ||
+          navigator.userLanguage ||
+          ""
+        ).toLowerCase();
+        currentLanguage = navLang.startsWith("pt") ? "pt" : "en";
+      }
+
+      const languageBtn = document.getElementById("languageBtn");
+      if (languageBtn) {
+        const newAria = currentLanguage === "pt" ? "pt-br" : "en-us";
+        languageBtn.setAttribute("aria-label", newAria);
+      }
+
+      applyTranslations(currentLanguage);
+      updateLanguageSelector();
+      setCVLink(currentLanguage);
+
+      window.dispatchEvent(new Event("translationsReady"));
+
+      window.dumpTranslations = function () {
+        console.log(
+          "Translation template:\n",
+          JSON.stringify({ en: translations.en, pt: translations.pt }, null, 2),
+        );
+      };
+    })
+    .catch((error) => {
+      console.error("Erro ao carregar traduções:", error);
     });
-
-    const savedLanguage = localStorage.getItem("language");
-    if (savedLanguage === "pt" || savedLanguage === "en") {
-      currentLanguage = savedLanguage;
-    } else {
-      const navLang = (
-        navigator.language ||
-        navigator.userLanguage ||
-        ""
-      ).toLowerCase();
-      currentLanguage = navLang.startsWith("pt") ? "pt" : "en";
-    }
-
-    // set initial aria-label for language button
-    const languageBtn = document.getElementById("languageBtn");
-    if (languageBtn) {
-      const newAria = currentLanguage === "pt" ? "pt-br" : "en-us";
-      languageBtn.setAttribute("aria-label", newAria);
-    }
-
-    applyTranslations(currentLanguage);
-    updateLanguageSelector();
-    setCVLink(currentLanguage);
-
-    window.dispatchEvent(new Event("translationsReady"));
-
-    // When developing, it's handy to be able to dump the current translation
-    // object so you can paste it back into the source file and keep things in
-    // sync.
-    window.dumpTranslations = function () {
-      console.log(
-        "Translation template:\n",
-        JSON.stringify({ en: translations.en, pt: translations.pt }, null, 2),
-      );
-    };
-  } catch (error) {
-    console.error("Erro ao carregar traduções:", error);
-  }
 }
 
 window.setTranslationDate = function (rawDate) {
@@ -143,12 +139,12 @@ window.setTranslationDate = function (rawDate) {
   };
 
   const templateEn =
-    window.__translationTemplates?.en ||
-    translations.en?.lastUpdate ||
+    (window.__translationTemplates && window.__translationTemplates.en) ||
+    (translations.en && translations.en.lastUpdate) ||
     "Last Update: {{date}}";
   const templatePt =
-    window.__translationTemplates?.pt ||
-    translations.pt?.lastUpdate ||
+    (window.__translationTemplates && window.__translationTemplates.pt) ||
+    (translations.pt && translations.pt.lastUpdate) ||
     "Última atualização: {{date}}";
 
   if (!translations.en) translations.en = {};
@@ -164,7 +160,12 @@ window.setTranslationDate = function (rawDate) {
   );
 
   const el = document.getElementById("lastUpdate");
-  if (el) el.textContent = translations[currentLanguage]?.lastUpdate || "";
+  if (el) {
+    el.textContent =
+      (translations[currentLanguage] &&
+        translations[currentLanguage].lastUpdate) ||
+      "";
+  }
 
   const currentFormatted =
     currentLanguage === "pt" ? formatted.pt : formatted.en;
@@ -175,7 +176,10 @@ window.setTranslationDate = function (rawDate) {
   );
   const nodes = [];
   while (walker.nextNode()) {
-    if (walker.currentNode.nodeValue?.includes("{{date}}"))
+    if (
+      walker.currentNode.nodeValue &&
+      walker.currentNode.nodeValue.includes("{{date}}")
+    )
       nodes.push(walker.currentNode);
   }
   nodes.forEach((n) => {
@@ -184,7 +188,10 @@ window.setTranslationDate = function (rawDate) {
 };
 
 function t(key) {
-  return translations[currentLanguage]?.[key] || key;
+  if (translations[currentLanguage] && key in translations[currentLanguage]) {
+    return translations[currentLanguage][key];
+  }
+  return key;
 }
 
 // Aplica texto/HTML com preservação controlada de spans internos.
@@ -240,7 +247,11 @@ function applyTranslations(language) {
   currentLanguage = language.startsWith("pt") ? "pt" : "en";
   document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en-US";
   try {
-    localStorage.setItem("language", currentLanguage);
+    try {
+      localStorage.setItem("language", currentLanguage);
+    } catch (e) {
+      console.warn("localStorage unavailable when saving language:", e);
+    }
   } catch (e) {
     console.warn("Unable to persist language selection:", e);
   }
