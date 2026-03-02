@@ -1,0 +1,22 @@
+{
+  "link1": "Projetos",
+  "link2": "Tecnologias",
+  "link3": "Sobre mim",
+  "link4": "Formações",
+  "link5": "Mais",
+  "link6": "Contato",
+  "webTitle": "Portfólio de JLBBARCO",
+  "welcome_title": "Bem-vindo ao meu portfólio",
+  "welcome_message": "Sou desenvolvedor fullstack apaixonado por criar soluções web inovadoras.",
+  "projectsTitle": "Projetos",
+  "technologiesTitle": "Tecnologias",
+  "linksTitle": "Links",
+  "aboutMeTitle": "Sobre mim",
+  "aboutMeText": "Meu nome é José Luiz Bruiani Barco e tenho {{age}} de idade. Sou desenvolvedor fullstack com experiência em <span class='emphasis'>HTML5, CSS3, JavaScript e Python</span>, criando interfaces responsivas e aplicações funcionais. Tenho paixão por transformar ideias em soluções digitais práticas e intuitivas. Além do português, também me comunico em inglês, o que me permite colaborar em projetos internacionais e acompanhar tendências globais de tecnologia",
+  "downloadCVTitle": "Baixar CV",
+  "formationsTitle": "Formações",
+  "moreTitle": "Mais sobre este site",
+  "lastUpdate": "Última atualização: {{date}}",
+  "skip_link": "Pular para o conteúdo principal",
+  "contactTitle": "Contato"
+}
