@@ -767,16 +767,22 @@ function setupTechnologies(container, cards, language = "pt-BR") {
 }
 
 function loadAllTechnologies(language = "pt-BR") {
-  return Promise.all([
-    fetchJsonWithFallback("src/json/areas/projects.json"),
-    fetchJsonWithFallback("src/json/areas/formation.json"),
-  ])
-    .then(([projectsData, formationsData]) => {
+  const owner = document.body.dataset.githubOwner || "JLBBARCO";
+  // get project cards either from GitHub API or, if that fails, local JSON
+  const pProjects = fetchGithubRepos(owner).catch(() =>
+    fetchJsonWithFallback("src/json/areas/projects.json").then((data) =>
+      data.cards || [],
+    ),
+  );
+  const pFormations = fetchJsonWithFallback("src/json/areas/formation.json").then(
+    (data) => data.cards || [],
+  );
+
+  return Promise.all([pProjects, pFormations])
+    .then(([projCards, formCards]) => {
       const container = document.getElementById("technologiesContainer");
       if (!container) return;
-      const allCards = [];
-      if (projectsData.cards) allCards.push(...projectsData.cards);
-      if (formationsData.cards) allCards.push(...formationsData.cards);
+      const allCards = [...projCards, ...formCards];
       setupTechnologies(container, allCards, language);
     })
     .catch((err) => console.error("Erro ao carregar tecnologias:", err));
