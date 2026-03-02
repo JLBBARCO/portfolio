@@ -60,7 +60,7 @@ function fetchGitHubRepos(owner) {
         return Promise.resolve(data);
       }
     } catch (e) {
-      console.warn('Failed to parse cached repos:', e);
+      console.warn("Failed to parse cached repos:", e);
     }
   }
 
@@ -68,7 +68,7 @@ function fetchGitHubRepos(owner) {
   return fetch(url, {
     headers: {
       // topic support, harmless if ignored
-      Accept: 'application/vnd.github.mercy-preview+json',
+      Accept: "application/vnd.github.mercy-preview+json",
     },
   })
     .then((res) => {
@@ -77,20 +77,23 @@ function fetchGitHubRepos(owner) {
     })
     .then((repos) => {
       try {
-        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: now, data: repos }));
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({ timestamp: now, data: repos }),
+        );
       } catch (e) {
-        console.warn('Unable to cache repos in localStorage:', e);
+        console.warn("Unable to cache repos in localStorage:", e);
       }
       return repos;
     })
     .catch((err) => {
-      console.warn('GitHub fetch failed, attempting cached data:', err);
+      console.warn("GitHub fetch failed, attempting cached data:", err);
       if (cached) {
         try {
           const { data } = JSON.parse(cached);
           return data;
         } catch (e) {
-          console.warn('Cached repos malformed:', e);
+          console.warn("Cached repos malformed:", e);
         }
       }
       // rethrow so caller can handle
@@ -107,42 +110,90 @@ function fetchGitHubRepos(owner) {
  * file ({ cards: [...] }) so the remainder of the rendering logic can stay
  * unchanged.
  */
+// fetch per-repo language breakdown with caching to avoid excess API calls
+function fetchRepoLanguages(owner, repoName) {
+  const key = `githubLang_${owner}_${repoName}`;
+  const cached = localStorage.getItem(key);
+  if (cached) {
+    try {
+      return Promise.resolve(JSON.parse(cached));
+    } catch (e) {
+      console.warn('Bad cached languages for', repoName, e);
+    }
+  }
+  return fetch(`https://api.github.com/repos/${owner}/${repoName}/languages`)
+    .then((res) => (res.ok ? res.json() : {}))
+    .then((data) => {
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (e) {
+        console.warn('Unable to cache repo languages:', e);
+      }
+      return data;
+    })
+    .catch((err) => {
+      console.warn('Error fetching languages for', repoName, err);
+      return {};
+    });
+}
+
 function loadProjectsData(source, owner) {
-  if (source === 'github') {
+  if (source === "github") {
     return fetchGitHubRepos(owner).then((repos) => {
-      // ignore forks; user likely only wants own projects and contributions
-      const cards = repos
-        .filter((repo) => !repo.fork)
-        .map((repo) => {
-        const techs = [];
-        if (Array.isArray(repo.topics) && repo.topics.length) {
-          techs.push(...repo.topics);
-        }
-        if (repo.language) techs.push(repo.language);
-        // de-duplicate
-        const unique = Array.from(new Set(techs));
+      // ignore forks and known "non-project" repositories
+      const filtered = repos.filter(
+        (repo) => {
+          const name = repo.name.toLowerCase();
+          return (
+            !repo.fork &&
+            name !== owner.toLowerCase() &&
+            name !== "portfolio" &&
+            name !== `${owner.toLowerCase()}.github.io`
+          );
+        },
+      );
 
-        // convert ISO date to MM/YYYY or YYYY
-        const makeDate = (iso) => {
-          if (!iso) return '';
-          const parts = iso.substring(0, 7).split('-'); // [YYYY,MM]
-          if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
-          return parts[0];
-        };
+      const cardsPromises = filtered.map((repo) =>
+        fetchRepoLanguages(owner, repo.name).then((langData) => {
+          const techs = [];
+          if (Array.isArray(repo.topics) && repo.topics.length) {
+            techs.push(...repo.topics);
+          }
+          if (repo.language) techs.push(repo.language);
+          techs.push(...Object.keys(langData));
+          // de-duplicate
+          const unique = Array.from(new Set(techs)).filter(Boolean);
 
-        return {
-          title: { 'pt-BR': repo.name, 'en-US': repo.name },
-          description: repo.description || '',
-          linkRepository: repo.html_url,
-          linkRepositoryTarget: "target='_blank' rel='noopener noreferrer'",
-          image: `https://opengraph.githubassets.com/1/${owner}/${repo.name}`,
-          // GitHub does not provide a mobile-specific thumbnail; reuse same
-          dateInit: makeDate(repo.created_at),
-          dateEnd: makeDate(repo.updated_at),
-          iconTechnologies: unique.map((t) => ({ name: t })),
-        };
-      });
-      return { cards };
+          // convert ISO date to MM/YYYY or YYYY
+          const makeDate = (iso) => {
+            if (!iso) return "";
+            const parts = iso.substring(0, 7).split("-"); // [YYYY,MM]
+            if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
+            return parts[0];
+          };
+
+          const card = {
+            title: { "pt-BR": repo.name, "en-US": repo.name },
+            description: repo.description || "",
+            linkRepository: repo.html_url,
+            linkRepositoryTarget: "target='_blank' rel='noopener noreferrer'",
+            image: `https://opengraph.githubassets.com/1/${owner}/${repo.name}`,
+            dateInit: makeDate(repo.created_at),
+            dateEnd: makeDate(repo.updated_at),
+            iconTechnologies: unique.map((t) => ({ name: t })),
+          };
+          if (repo.homepage) {
+            let url = repo.homepage;
+            if (!url.match(/^https?:\/\//)) {
+              url = `https://${url}`;
+            }
+            card.linkDemo = url;
+            card.linkDemoTarget = "target='_blank' rel='noopener noreferrer'";
+          }
+          return card;
+        }),
+      );
+      return Promise.all(cardsPromises).then((cards) => ({ cards }));
     });
   }
   // default behaviour: local JSON file
@@ -816,7 +867,7 @@ function loadAllTechnologies(language = "pt-BR") {
   const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
   return Promise.all([
     // when the projects source was switched we still want the cards shape
-    loadProjectsData('github', githubOwner),
+    loadProjectsData("github", githubOwner),
     fetchJsonWithFallback("src/json/areas/formation.json"),
   ])
     .then(([projectsData, formationsData]) => {
