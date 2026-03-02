@@ -377,6 +377,8 @@ function getLocalized(value, language) {
 
 /**
  * Converte string de data (MM/AAAA ou AAAA) em timestamp.
+ * retorna 0 se a data for inválida ou ausente, facilitando comparações
+ * de ordenação.
  * @param {string} dateStr
  * @returns {number}
  */
@@ -442,17 +444,18 @@ function setupProjects(fileURL, containerId, language) {
 
       const fragment = document.createDocumentFragment();
 
+      // sort by most recent start date first; if starts are equal (or missing),
+      // then sort by most recent end date.  This puts cards that began in a given
+      // year ahead of cards that only ended in that year.
       const sortedCards = [...cards].sort((a, b) => {
-        const endA = parseDate(a.dateEnd);
-        const endB = parseDate(b.dateEnd);
-
-        if (endA !== endB) {
-          return endB - endA;
-        }
-
         const initA = parseDate(a.dateInit);
         const initB = parseDate(b.dateInit);
-        return initB - initA;
+        if (initA !== initB) {
+          return initB - initA;
+        }
+        const endA = parseDate(a.dateEnd);
+        const endB = parseDate(b.dateEnd);
+        return endB - endA;
       });
 
       sortedCards.forEach((card) => {
@@ -560,17 +563,17 @@ function setupFormations(fileURL, containerId, language) {
         container.parentNode.insertBefore(filterContainer, container);
       }
 
+      // sort formation entries the same way as projects: recent starts first
+      // then recent ends.
       const sortedCards = [...cards].sort((a, b) => {
-        const endA = parseDate(a.dateEnd);
-        const endB = parseDate(b.dateEnd);
-
-        if (endA !== endB) {
-          return endB - endA;
-        }
-
         const initA = parseDate(a.dateInit);
         const initB = parseDate(b.dateInit);
-        return initB - initA;
+        if (initA !== initB) {
+          return initB - initA;
+        }
+        const endA = parseDate(a.dateEnd);
+        const endB = parseDate(b.dateEnd);
+        return endB - endA;
       });
 
       const fragment = document.createDocumentFragment();
