@@ -50,10 +50,11 @@ Cards now choose project thumbnails according to the following precedence:
    screenshot is generated via the Microlink API and used for both desktop and
    mobile images.
 2. **Repository thumbnail file** – lacking a homepage, the code checks
-   `src/assets/img/tumbnail.webp` in the repository (via the raw.githubusercontent
+   `src/assets/img/thumbnail.webp` in the repository (via the raw.githubusercontent
    path). If that file exists the raw URL is used.
 3. **No image** – if neither of the above yields a result the card is rendered
-   without an image element, preventing empty placeholders.
+   without an image element, preventing empty placeholders. (Open‑graph
+   fallbacks are no longer injected.)
 
 Local JSON entries and manually‑specified cards are unaffected; they can still
 provide their own `image`, `imageMobile` or `imageType` values and the

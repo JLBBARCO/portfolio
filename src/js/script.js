@@ -158,7 +158,13 @@ function fetchAny(...paths) {
 function fetchGitHubRepos(owner) {
   const cacheKey = `githubRepos_${owner}`;
   const now = Date.now();
-  const cached = localStorage.getItem(cacheKey);
+  let cached;
+  try {
+    cached = localStorage.getItem(cacheKey);
+  } catch (e) {
+    console.warn("localStorage unavailable when reading repos cache:", e);
+    cached = null;
+  }
   if (cached) {
     try {
       const { timestamp, data } = JSON.parse(cached);
@@ -192,10 +198,15 @@ function fetchGitHubRepos(owner) {
       // merge and dedupe by repo id
       const combined = [];
       const seen = new Set();
-      arrays.flat().forEach((repo) => {
-        if (repo && repo.id && !seen.has(repo.id)) {
-          seen.add(repo.id);
-          combined.push(repo);
+      // arrays may be [ownerRepos, memberRepos]; flatten manually for older browsers
+      arrays.forEach((arr) => {
+        if (Array.isArray(arr)) {
+          arr.forEach((repo) => {
+            if (repo && repo.id && !seen.has(repo.id)) {
+              seen.add(repo.id);
+              combined.push(repo);
+            }
+          });
         }
       });
       // sort by updated_at descending
@@ -237,7 +248,13 @@ function fetchGitHubRepos(owner) {
 // fetch per-repo language breakdown with caching to avoid excess API calls
 function fetchRepoLanguages(owner, repoName) {
   const key = `githubLang_${owner}_${repoName}`;
-  const cached = localStorage.getItem(key);
+  let cached;
+  try {
+    cached = localStorage.getItem(key);
+  } catch (e) {
+    console.warn("localStorage unavailable when reading lang cache:", e);
+    cached = null;
+  }
   if (cached) {
     try {
       return Promise.resolve(JSON.parse(cached));
@@ -292,7 +309,9 @@ function loadProjectsData(source, owner) {
       // ignore a few special repositories that aren't really projects
       const filtered = repos.filter((repo) => {
         const name = repo.name.toLowerCase();
-        const repoOwner = (repo.owner?.login || "").toLowerCase();
+        const repoOwner = (
+          repo.owner && repo.owner.login ? repo.owner.login : ""
+        ).toLowerCase();
         return (
           // exclude the user's own profile repo(s)
           name !== owner.toLowerCase() &&
@@ -323,12 +342,12 @@ function loadProjectsData(source, owner) {
 
         // makeCard returns a promise because we may need to probe GitHub for
         // an existing thumbnail file when no homepage is provided.
-        const makeCard = async (unique) => {
+        const makeCard = (unique) => {
           const techObjects = unique
             .map(makeTechObject)
             .filter((t) => t !== null);
 
-          const repoOwnerName = repo.owner?.login || owner;
+          const repoOwnerName = (repo.owner && repo.owner.login) || owner;
 
           const card = {
             title: { "pt-BR": repo.name, "en-US": repo.name },
@@ -340,10 +359,7 @@ function loadProjectsData(source, owner) {
             iconTechnologies: techObjects,
           };
 
-          // image determination follows the order requested by the user.
           if (repo.homepage) {
-            // use screenshot API when a website is specified in the GitHub
-            // repo "about" section.
             let url = repo.homepage;
             if (!url.match(/^https?:\/\//)) {
               url = `https://${url}`;
@@ -355,48 +371,40 @@ function loadProjectsData(source, owner) {
             )}&screenshot=true&meta=false&embed=screenshot.url`;
             card.image = screenshot;
             card.imageMobile = screenshot;
-          } else {
-            // no homepage; attempt to use a repository thumbnail at a
-            // well-known path.  Use HEAD first but fall back to GET if the
-            // method is blocked by CORS or not allowed (GitHub sometimes
-            // responds 405).
-            const rawThumb = `https://raw.githubusercontent.com/${repoOwnerName}/${repo.name}/main/src/assets/img/tumbnail.webp`;
-            try {
-              let resp = await fetch(rawThumb, { method: "HEAD" });
+            return Promise.resolve(card);
+          }
+
+          const rawThumb = `https://raw.githubusercontent.com/${repoOwnerName}/${repo.name}/main/src/assets/img/thumbnail.webp`;
+          return fetch(rawThumb, { method: "HEAD" })
+            .then((resp) => {
               if (!resp.ok) {
-                // some servers reject HEAD; try GET to be certain
-                resp = await fetch(rawThumb);
+                return fetch(rawThumb);
               }
+              return resp;
+            })
+            .then((resp) => {
               if (resp.ok) {
                 card.image = rawThumb;
                 card.imageMobile = rawThumb;
               }
-            } catch (e) {
+            })
+            .catch(() => {
               // any failure treated as missing file
-            }
-          }
+            })
+            .then(() => {
+              if (!card.image) {
+                delete card.image;
+                delete card.imageMobile;
+                delete card.imageType;
+              }
 
-          // remove image fields if we never found anything (or they
-          // weren't set above).  if no image exists, provide a sensible
-          // default open-graph preview so that GitHub cards and the projects
-          // carousel don't look empty.
-          if (!card.image) {
-            delete card.image;
-            delete card.imageMobile;
-            delete card.imageType;
-          }
-          if (!card.image) {
-            const og = `https://opengraph.githubassets.com/1/${repoOwnerName}/${repo.name}`;
-            card.image = og;
-            card.imageMobile = og;
-          }
-
-          if (repo.fork && repo.parent) {
-            card.description =
-              (card.description ? card.description + " " : "") +
-              `(fork of ${repo.parent.full_name})`;
-          }
-          return card;
+              if (repo.fork && repo.parent) {
+                card.description =
+                  (card.description ? card.description + " " : "") +
+                  `(fork of ${repo.parent.full_name})`;
+              }
+              return card;
+            });
         };
 
         if (idx < maxLangCalls) {
@@ -438,13 +446,18 @@ function fetchJsonWithFallback(path) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const faviconLink = document.getElementById("favicon");
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const prefersDark =
+    typeof window.matchMedia === "function"
+      ? window.matchMedia("(prefers-color-scheme: dark)")
+      : null;
 
   function updateFavicon(eventOrBool) {
     const isDark =
       typeof eventOrBool === "boolean"
         ? eventOrBool
-        : (eventOrBool?.matches ?? prefersDark.matches);
+        : eventOrBool && typeof eventOrBool.matches !== "undefined"
+          ? eventOrBool.matches
+          : prefersDark.matches;
     if (!faviconLink) return;
     const newHref = isDark
       ? "src/assets/favicon/code-dark.svg"
@@ -452,14 +465,22 @@ document.addEventListener("DOMContentLoaded", () => {
     faviconLink.href = newHref + "?v=" + Date.now();
   }
 
-  updateFavicon(prefersDark.matches);
-  if (typeof prefersDark.addEventListener === "function") {
-    prefersDark.addEventListener("change", updateFavicon);
-  } else if (typeof prefersDark.addListener === "function") {
-    prefersDark.addListener(updateFavicon);
+  updateFavicon(prefersDark ? prefersDark.matches : false);
+  if (prefersDark) {
+    if (typeof prefersDark.addEventListener === "function") {
+      prefersDark.addEventListener("change", updateFavicon);
+    } else if (typeof prefersDark.addListener === "function") {
+      prefersDark.addListener(updateFavicon);
+    }
   }
 
-  const savedFontSize = localStorage.getItem("fontSize");
+  let savedFontSize;
+  try {
+    savedFontSize = localStorage.getItem("fontSize");
+  } catch (e) {
+    console.warn("localStorage unavailable when reading fontSize:", e);
+    savedFontSize = null;
+  }
   if (savedFontSize) {
     document.body.style.fontSize = savedFontSize;
     const parsed = parseFloat(savedFontSize);
@@ -502,7 +523,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const accessibilityMenu = document.getElementById("accessibility-menu");
     if (accessibilityMenu && accessibilityMenu.style.display === "flex") {
       const isClickInsideMenu = accessibilityMenu.contains(event.target);
-      const isClickOnButton = accessibilityButton?.contains(event.target);
+      const isClickOnButton =
+        accessibilityButton && accessibilityButton.contains(event.target);
       if (!isClickInsideMenu && !isClickOnButton) {
         accessibilityMenu.style.display = "none";
         accessibilityMenu.setAttribute("aria-hidden", "true");
@@ -529,11 +551,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (el) el.innerHTML = "";
     });
 
-    document
-      .querySelectorAll(".filter-container, .btn.prev, .btn.next")
-      .forEach((el) => el.remove());
+    Array.from(
+      document.querySelectorAll(".filter-container, .btn.prev, .btn.next"),
+    ).forEach((el) => el.remove());
 
-    const storedLang = localStorage.getItem("language");
+    let storedLang;
+    try {
+      storedLang = localStorage.getItem("language");
+    } catch (e) {
+      console.warn("localStorage unavailable when reading language:", e);
+      storedLang = null;
+    }
     const currentLang =
       storedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
     const locale = currentLang === "pt" ? "pt-BR" : "en-US";
@@ -583,9 +611,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!carrosselContainer) return;
 
     const parent = carrosselContainer.parentNode;
-    parent
-      .querySelectorAll(".btn.prev, .btn.next")
-      .forEach((el) => el.remove());
+    Array.from(parent.querySelectorAll(".btn.prev, .btn.next")).forEach((el) =>
+      el.remove(),
+    );
 
     const prevBtn = document.createElement("button");
     prevBtn.className = "btn prev";
@@ -808,13 +836,13 @@ function setupProjects(source, containerId, language, owner, loadId) {
       // deduplicate by repository link or title (covers mixed JSON/github sources)
       let cards = data.cards || [];
 
-      // ensure demo links have screenshot images even for local JSON entries
+      // ensure demo links have screenshot images when no explicit image
+      // is supplied (local JSON cards may already provide their own).
       cards.forEach((card) => {
-        if (card.linkDemo) {
-          const screenshot =
-            `https://api.microlink.io/?url=${encodeURIComponent(
-              card.linkDemo,
-            )}&screenshot=true&meta=false&embed=screenshot.url` || ``;
+        if (card.linkDemo && !card.image) {
+          const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(
+            card.linkDemo,
+          )}&screenshot=true&meta=false&embed=screenshot.url`;
           card.image = screenshot;
         }
       });
@@ -909,7 +937,7 @@ function setupProjects(source, containerId, language, owner, loadId) {
           html += `<picture>`;
           if (card.imageMobile)
             html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
-          html += `<img src="${card.image}" alt="${getLocalized(card.descriptionImage, language)}" loading="lazy" onerror="this.closest('picture')?.remove()"></picture>`;
+          html += `<img src="${card.image}" alt="${getLocalized(card.descriptionImage, language)}" loading="lazy" onerror="var p=this.closest('picture'); if(p) p.remove();"></picture>`;
         }
         if (card.title)
           html += `<h3>${getLocalized(card.title, language)}</h3>`;
@@ -974,7 +1002,7 @@ function setupFormations(fileURL, containerId, language, loadId) {
       const typeCount = {};
       const typeNames = {};
       cards.forEach((card) => {
-        if (card.type?.id) {
+        if (card.type && card.type.id) {
           typeCount[card.type.id] = (typeCount[card.type.id] || 0) + 1;
           typeNames[card.type.id] = getLocalized(card.type, language);
         }
@@ -1022,7 +1050,7 @@ function setupFormations(fileURL, containerId, language, loadId) {
       sortedCards.forEach((card) => {
         const div = document.createElement("div");
         div.className = "card card-formation";
-        if (card.type?.id) div.dataset.type = card.type.id;
+        if (card.type && card.type.id) div.dataset.type = card.type.id;
 
         let html = "";
         if (card.title)
@@ -1168,25 +1196,30 @@ function loadAllTechnologies(language = "pt-BR", loadId) {
 }
 
 function filterProjectsByTechnology(tech) {
-  document.querySelectorAll(".card.card-projects").forEach((card) => {
-    const techs =
-      card.dataset.technologies?.split(",")?.map((t) => t.trim()) || [];
-    card.style.display =
-      tech === "all" || techs.includes(tech) ? "flex" : "none";
-  });
+  Array.from(document.querySelectorAll(".card.card-projects")).forEach(
+    (card) => {
+      const techs = card.dataset.technologies
+        ? card.dataset.technologies.split(",").map((t) => t.trim())
+        : [];
+      card.style.display =
+        tech === "all" || techs.includes(tech) ? "flex" : "none";
+    },
+  );
   updateFilterButtons(tech);
 }
 
 function filterFormationsByType(type) {
-  document.querySelectorAll(".card.card-formation").forEach((card) => {
-    card.style.display =
-      type === "all" || card.dataset.type === type ? "block" : "none";
-  });
+  Array.from(document.querySelectorAll(".card.card-formation")).forEach(
+    (card) => {
+      card.style.display =
+        type === "all" || card.dataset.type === type ? "block" : "none";
+    },
+  );
   updateFilterButtons(type);
 }
 
 function updateFilterButtons(activeFilter) {
-  document.querySelectorAll(".filter-button").forEach((btn) => {
+  Array.from(document.querySelectorAll(".filter-button")).forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.filter === activeFilter);
   });
 }
@@ -1211,25 +1244,29 @@ function addNewIcons(linkFile) {
         const svg = icon.svg
           .replace(/fill=['"]#[^'"]*['"]/g, "")
           .replace(/stroke=['"]#[^'"]*['"]/g, "");
-        document.querySelectorAll(`i.${icon.class}`).forEach((el) => {
-          el.innerHTML = svg;
-          const s = el.querySelector("svg");
-          if (s) {
-            s.classList.add("svg-icon");
-            s.removeAttribute("width");
-            s.removeAttribute("height");
-            if (!s.getAttribute("viewBox"))
-              s.setAttribute("viewBox", "0 0 24 24");
-            s.querySelectorAll(
-              "path, circle, rect, line, polygon, ellipse",
-            ).forEach((shape) => {
-              if (shape.getAttribute("fill") !== "none")
-                shape.setAttribute("fill", "currentColor");
-              if (shape.getAttribute("stroke"))
-                shape.setAttribute("stroke", "currentColor");
-            });
-          }
-        });
+        Array.from(document.querySelectorAll(`i.${icon.class}`)).forEach(
+          (el) => {
+            el.innerHTML = svg;
+            const s = el.querySelector("svg");
+            if (s) {
+              s.classList.add("svg-icon");
+              s.removeAttribute("width");
+              s.removeAttribute("height");
+              if (!s.getAttribute("viewBox"))
+                s.setAttribute("viewBox", "0 0 24 24");
+              Array.from(
+                s.querySelectorAll(
+                  "path, circle, rect, line, polygon, ellipse",
+                ),
+              ).forEach((shape) => {
+                if (shape.getAttribute("fill") !== "none")
+                  shape.setAttribute("fill", "currentColor");
+                if (shape.getAttribute("stroke"))
+                  shape.setAttribute("stroke", "currentColor");
+              });
+            }
+          },
+        );
       });
     })
     .catch((err) => console.error("Erro ao carregar SVGs:", err));
@@ -1238,9 +1275,8 @@ function addNewIcons(linkFile) {
 function prevProjects() {
   // dynamically compute scroll distance based on the width of a card
   // (plus a little margin) so the carousel stays snappy on different layouts.
-  document
-    .getElementById("projectsContainer")
-    ?.scrollBy({ left: -300, behavior: "smooth" });
+  const prevEl = document.getElementById("projectsContainer");
+  if (prevEl) prevEl.scrollBy({ left: -300, behavior: "smooth" });
 }
 
 function nextProjects() {
