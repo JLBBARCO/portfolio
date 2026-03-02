@@ -1,27 +1,13 @@
 // Sistema de tradução simples usando JSON
 let currentLanguage = "pt";
 let translations = {};
+// cache nodeLists for efficiency
+let _i18nElements = null;
+let _idElements = null;
 
-// Função para obter cookie por nome
-function getCookie(name) {
-  const nameEQ = name + "=";
-  const cookies = document.cookie.split(";");
-  for (let cookie of cookies) {
-    cookie = cookie.trim();
-    if (cookie.indexOf(nameEQ) === 0) {
-      return cookie.substring(nameEQ.length);
-    }
-  }
-  return null;
-}
-
-// Função para definir cookie
-function setCookie(name, value, days = 365) {
-  const date = new Date();
-  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-  const expires = "expires=" + date.toUTCString();
-  document.cookie = name + "=" + value + ";" + expires + ";path=/";
-}
+// previously there were helper functions to read/write cookies; the
+// language preference is now stored in localStorage instead, so those are
+// no longer needed.
 
 // Sanitizador simples — permite apenas <span class="emphasis"> e texto.
 // Remove outros elementos/atributos para evitar injeção.
@@ -54,23 +40,45 @@ function sanitizeTranslationHTML(html) {
 // Carrega as traduções (com fallback)
 async function loadTranslations() {
   try {
-    // usa fetchJsonWithFallback (definida em script.js)
-    const [en, pt] = await Promise.all([
-      fetchJsonWithFallback("src/json/translate/en-us.json"),
-      fetchJsonWithFallback("src/json/translate/pt-br.json"),
-    ]);
+    // primeiro tente carregar um único arquivo com ambas as línguas.
+    // o formato esperado é:
+    // { "en": { ... }, "pt": { ... } }
+    let en, pt;
+    try {
+      const combined = await fetchJsonWithFallback(
+        "src/json/translate/strings.json",
+      );
+      if (combined && combined.en && combined.pt) {
+        en = combined.en;
+        pt = combined.pt;
+      } else {
+        throw new Error("combined file missing expected keys");
+      }
+    } catch (e) {
+      // se não existir ou estiver malformado, recorra aos arquivos separados
+      [en, pt] = await Promise.all([
+        fetchJsonWithFallback("src/json/translate/en-us.json"),
+        fetchJsonWithFallback("src/json/translate/pt-br.json"),
+      ]);
+    }
 
     translations.en = en;
     translations.pt = pt;
 
-    // Preserve templates para reformatar {{date}}
-    window.__translationTemplates = {
-      en: translations.en?.lastUpdate || "Last Update: {{date}}",
-      pt: translations.pt?.lastUpdate || "Última atualização: {{date}}",
-    };
+    // sincroniza chaves (preenchendo com a outra língua quando faltar)
+    const allKeys = new Set([
+      ...Object.keys(translations.en || {}),
+      ...Object.keys(translations.pt || {}),
+    ]);
+    allKeys.forEach((k) => {
+      if (!(k in translations.en))
+        translations.en[k] = translations.pt[k] || "";
+      if (!(k in translations.pt))
+        translations.pt[k] = translations.en[k] || "";
+    });
 
-    const savedLanguage = getCookie("language");
-    if (savedLanguage && (savedLanguage === "pt" || savedLanguage === "en")) {
+    const savedLanguage = localStorage.getItem("language");
+    if (savedLanguage === "pt" || savedLanguage === "en") {
       currentLanguage = savedLanguage;
     } else {
       const navLang = (
@@ -81,11 +89,28 @@ async function loadTranslations() {
       currentLanguage = navLang.startsWith("pt") ? "pt" : "en";
     }
 
+    // set initial aria-label for language button
+    const languageBtn = document.getElementById("languageBtn");
+    if (languageBtn) {
+      const newAria = currentLanguage === "pt" ? "pt-br" : "en-us";
+      languageBtn.setAttribute("aria-label", newAria);
+    }
+
     applyTranslations(currentLanguage);
     updateLanguageSelector();
     setCVLink(currentLanguage);
 
     window.dispatchEvent(new Event("translationsReady"));
+
+    // When developing, it's handy to be able to dump the current translation
+    // object so you can paste it back into the source file and keep things in
+    // sync.
+    window.dumpTranslations = function () {
+      console.log(
+        "Translation template:\n",
+        JSON.stringify({ en: translations.en, pt: translations.pt }, null, 2),
+      );
+    };
   } catch (error) {
     console.error("Erro ao carregar traduções:", error);
   }
@@ -214,12 +239,26 @@ function setTextPreserveSpans(element, text) {
 function applyTranslations(language) {
   currentLanguage = language.startsWith("pt") ? "pt" : "en";
   document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en-US";
-  setCookie("language", currentLanguage);
+  try {
+    localStorage.setItem("language", currentLanguage);
+  } catch (e) {
+    console.warn("Unable to persist language selection:", e);
+  }
   updateLanguageSelector();
 
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
+  if (!_i18nElements) {
+    _i18nElements = document.querySelectorAll("[data-i18n]");
+  }
+  _i18nElements.forEach((element) => {
     const key = element.getAttribute("data-i18n");
     const translation = t(key);
+    // if caller specified a particular attribute to update (e.g. aria-label)
+    const attr = element.getAttribute("data-i18n-attr");
+    if (attr) {
+      element.setAttribute(attr, translation);
+      return;
+    }
+
     const tag = element.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA") {
       element.value = translation;
@@ -230,17 +269,34 @@ function applyTranslations(language) {
   });
 
   if (translations[currentLanguage]) {
-    Object.keys(translations[currentLanguage]).forEach((key) => {
-      const element = document.getElementById(key);
-      if (element) {
-        if (key === "webTitle") document.title = t(key);
-        setTextPreserveSpans(element, t(key));
-        if (element.tagName === "A") element.setAttribute("aria-label", t(key));
-      }
+    if (!_idElements) {
+      _idElements = {};
+      Object.keys(translations[currentLanguage]).forEach((k) => {
+        const el = document.getElementById(k);
+        if (el) _idElements[k] = el;
+      });
+    }
+    Object.entries(_idElements).forEach(([key, element]) => {
+      if (key === "webTitle") document.title = t(key);
+      setTextPreserveSpans(element, t(key));
+      if (element.tagName === "A") element.setAttribute("aria-label", t(key));
     });
   }
 
   fillReusableTitles();
+
+  // also update known aria-labels that are not captured by data-i18n
+  const ariaMap = {
+    "menu-button": "toggle_menu",
+    "increase-font": "increase_font",
+    "decrease-font": "decrease_font",
+    "reset-font": "reset_font",
+    linkDownloadCV: "downloadCVTitle",
+  };
+  Object.entries(ariaMap).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute("aria-label", t(key));
+  });
 
   window.dispatchEvent(
     new CustomEvent("languageChanged", {
@@ -262,6 +318,8 @@ function setCVLink(language) {
     language === "pt"
       ? "src/assets/documents/Curriculo_Jose_Luiz_Bruiani_Barco_pt-BR.pdf"
       : "src/assets/documents/Resume_Jose_Luiz_Bruiani_Barco_en-US.pdf";
+  // update aria-label in case language changed outside of applyTranslations
+  downloadCV.setAttribute("aria-label", t("downloadCVTitle"));
 
   // usa fetchAny (definida em script.js)
   fetchAny(linkToCV, linkToCV.split("/").pop())

@@ -276,6 +276,14 @@ section {
   box-shadow: var(--shadow);
 }
 
+/* small indicator for participative projects */
+.card .participating {
+  font-size: 0.85em;
+  font-style: italic;
+  color: #666;
+  margin: -8px 0 4px;
+}
+
 .card h3,
 .card h4,
 .card p {

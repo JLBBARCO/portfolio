@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "i18next": "^25.6.3"
+  },
+  "scripts": {
+    "extract-translations": "node scripts/extract-translations.js"
   }
 }
