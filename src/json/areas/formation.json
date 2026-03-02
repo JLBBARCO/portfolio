@@ -25,7 +25,7 @@
       "iconTechnologies": [
         {
           "icon": "fa-html5",
-          "name": "HTML5",
+          "name": "HTML",
           "style": "fa-brands",
           "stack": {
             "id": "frontEnd",
@@ -35,7 +35,7 @@
         },
         {
           "icon": "fa-css3",
-          "name": "CSS3",
+          "name": "CSS",
           "style": "fa-brands",
           "stack": {
             "id": "frontEnd",
@@ -168,7 +168,7 @@
       "iconTechnologies": [
         {
           "icon": "fa-html5",
-          "name": "HTML5",
+          "name": "HTML",
           "style": "fa-brands",
           "stack": {
             "id": "frontEnd",
@@ -178,7 +178,7 @@
         },
         {
           "icon": "fa-css3",
-          "name": "CSS3",
+          "name": "CSS",
           "style": "fa-brands",
           "stack": {
             "id": "frontEnd",
@@ -254,6 +254,36 @@
           "name": {
             "en-US": "Certificate of Completion - Python [120 hours]",
             "pt-BR": "Certificado de Conclusão - Python [120 horas]"
+          },
+          "url": ""
+        }
+      ]
+    },
+    {
+      "title": {
+        "en-US": "Software Engineering Course",
+        "pt-BR": "Curso de Engenharia de Software"
+      },
+      "institution": {
+        "en-US": "UniCesumar",
+        "pt-BR": "UniCesumar"
+      },
+      "description": {
+        "en-US": "Bachelor's Degree course in Software Engineering, covering fundamentals of development, software architecture, agile methodologies, and engineering practices for creating robust and scalable digital solutions",
+        "pt-BR": "Curso de Bacharelado em Engenharia de Software, abrangendo fundamentos de desenvolvimento, arquitetura de software, metodologias ágeis e práticas de engenharia para criação de soluções digitais robustas e escaláveis"
+      },
+      "type": {
+        "id": "bachelor",
+        "en-US": "Bachelor's Degree",
+        "pt-BR": "Bacharelado"
+      },
+      "dateInit": "2026",
+      "dateEnd": "2029",
+      "certificates": [
+        {
+          "name": {
+            "en-US": "Certificate Bachelor's Degree in Software Engineering (in progress)",
+            "pt-BR": "Certificado de Bacharelado em Engenharia de Software (em andamento)"
           },
           "url": ""
         }

@@ -1,5 +1,9 @@
 const windowWidth = 990;
 
+// unique identifier for the most recent dynamic-content load; used to
+// ignore stale async results (e.g. user switched language mid-load).
+let _currentLoadId = 0;
+
 // Helper para normalizar classes do Font Awesome
 function faClass(style, icon, size) {
   let styleClass = style || "fa-solid";
@@ -10,6 +14,109 @@ function faClass(style, icon, size) {
   let sizeClass = size || "";
   if (sizeClass && !sizeClass.startsWith("fa-")) sizeClass = `fa-${sizeClass}`;
   return [styleClass, iconClass, sizeClass].filter(Boolean).join(" ");
+}
+
+// try to guess a FontAwesome icon based on a technology name.  returns
+// an object { style, icon } or null if no matching icon could be found.
+// caching the result avoids repeated DOM manipulations.
+const _faGuessCache = {};
+// some common technology names don't match the FontAwesome class.  e.g.
+// "html" → "html5", "javascript" → "js".  when the direct lookup fails we
+// consult this alias table and try again once more.
+const _faAliasMap = {
+  javascript: "js",
+  html: "html5",
+  css: "css3",
+  "c#": "csharp",
+  "c++": "cplusplus",
+  node: "node-js",
+  // handle the different ways people write "Node.js"
+  nodejs: "node-js",
+  typescript: "typescript",
+  react: "react",
+  vue: "vuejs",
+  angular: "angular",
+};
+function guessFaIcon(name) {
+  if (!name) return null;
+  const key = name.toLowerCase().trim();
+  if (_faGuessCache[key] !== undefined) return _faGuessCache[key];
+
+  // normalize to a candidate class name (drop spaces, punctuation)
+  const candidate = key
+    .replace(/\s+/g, "-")
+    .replace(/[\+\.#]/g, "")
+    .replace(/[^a-z0-9\-]/g, "");
+  if (!candidate) {
+    _faGuessCache[key] = null;
+    return null;
+  }
+
+  const styles = ["fa-brands", "fa-solid", "fa-regular"];
+  let found = null;
+  for (const style of styles) {
+    const className = `fa-${candidate}`;
+    const i = document.createElement("i");
+    i.className = `${style} ${className} fa-test-icon`;
+    i.style.position = "absolute";
+    i.style.visibility = "hidden";
+    document.body.appendChild(i);
+    // read computed content to see if FA knows the icon
+    const content = window
+      .getComputedStyle(i, ":before")
+      .getPropertyValue("content");
+    document.body.removeChild(i);
+    if (content && content !== '""' && content !== "none") {
+      found = { style, icon: className };
+      break;
+    }
+  }
+  _faGuessCache[key] = found;
+  if (!found && _faAliasMap[key]) {
+    // recursive call with alias (will hit cache if we've tried it before)
+    found = guessFaIcon(_faAliasMap[key]);
+    _faGuessCache[key] = found;
+  }
+  return found;
+}
+
+// choose a stack category based on common language/technology names.  the
+// returned object has the same shape as the stack entries in projects.json.
+function determineStack(name) {
+  const lower = (name || "").toLowerCase();
+  const front = [
+    "html",
+    "css",
+    "javascript",
+    "js",
+    "react",
+    "vue",
+    "angular",
+    "sass",
+    "scss",
+    "bootstrap",
+    "tailwind",
+  ];
+  const back = [
+    "python",
+    "java",
+    "node",
+    "nodejs",
+    "php",
+    "ruby",
+    "go",
+    "c#",
+    "c++",
+    "c",
+    "rust",
+    "kotlin",
+    "swift",
+  ];
+  if (front.some((w) => lower.includes(w)))
+    return { id: "frontEnd", "en-US": "Front-end", "pt-BR": "Front-end" };
+  if (back.some((w) => lower.includes(w)))
+    return { id: "backEnd", "en-US": "Back-end", "pt-BR": "Back-end" };
+  return { id: "other", "en-US": "Other", "pt-BR": "Outro" };
 }
 
 // Controle de tamanho de fonte
@@ -64,27 +171,44 @@ function fetchGitHubRepos(owner) {
     }
   }
 
-  const url = `https://api.github.com/users/${owner}/repos?per_page=100&sort=updated&direction=desc`;
-  return fetch(url, {
-    headers: {
-      // topic support, harmless if ignored
-      Accept: "application/vnd.github.mercy-preview+json",
-    },
-  })
-    .then((res) => {
-      if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
-      return res.json();
-    })
-    .then((repos) => {
+  // try fetching both owned repos and, if available, memberships
+  const baseHeaders = {
+    // topic support, harmless if ignored
+    Accept: "application/vnd.github.mercy-preview+json",
+  };
+  const urls = [
+    `https://api.github.com/users/${owner}/repos?per_page=100&sort=updated&direction=desc&type=owner`,
+    `https://api.github.com/users/${owner}/repos?per_page=100&sort=updated&direction=desc&type=member`,
+  ];
+
+  return Promise.all(
+    urls.map((u) =>
+      fetch(u, { headers: baseHeaders })
+        .then((res) => (res.ok ? res.json() : []))
+        .catch(() => []),
+    ),
+  )
+    .then((arrays) => {
+      // merge and dedupe by repo id
+      const combined = [];
+      const seen = new Set();
+      arrays.flat().forEach((repo) => {
+        if (repo && repo.id && !seen.has(repo.id)) {
+          seen.add(repo.id);
+          combined.push(repo);
+        }
+      });
+      // sort by updated_at descending
+      combined.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
       try {
         localStorage.setItem(
           cacheKey,
-          JSON.stringify({ timestamp: now, data: repos }),
+          JSON.stringify({ timestamp: now, data: combined }),
         );
       } catch (e) {
         console.warn("Unable to cache repos in localStorage:", e);
       }
-      return repos;
+      return combined;
     })
     .catch((err) => {
       console.warn("GitHub fetch failed, attempting cached data:", err);
@@ -118,7 +242,7 @@ function fetchRepoLanguages(owner, repoName) {
     try {
       return Promise.resolve(JSON.parse(cached));
     } catch (e) {
-      console.warn('Bad cached languages for', repoName, e);
+      console.warn("Bad cached languages for", repoName, e);
     }
   }
   return fetch(`https://api.github.com/repos/${owner}/${repoName}/languages`)
@@ -127,35 +251,62 @@ function fetchRepoLanguages(owner, repoName) {
       try {
         localStorage.setItem(key, JSON.stringify(data));
       } catch (e) {
-        console.warn('Unable to cache repo languages:', e);
+        console.warn("Unable to cache repo languages:", e);
       }
       return data;
     })
     .catch((err) => {
-      console.warn('Error fetching languages for', repoName, err);
+      console.warn("Error fetching languages for", repoName, err);
       return {};
     });
 }
 
 function loadProjectsData(source, owner) {
-  if (source === "github") {
-    return fetchGitHubRepos(owner).then((repos) => {
-      // ignore forks and known "non-project" repositories
-      const filtered = repos.filter(
-        (repo) => {
-          const name = repo.name.toLowerCase();
-          return (
-            !repo.fork &&
-            name !== owner.toLowerCase() &&
-            name !== "portfolio" &&
-            name !== `${owner.toLowerCase()}.github.io`
-          );
-        },
-      );
+  // when building cards from github results, we convert simple strings into
+  // full technology objects; this helper does that so the logic stays clean.
+  function makeTechObject(name) {
+    const tech = { name };
+    const guess = guessFaIcon(name);
+    if (guess) {
+      tech.style = guess.style;
+      tech.icon = guess.icon;
+    } else {
+      // If the Font Awesome stylesheet didn't load or the specific icon
+      // isn't available, fall back to a generic code icon instead of
+      // dropping the technology entirely.  This prevents "all icons broken"
+      // situations when the CDN is unreachable.
+      tech.style = "fa-solid";
+      tech.icon = "fa-code";
+    }
+    tech.stack = determineStack(name);
+    return tech;
+  }
 
-      // we have already consumed 1 request for the repo list; keep
-      // subsequent language requests below the remaining limit.
-      const maxLangCalls = 59; // safe margin
+  if (source === "github") {
+    // load the list of repos, convert them into card objects, then
+    // merge with whatever is defined locally (useful for collaborations or
+    // projects that don't live under the user's account).  setupProjects
+    // already deduplicates by link/title so we don't need to worry about
+    // collisions here.
+    const ghPromise = fetchGitHubRepos(owner).then((repos) => {
+      // ignore a few special repositories that aren't really projects
+      const filtered = repos.filter((repo) => {
+        const name = repo.name.toLowerCase();
+        const repoOwner = (repo.owner?.login || "").toLowerCase();
+        return (
+          // exclude the user's own profile repo(s)
+          name !== owner.toLowerCase() &&
+          // also ignore any repo whose name equals its owner's login (GitHub Pages
+          // style repositories) regardless of whether the owner is the supplied
+          // account or a collaborator.
+          name !== repoOwner &&
+          name !== "portfolio" &&
+          name !== "study" &&
+          name !== `${owner.toLowerCase()}.github.io`
+        );
+      });
+
+      const maxLangCalls = 59; // keep us safely under the rate limit
       const cardsPromises = filtered.map((repo, idx) => {
         const baseTechs = [];
         if (Array.isArray(repo.topics) && repo.topics.length) {
@@ -170,24 +321,80 @@ function loadProjectsData(source, owner) {
           return parts[0];
         };
 
-        const makeCard = (unique) => {
+        // makeCard returns a promise because we may need to probe GitHub for
+        // an existing thumbnail file when no homepage is provided.
+        const makeCard = async (unique) => {
+          const techObjects = unique
+            .map(makeTechObject)
+            .filter((t) => t !== null);
+
+          const repoOwnerName = repo.owner?.login || owner;
+
           const card = {
             title: { "pt-BR": repo.name, "en-US": repo.name },
             description: repo.description || "",
             linkRepository: repo.html_url,
             linkRepositoryTarget: "target='_blank' rel='noopener noreferrer'",
-            image: `https://opengraph.githubassets.com/1/${owner}/${repo.name}`,
             dateInit: makeDate(repo.created_at),
-            dateEnd: makeDate(repo.updated_at),
-            iconTechnologies: unique.map((t) => ({ name: t })),
+            dateEnd: makeDate(repo.pushed_at),
+            iconTechnologies: techObjects,
           };
+
+          // image determination follows the order requested by the user.
           if (repo.homepage) {
+            // use screenshot API when a website is specified in the GitHub
+            // repo "about" section.
             let url = repo.homepage;
             if (!url.match(/^https?:\/\//)) {
               url = `https://${url}`;
             }
             card.linkDemo = url;
             card.linkDemoTarget = "target='_blank' rel='noopener noreferrer'";
+            const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(
+              url,
+            )}&screenshot=true&meta=false&embed=screenshot.url`;
+            card.image = screenshot;
+            card.imageMobile = screenshot;
+          } else {
+            // no homepage; attempt to use a repository thumbnail at a
+            // well-known path.  Use HEAD first but fall back to GET if the
+            // method is blocked by CORS or not allowed (GitHub sometimes
+            // responds 405).
+            const rawThumb = `https://raw.githubusercontent.com/${repoOwnerName}/${repo.name}/main/src/assets/img/tumbnail.webp`;
+            try {
+              let resp = await fetch(rawThumb, { method: "HEAD" });
+              if (!resp.ok) {
+                // some servers reject HEAD; try GET to be certain
+                resp = await fetch(rawThumb);
+              }
+              if (resp.ok) {
+                card.image = rawThumb;
+                card.imageMobile = rawThumb;
+              }
+            } catch (e) {
+              // any failure treated as missing file
+            }
+          }
+
+          // remove image fields if we never found anything (or they
+          // weren't set above).  if no image exists, provide a sensible
+          // default open-graph preview so that GitHub cards and the projects
+          // carousel don't look empty.
+          if (!card.image) {
+            delete card.image;
+            delete card.imageMobile;
+            delete card.imageType;
+          }
+          if (!card.image) {
+            const og = `https://opengraph.githubassets.com/1/${repoOwnerName}/${repo.name}`;
+            card.image = og;
+            card.imageMobile = og;
+          }
+
+          if (repo.fork && repo.parent) {
+            card.description =
+              (card.description ? card.description + " " : "") +
+              `(fork of ${repo.parent.full_name})`;
           }
           return card;
         };
@@ -199,12 +406,21 @@ function loadProjectsData(source, owner) {
             return makeCard(unique);
           });
         } else {
-          // skip languages API to preserve rate limit
           const unique = Array.from(new Set(baseTechs)).filter(Boolean);
-          return Promise.resolve(makeCard(unique));
+          // makeCard returns a promise already
+          return makeCard(unique);
         }
       });
-      return Promise.all(cardsPromises).then((cards) => ({ cards }));
+
+      return Promise.all(cardsPromises).then((cards) => cards);
+    });
+
+    const localPromise = fetchJsonWithFallback(
+      "src/json/areas/projects.json",
+    ).catch(() => ({ cards: [] }));
+
+    return Promise.all([ghPromise, localPromise]).then(([ghCards, local]) => {
+      return { cards: [...ghCards, ...(local.cards || [])] };
     });
   }
   // default behaviour: local JSON file
@@ -218,15 +434,6 @@ function fetchJsonWithFallback(path) {
       ? res.json()
       : Promise.reject(new Error(`Fetch failed with status: ${res.status}`)),
   );
-}
-
-// Função para trocar o idioma
-function changeLanguage() {
-  const savedLang = localStorage.getItem("language");
-  const newLang = savedLang === "pt" ? "en" : "pt";
-  localStorage.setItem("language", newLang);
-  document.documentElement.lang = newLang === "pt" ? "pt-BR" : "en-US";
-  window.dispatchEvent(new Event("languageChanged"));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -306,6 +513,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function loadDynamicContent() {
+    // bump token for this run; any previous promises will become stale
+    const myLoadId = ++_currentLoadId;
+
     const containers = [
       "projectsContainer",
       "technologiesContainer",
@@ -335,22 +545,26 @@ document.addEventListener("DOMContentLoaded", () => {
       "projectsContainer",
       locale,
       githubOwner,
+      myLoadId,
     );
     const pFormations = setupFormations(
       "src/json/areas/formation.json",
       "formationsContainer",
       locale,
+      myLoadId,
     );
     const pIcons = setIconsTechsSite(
       "src/json/areas/techs-this-site.json",
       "techsThisSite",
+      myLoadId,
     );
     const pLinks = setIconsContact(
       "src/json/areas/contact.json",
       "contactContainer",
+      myLoadId,
     );
 
-    const pTechnologies = loadAllTechnologies(locale);
+    const pTechnologies = loadAllTechnologies(locale, myLoadId);
 
     Promise.all([pProjects, pIcons, pLinks, pFormations, pTechnologies])
       .then(() => {
@@ -408,7 +622,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadDynamicContent();
   window.addEventListener("languageChanged", loadDynamicContent);
-  showLastUpdate("lastUpdate");
 });
 
 function calcularIdade() {
@@ -486,11 +699,14 @@ function resetFont() {
   updateFontSize(1);
 }
 
-function setIconsTechsSite(fileURL, containerID) {
+function setIconsTechsSite(fileURL, containerID, loadId) {
+  const container = document.getElementById(containerID);
+  if (container && loadId !== undefined) container.dataset.loadId = loadId;
   return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerID);
       if (!container || !data.icons) return;
+      if (loadId !== undefined && container.dataset.loadId != loadId) return;
       const fragment = document.createDocumentFragment();
       data.icons.forEach((icon) => {
         const div = document.createElement("div");
@@ -499,6 +715,7 @@ function setIconsTechsSite(fileURL, containerID) {
         div.innerHTML = `<i class="${classes} icon" title="${icon.name || icon.class || ""}"></i>`;
         fragment.appendChild(div);
       });
+      if (loadId !== undefined && container.dataset.loadId != loadId) return;
       container.appendChild(fragment);
     })
     .catch((err) =>
@@ -506,11 +723,14 @@ function setIconsTechsSite(fileURL, containerID) {
     );
 }
 
-function setIconsContact(fileURL, containerId) {
+function setIconsContact(fileURL, containerId, loadId) {
+  const container = document.getElementById(containerId);
+  if (container && loadId !== undefined) container.dataset.loadId = loadId;
   return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container || !Array.isArray(data.cards)) return;
+      if (loadId !== undefined && container.dataset.loadId != loadId) return;
       const fragment = document.createDocumentFragment();
 
       data.cards.forEach((card) => {
@@ -527,6 +747,7 @@ function setIconsContact(fileURL, containerId) {
 
         fragment.appendChild(a);
       });
+      if (loadId !== undefined && container.dataset.loadId != loadId) return;
       container.appendChild(fragment);
     })
     .catch((err) => console.error("Erro ao carregar contatos:", err));
@@ -565,25 +786,58 @@ function parseDate(dateStr) {
   return 0;
 }
 
-function setupProjects(source, containerId, language, owner) {
+function setupProjects(source, containerId, language, owner, loadId) {
+  // when we start working with a container we tag it with the load id so
+  // stale async results know to bail out.  loadId is produced by
+  // loadDynamicContent and incremented on each invocation.
+  const container = document.getElementById(containerId);
+  if (container && loadId !== undefined) {
+    container.dataset.loadId = loadId;
+  }
+
   // source may be a local path or the literal string 'github' to indicate using
   // the GitHub API for the given owner.
   return loadProjectsData(source, owner)
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container || !data.cards) return;
-      const cards = data.cards;
+      if (loadId !== undefined && container.dataset.loadId != loadId) {
+        // load was superseded by a newer one, nothing to do
+        return;
+      }
+      // deduplicate by repository link or title (covers mixed JSON/github sources)
+      let cards = data.cards || [];
+
+      // ensure demo links have screenshot images even for local JSON entries
+      cards.forEach((card) => {
+        if (card.linkDemo) {
+          const screenshot =
+            `https://api.microlink.io/?url=${encodeURIComponent(
+              card.linkDemo,
+            )}&screenshot=true&meta=false&embed=screenshot.url` || ``;
+          card.image = screenshot;
+        }
+      });
+      const seen = new Set();
+      cards = cards.filter((c) => {
+        const key =
+          c.linkRepository ||
+          getLocalized(c.title, language) ||
+          JSON.stringify(c);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
       const techCount = {};
       const techFilter = {};
 
       cards.forEach((card) => {
         if (card.iconTechnologies) {
           card.iconTechnologies.forEach((tech) => {
-            if (tech.name) {
-              techCount[tech.name] = (techCount[tech.name] || 0) + 1;
-              if (tech.filter === "no") {
-                techFilter[tech.name] = true;
-              }
+            if (!tech.name || !tech.style || !tech.icon) return;
+            techCount[tech.name] = (techCount[tech.name] || 0) + 1;
+            if (tech.filter === "no") {
+              techFilter[tech.name] = true;
             }
           });
         }
@@ -632,6 +886,15 @@ function setupProjects(source, containerId, language, owner) {
       });
 
       sortedCards.forEach((card) => {
+        // ignore stale loads that finished after a later one started
+        if (
+          loadId !== undefined &&
+          container &&
+          container.dataset.loadId != loadId
+        ) {
+          return;
+        }
+
         const div = document.createElement("div");
         div.className = "card card-projects";
         if (card.iconTechnologies) {
@@ -646,7 +909,7 @@ function setupProjects(source, containerId, language, owner) {
           html += `<picture>`;
           if (card.imageMobile)
             html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
-          html += `<img src="${card.image}" alt="${getLocalized(card.descriptionImage, language)}" loading="lazy"></picture>`;
+          html += `<img src="${card.image}" alt="${getLocalized(card.descriptionImage, language)}" loading="lazy" onerror="this.closest('picture')?.remove()"></picture>`;
         }
         if (card.title)
           html += `<h3>${getLocalized(card.title, language)}</h3>`;
@@ -664,6 +927,7 @@ function setupProjects(source, containerId, language, owner) {
             (a.name || "").localeCompare(b.name || ""),
           );
           sortedTechs.forEach((tech) => {
+            if (!tech.style || !tech.icon) return; // omit unknown icons
             html += `<i class="${faClass(tech.style, tech.icon)} icon" title="${tech.name || ""}"></i>`;
           });
           html += `</div>`;
@@ -695,11 +959,16 @@ function setupProjects(source, containerId, language, owner) {
     .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
 }
 
-function setupFormations(fileURL, containerId, language) {
+function setupFormations(fileURL, containerId, language, loadId) {
+  const container = document.getElementById(containerId);
+  if (container && loadId !== undefined) container.dataset.loadId = loadId;
   return fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerId);
       if (!container || !data.cards) return;
+      if (loadId !== undefined && container.dataset.loadId != loadId) {
+        return;
+      }
       const cards = data.cards;
 
       const typeCount = {};
@@ -775,6 +1044,7 @@ function setupFormations(fileURL, containerId, language) {
             (a.name || "").localeCompare(b.name || ""),
           );
           sortedTechs.forEach((tech) => {
+            if (!tech.style || !tech.icon) return;
             const iconClass = faClass(tech.style, tech.icon);
             techsDiv += `<i class="${iconClass} icon" title="${tech.name || ""}"></i>`;
           });
@@ -806,6 +1076,7 @@ function setupFormations(fileURL, containerId, language) {
         fragment.appendChild(div);
       });
 
+      if (loadId !== undefined && container.dataset.loadId != loadId) return;
       container.appendChild(fragment);
     })
     .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
@@ -856,6 +1127,7 @@ function setupTechnologies(container, cards, language = "pt-BR") {
 
     sortedTechs.forEach((tech) => {
       if (renderedTechs.has(tech.name)) return;
+      if (!tech.style || !tech.icon) return;
       renderedTechs.add(tech.name);
       const div = document.createElement("div");
       div.className = "card tech-cards";
@@ -874,8 +1146,10 @@ function setupTechnologies(container, cards, language = "pt-BR") {
   container.appendChild(fragment);
 }
 
-function loadAllTechnologies(language = "pt-BR") {
+function loadAllTechnologies(language = "pt-BR", loadId) {
   const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
+  const container = document.getElementById("technologiesContainer");
+  if (container && loadId !== undefined) container.dataset.loadId = loadId;
   return Promise.all([
     // when the projects source was switched we still want the cards shape
     loadProjectsData("github", githubOwner),
@@ -884,6 +1158,7 @@ function loadAllTechnologies(language = "pt-BR") {
     .then(([projectsData, formationsData]) => {
       const container = document.getElementById("technologiesContainer");
       if (!container) return;
+      if (loadId !== undefined && container.dataset.loadId != loadId) return;
       const allCards = [];
       if (projectsData.cards) allCards.push(...projectsData.cards);
       if (formationsData.cards) allCards.push(...formationsData.cards);
@@ -917,7 +1192,13 @@ function updateFilterButtons(activeFilter) {
 }
 
 function addNewIcons(linkFile) {
-  fetch(linkFile)
+  // make sure we build an absolute URL so the fetch works regardless of the
+  // base path the site is served from (GitHub Pages, subfolder, etc).
+  const url = linkFile.match(/^https?:\/\//)
+    ? linkFile
+    : new URL(linkFile, document.baseURI).href;
+
+  fetch(url)
     .then((res) =>
       res.ok
         ? res.json()
@@ -954,82 +1235,20 @@ function addNewIcons(linkFile) {
     .catch((err) => console.error("Erro ao carregar SVGs:", err));
 }
 
-async function showLastUpdate(elementId) {
-  const owner = document.body.dataset.githubOwner || "JLBBARCO";
-  const repo = document.body.dataset.githubRepo || "portfolio";
-
-  try {
-    const url = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`;
-
-    const res = await fetch(url, {
-      headers: {
-        Accept: "application/vnd.github.v3+json",
-      },
-    });
-
-    if (!res.ok) {
-      console.warn(`GitHub API retornou status ${res.status}`);
-      return;
-    }
-
-    const commits = await res.json();
-
-    if (!Array.isArray(commits) || commits.length === 0) {
-      console.warn("Nenhum commit encontrado");
-      return;
-    }
-
-    const commitDate = commits[0].commit?.author?.date;
-    if (!commitDate) {
-      console.warn("Data do commit não encontrada");
-      return;
-    }
-
-    const date = new Date(commitDate);
-
-    if (isNaN(date.getTime())) {
-      console.warn("Data inválida:", commitDate);
-      return;
-    }
-
-    window.__lastUpdateRawDate = date;
-
-    const lang = document.documentElement.lang || "pt-BR";
-    const formatted = date.toLocaleDateString(lang, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
-    const el = document.getElementById(elementId);
-    if (el) {
-      const prefix =
-        lang === "en-US" ? "Last Update: " : "Última atualização: ";
-      el.textContent = `${prefix}${formatted}`;
-    }
-
-    if (window.setTranslationDate) {
-      window.setTranslationDate(date);
-    }
-
-    window.dispatchEvent(new Event("lastUpdateReady"));
-  } catch (err) {
-    console.error("Erro ao buscar dados do GitHub:", err);
-  }
-}
-
 function prevProjects() {
-  let widthCard = document.querySelector;
-
+  // dynamically compute scroll distance based on the width of a card
+  // (plus a little margin) so the carousel stays snappy on different layouts.
   document
     .getElementById("projectsContainer")
     ?.scrollBy({ left: -300, behavior: "smooth" });
 }
 
 function nextProjects() {
-  document
-    .getElementById("projectsContainer")
-    ?.scrollBy({ left: 300, behavior: "smooth" });
+  const container = document.getElementById("projectsContainer");
+  if (!container) return;
+  const card = container.querySelector(".card");
+  const delta = card ? card.getBoundingClientRect().width + 16 : 300;
+  container.scrollBy({ left: delta, behavior: "smooth" });
 }
 
 function getAverageColor(imgElement) {
