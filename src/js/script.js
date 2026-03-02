@@ -153,25 +153,24 @@ function loadProjectsData(source, owner) {
         },
       );
 
-      const cardsPromises = filtered.map((repo) =>
-        fetchRepoLanguages(owner, repo.name).then((langData) => {
-          const techs = [];
-          if (Array.isArray(repo.topics) && repo.topics.length) {
-            techs.push(...repo.topics);
-          }
-          if (repo.language) techs.push(repo.language);
-          techs.push(...Object.keys(langData));
-          // de-duplicate
-          const unique = Array.from(new Set(techs)).filter(Boolean);
+      // we have already consumed 1 request for the repo list; keep
+      // subsequent language requests below the remaining limit.
+      const maxLangCalls = 59; // safe margin
+      const cardsPromises = filtered.map((repo, idx) => {
+        const baseTechs = [];
+        if (Array.isArray(repo.topics) && repo.topics.length) {
+          baseTechs.push(...repo.topics);
+        }
+        if (repo.language) baseTechs.push(repo.language);
 
-          // convert ISO date to MM/YYYY or YYYY
-          const makeDate = (iso) => {
-            if (!iso) return "";
-            const parts = iso.substring(0, 7).split("-"); // [YYYY,MM]
-            if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
-            return parts[0];
-          };
+        const makeDate = (iso) => {
+          if (!iso) return "";
+          const parts = iso.substring(0, 7).split("-");
+          if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
+          return parts[0];
+        };
 
+        const makeCard = (unique) => {
           const card = {
             title: { "pt-BR": repo.name, "en-US": repo.name },
             description: repo.description || "",
@@ -191,8 +190,20 @@ function loadProjectsData(source, owner) {
             card.linkDemoTarget = "target='_blank' rel='noopener noreferrer'";
           }
           return card;
-        }),
-      );
+        };
+
+        if (idx < maxLangCalls) {
+          return fetchRepoLanguages(owner, repo.name).then((langData) => {
+            const techs = [...baseTechs, ...Object.keys(langData)];
+            const unique = Array.from(new Set(techs)).filter(Boolean);
+            return makeCard(unique);
+          });
+        } else {
+          // skip languages API to preserve rate limit
+          const unique = Array.from(new Set(baseTechs)).filter(Boolean);
+          return Promise.resolve(makeCard(unique));
+        }
+      });
       return Promise.all(cardsPromises).then((cards) => ({ cards }));
     });
   }
