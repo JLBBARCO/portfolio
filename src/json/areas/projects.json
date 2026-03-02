@@ -2,12 +2,12 @@
   "cards": [
     {
       "projectTitle": "Unit Converter",
-      "image": "src/assets/img/unit-converter.png",
+      "image": "https://github.com/JLBBARCO/unit-converter/blob/main/src/assets/img/unit-converter.png?raw=true",
       "descriptionImage": {
         "en-US": "Image of Unit Converter UI",
         "pt-BR": "Imagem da UI do Conversor de Unidades"
       },
-      "imageMobile": "src/assets/img/unit-converter-mobile.png",
+      "imageMobile": "https://github.com/JLBBARCO/unit-converter/blob/main/src/assets/img/unit-converter-mobile.png?raw=true",
       "imageType": "image/png",
       "title": {
         "en-US": "Unit Converter",
@@ -35,13 +35,11 @@
     },
     {
       "projectTitle": "GreenTech",
-      "image": "src/assets/img/greentech.png",
+      "image": "https://api.microlink.io/?url=https://jlbbarco.github.io/tecnoverde&screenshot=true&meta=false&embed=screenshot.url",
       "descriptionImage": {
         "en-US": "Image of Greentech Website",
         "pt-BR": "Imagem do Website Tecnoverde"
       },
-      "imageMobile": "src/assets/img/greentech-mobile.png",
-      "imageType": "image/png",
       "title": {
         "en-US": "Greentech",
         "pt-BR": "Tecnoverde"
@@ -91,13 +89,11 @@
     },
     {
       "projectTitle": "Adolpho College",
-      "image": "src/assets/img/adolpho-college.png",
+      "image": "https://api.microlink.io/?url=https://jlbbarco.github.io/colegio-adolpho&screenshot=true&meta=false&embed=screenshot.url",
       "descriptionImage": {
         "en-US": "Image of Adolpho College Website UI",
         "pt-BR": "Imagem da UI do website do Colégio Adolpho"
       },
-      "imageMobile": "src/assets/img/adolpho-college-mobile.png",
-      "imageType": "image/png",
       "title": {
         "en-US": "Adolpho College",
         "pt-BR": "Colégio Adolpho"
@@ -147,12 +143,12 @@
     },
     {
       "projectTitle": "Passwords Manager",
-      "image": "src/assets/img/passwords-manager.png",
+      "image": "https://github.com/JLBBARCO/passwords-manager/blob/main/src/assets/img/passwords-manager.png?raw=true",
       "descriptionImage": {
         "en-US": "Image of Passwords Manager UI",
         "pt-BR": "Imagem da UI do Gerenciador de Senhas"
       },
-      "imageMobile": "src/assets/img/passwords-manager-mobile.png",
+      "imageMobile": "https://github.com/JLBBARCO/passwords-manager/blob/main/src/assets/img/passwords-manager-mobile.png?raw=true",
       "imageType": "image/png",
       "title": {
         "en-US": "Passwords Manager",
@@ -208,12 +204,12 @@
     },
     {
       "projectTitle": "RandomGenerator",
-      "image": "src/assets/img/random-generator.png",
+      "image": "https://github.com/JLBBARCO/random-generator/blob/main/src/assets/img/random-generator.png?raw=true",
       "descriptionImage": {
         "en-US": "Image of Random Generator UI",
         "pt-BR": "Imagem da UI do Gerador Aleatório"
       },
-      "imageMobile": "src/assets/img/random-generator-mobile.png",
+      "imageMobile": "https://github.com/JLBBARCO/random-generator/blob/main/src/assets/img/random-generator-mobile.png?raw=true",
       "imageType": "image/png",
       "title": {
         "en-US": "Random Generator",
@@ -242,7 +238,8 @@
     },
     {
       "projectTitle": "ReceiptGenerator",
-      "image": "src/assets/img/receipt-generator.png",
+      "image": "https://api.microlink.io/?url=https://jlbbarco.github.io/receipt-generator&screenshot=true&meta=false&embed=screenshot.url",
+
       "descriptionImage": {
         "en-US": "Image of Receipt Generator UI",
         "pt-BR": "Imagem da UI do Gerador de Recibos"
@@ -275,6 +272,145 @@
       "linkDemoTarget": "target='_blank' rel='noopener noreferrer'",
       "dateInit": "2025",
       "dateEnd": "2026"
+    },
+    {
+      "projectTitle": "ImageConverter",
+      "image": "https://api.microlink.io/?url=https://jlbbarco.github.io/image-converter&screenshot=true&meta=false&embed=screenshot.url",
+
+      "descriptionImage": {
+        "en-US": "Image of Image Converter UI",
+        "pt-BR": "Imagem da UI do Conversor de Imagens"
+      },
+      "title": {
+        "en-US": "Image Converter",
+        "pt-BR": "Conversor de Imagens"
+      },
+      "description": {
+        "en-US": "System with image converter at the user inserts basic informations",
+        "pt-BR": "Sistema com conversor de imagens ao usuário inserir informações base"
+      },
+      "iconTechnologies": [
+        {
+          "icon": "fa-html5",
+          "name": "HTML5",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-css3",
+          "name": "CSS3",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        }
+      ],
+      "linkRepository": "https://github.com/jlbbarco/reciept-generator/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "linkDemo": "https://receipt-generator-tan.vercel.app/",
+      "linkDemoTarget": "target='_blank' rel='noopener noreferrer'",
+      "dateInit": "2026"
+    },
+    {
+      "projectTitle": "AutoInstallPrograms",
+      "image": "https://github.com/JLBBARCO/auto-install-programs/blob/main/src/assets/img/auto-install-programs.png?raw=true",
+
+      "descriptionImage": {
+        "en-US": "Auto Install Programs UI Image",
+        "pt-BR": "Imagem da UI do Auto Install Programs"
+      },
+      "imageMobile": "https://github.com/JLBBARCO/auto-install-programs/blob/main/src/assets/img/auto-install-programs-mobile.png?raw=true",
+      "imageType": "image/png",
+      "title": {
+        "en-US": "Auto Install Programs",
+        "pt-BR": "Instalador Automático de Programas"
+      },
+      "description": {
+        "en-US": "System with automatic installer of programs at the user inserts basic informations",
+        "pt-BR": "Sistema com instalador automático de programas ao usuário inserir informações base"
+      },
+      "iconTechnologies": [
+        {
+          "icon": "fa-python",
+          "name": "Python",
+          "style": "fa-brands",
+          "stack": {
+            "id": "backEnd",
+            "en-US": "Back-end",
+            "pt-BR": "Back-end"
+          }
+        }
+      ],
+      "linkRepository": "https://github.com/jlbbarco/auto-install-programs/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "dateInit": "2026"
+    },
+    {
+      "projectTitle": "OrbityStore",
+      "image": "https://api.microlink.io/?url=https://beatriz-soares-1.github.io/Orbity&screenshot=true&meta=false&embed=screenshot.url",
+      "descriptionImage": {
+        "en-US": "Orbity Store UI Image",
+        "pt-BR": "Imagem da UI da Orbity Store"
+      },
+      "title": {
+        "en-US": "Orbity Store",
+        "pt-BR": "Loja Orbity"
+      },
+      "description": {
+        "en-US": "Video games website, where the user can choose a game, and it will show a synopsis, gameplay, screenshot and a link to buy the game",
+        "pt-BR": "Site de video games, onde o usuário pode escolher um jogo, e será mostrado uma sinopse, gameplay, screenshot e um link para comprar o jogo"
+      },
+      "iconTechnologies": [
+        {
+          "icon": "fa-html5",
+          "name": "HTML5",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-css3",
+          "name": "CSS3",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        },
+        {
+          "icon": "fa-js",
+          "name": "JavaScript",
+          "style": "fa-brands",
+          "stack": {
+            "id": "frontEnd",
+            "en-US": "Front-end",
+            "pt-BR": "Front-end"
+          }
+        }
+      ],
+      "linkRepository": "https://github.com/jlbbarco/auto-install-programs/",
+      "linkRepositoryTarget": "target='_blank' rel='noopener noreferrer'",
+      "dateInit": "2026"
     }
   ]
 }
