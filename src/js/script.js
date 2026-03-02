@@ -165,8 +165,9 @@ document.addEventListener("DOMContentLoaded", () => {
       savedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
     const locale = currentLang === "pt" ? "pt-BR" : "en-US";
 
+    // use GitHub API for project list (fallback to local JSON handled in setupProjects)
     const pProjects = setupProjects(
-      "src/json/areas/projects.json",
+      "github",
       "projectsContainer",
       locale,
     );
@@ -394,69 +395,110 @@ function parseDate(dateStr) {
   return 0;
 }
 
-function setupProjects(fileURL, containerId, language) {
-  return fetchJsonWithFallback(fileURL)
-    .then((data) => {
-      const container = document.getElementById(containerId);
-      if (!container || !data.cards) return;
-      const cards = data.cards;
-      const techCount = {};
-      const techFilter = {};
 
-      cards.forEach((card) => {
-        if (card.iconTechnologies) {
-          card.iconTechnologies.forEach((tech) => {
-            if (tech.name) {
-              techCount[tech.name] = (techCount[tech.name] || 0) + 1;
-              if (tech.filter === "no") {
-                techFilter[tech.name] = true;
-              }
-            }
-          });
+// converts a Date object into a card-friendly string (MM/YYYY or YYYY)
+function formatCardDate(date) {
+  if (!(date instanceof Date) || isNaN(date.getTime())) return "";
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  return m === 1 ? `${y}` : `${String(m).padStart(2, "0")}/${y}`;
+}
+
+// fetch public repos for owner; forks are included so participations appear too
+function fetchGithubRepos(owner) {
+  const url = `https://api.github.com/users/${owner}/repos?per_page=100`;
+  return fetch(url)
+    .then((res) => {
+      if (!res.ok) throw new Error(`GitHub API status ${res.status}`);
+      return res.json();
+    })
+    .then((repos) => {
+      if (!Array.isArray(repos)) return [];
+      return repos.map((repo) => {
+        const created = new Date(repo.created_at);
+        const pushed = new Date(repo.pushed_at || repo.updated_at);
+        return {
+          title: repo.name,
+          description: repo.description || "",
+          linkRepository: repo.html_url,
+          linkRepositoryTarget: "target='_blank' rel='noopener noreferrer'",
+          image: `https://opengraph.githubassets.com/1/${repo.full_name}`,
+          dateInit: formatCardDate(created),
+          dateEnd: formatCardDate(pushed),
+          // optionally include primary language as a technology
+          iconTechnologies: repo.language
+            ? [
+                {
+                  name: repo.language,
+                  icon: "",
+                },
+              ]
+            : [],
+        };
+      });
+    });
+}
+
+function populateProjectCards(container, cards, language) {
+  if (typeof container === "string") {
+    container = document.getElementById(container);
+  }
+  if (!container || !Array.isArray(cards)) return;
+
+  const techCount = {};
+  const techFilter = {};
+
+  cards.forEach((card) => {
+    if (card.iconTechnologies) {
+      card.iconTechnologies.forEach((tech) => {
+        if (tech.name) {
+          techCount[tech.name] = (techCount[tech.name] || 0) + 1;
+          if (tech.filter === "no") {
+            techFilter[tech.name] = true;
+          }
         }
       });
+    }
+  });
 
-      if (Object.keys(techCount).length > 1) {
-        const filterContainer = document.createElement("div");
-        filterContainer.className = "filter-container";
-        const btnAll = document.createElement("button");
-        btnAll.className = "filter-button active";
-        btnAll.dataset.filter = "all";
-        btnAll.textContent = language === "pt-BR" ? "Todos" : "All";
-        btnAll.onclick = () => filterProjectsByTechnology("all");
-        filterContainer.appendChild(btnAll);
+  if (Object.keys(techCount).length > 1) {
+    const filterContainer = document.createElement("div");
+    filterContainer.className = "filter-container";
+    const btnAll = document.createElement("button");
+    btnAll.className = "filter-button active";
+    btnAll.dataset.filter = "all";
+    btnAll.textContent = language === "pt-BR" ? "Todos" : "All";
+    btnAll.onclick = () => filterProjectsByTechnology("all");
+    filterContainer.appendChild(btnAll);
 
-        const sortedTechs = Object.entries(techCount).sort(([nameA], [nameB]) =>
-          nameA.localeCompare(nameB),
-        );
+    const sortedTechs = Object.entries(techCount).sort(([nameA], [nameB]) =>
+      nameA.localeCompare(nameB),
+    );
 
-        sortedTechs.forEach(([name, count]) => {
-          if (techFilter[name]) return;
-          const btn = document.createElement("button");
-          btn.className = "filter-button";
-          btn.dataset.filter = name;
-          btn.textContent = `${name} (${count})`;
-          btn.onclick = () => filterProjectsByTechnology(name);
-          filterContainer.appendChild(btn);
-        });
-        container.parentNode.insertBefore(filterContainer, container);
-      }
+    sortedTechs.forEach(([name, count]) => {
+      if (techFilter[name]) return;
+      const btn = document.createElement("button");
+      btn.className = "filter-button";
+      btn.dataset.filter = name;
+      btn.textContent = `${name} (${count})`;
+      btn.onclick = () => filterProjectsByTechnology(name);
+      filterContainer.appendChild(btn);
+    });
+    container.parentNode.insertBefore(filterContainer, container);
+  }
 
-      const fragment = document.createDocumentFragment();
+  const fragment = document.createDocumentFragment();
 
-      // sort by most recent start date first; if starts are equal (or missing),
-      // then sort by most recent end date.  This puts cards that began in a given
-      // year ahead of cards that only ended in that year.
-      const sortedCards = [...cards].sort((a, b) => {
-        const initA = parseDate(a.dateInit);
-        const initB = parseDate(b.dateInit);
-        if (initA !== initB) {
-          return initB - initA;
-        }
-        const endA = parseDate(a.dateEnd);
-        const endB = parseDate(b.dateEnd);
-        return endB - endA;
-      });
+  const sortedCards = [...cards].sort((a, b) => {
+    const initA = parseDate(a.dateInit);
+    const initB = parseDate(b.dateInit);
+    if (initA !== initB) {
+      return initB - initA;
+    }
+    const endA = parseDate(a.dateEnd);
+    const endB = parseDate(b.dateEnd);
+    return endB - endA;
+  });
 
       sortedCards.forEach((card) => {
         const div = document.createElement("div");
@@ -518,8 +560,31 @@ function setupProjects(fileURL, containerId, language) {
         fragment.appendChild(div);
       });
       container.appendChild(fragment);
-    })
-    .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
+}
+
+// top-level function that chooses between static JSON or GitHub API
+function setupProjects(source, containerId, language) {
+  if (source === "github") {
+    const owner = document.body.dataset.githubOwner || "JLBBARCO";
+    return fetchGithubRepos(owner)
+      .then((cards) => populateProjectCards(containerId, cards, language))
+      .catch((err) => {
+        console.warn("Erro GitHub, usando fallback local:", err);
+        return fetchJsonWithFallback("src/json/areas/projects.json").then((data) => {
+          if (data && data.cards) {
+            populateProjectCards(containerId, data.cards, language);
+          }
+        });
+      });
+  } else {
+    return fetchJsonWithFallback(source)
+      .then((data) => {
+        if (data && data.cards) {
+          populateProjectCards(containerId, data.cards, language);
+        }
+      })
+      .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
+  }
 }
 
 function setupFormations(fileURL, containerId, language) {
