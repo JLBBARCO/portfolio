@@ -39,6 +39,116 @@ function fetchAny(...paths) {
   });
 }
 
+// ============================================================================
+// GitHub API helpers
+// ============================================================================
+
+/**
+ * Retrieve repository list for a user; uses localStorage caching to avoid
+ * hammering the unauthenticated rate limit.  The cache expires after one hour.
+ * Returns a promise that resolves to the raw array returned by the GitHub API.
+ */
+function fetchGitHubRepos(owner) {
+  const cacheKey = `githubRepos_${owner}`;
+  const now = Date.now();
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    try {
+      const { timestamp, data } = JSON.parse(cached);
+      // 1‑hour freshness window
+      if (now - timestamp < 1000 * 60 * 60) {
+        return Promise.resolve(data);
+      }
+    } catch (e) {
+      console.warn('Failed to parse cached repos:', e);
+    }
+  }
+
+  const url = `https://api.github.com/users/${owner}/repos?per_page=100&sort=updated&direction=desc`;
+  return fetch(url, {
+    headers: {
+      // topic support, harmless if ignored
+      Accept: 'application/vnd.github.mercy-preview+json',
+    },
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
+      return res.json();
+    })
+    .then((repos) => {
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: now, data: repos }));
+      } catch (e) {
+        console.warn('Unable to cache repos in localStorage:', e);
+      }
+      return repos;
+    })
+    .catch((err) => {
+      console.warn('GitHub fetch failed, attempting cached data:', err);
+      if (cached) {
+        try {
+          const { data } = JSON.parse(cached);
+          return data;
+        } catch (e) {
+          console.warn('Cached repos malformed:', e);
+        }
+      }
+      // rethrow so caller can handle
+      throw err;
+    });
+}
+
+/**
+ * Generic loader for project 'data' used by setupProjects.  It currently supports
+ * two modes:
+ *   * fetch from a local JSON file (maintains backward compatibility)
+ *   * fetch from GitHub API for a given username
+ * When loading from GitHub the returned object has the same shape as the JSON
+ * file ({ cards: [...] }) so the remainder of the rendering logic can stay
+ * unchanged.
+ */
+function loadProjectsData(source, owner) {
+  if (source === 'github') {
+    return fetchGitHubRepos(owner).then((repos) => {
+      // ignore forks; user likely only wants own projects and contributions
+      const cards = repos
+        .filter((repo) => !repo.fork)
+        .map((repo) => {
+        const techs = [];
+        if (Array.isArray(repo.topics) && repo.topics.length) {
+          techs.push(...repo.topics);
+        }
+        if (repo.language) techs.push(repo.language);
+        // de-duplicate
+        const unique = Array.from(new Set(techs));
+
+        // convert ISO date to MM/YYYY or YYYY
+        const makeDate = (iso) => {
+          if (!iso) return '';
+          const parts = iso.substring(0, 7).split('-'); // [YYYY,MM]
+          if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
+          return parts[0];
+        };
+
+        return {
+          title: { 'pt-BR': repo.name, 'en-US': repo.name },
+          description: repo.description || '',
+          linkRepository: repo.html_url,
+          linkRepositoryTarget: "target='_blank' rel='noopener noreferrer'",
+          image: `https://opengraph.githubassets.com/1/${owner}/${repo.name}`,
+          // GitHub does not provide a mobile-specific thumbnail; reuse same
+          dateInit: makeDate(repo.created_at),
+          dateEnd: makeDate(repo.updated_at),
+          iconTechnologies: unique.map((t) => ({ name: t })),
+        };
+      });
+      return { cards };
+    });
+  }
+  // default behaviour: local JSON file
+  return fetchJsonWithFallback(source);
+}
+
 function fetchJsonWithFallback(path) {
   const basename = path.split("/").pop();
   return fetchAny(path, basename).then((res) =>
@@ -50,12 +160,9 @@ function fetchJsonWithFallback(path) {
 
 // Função para trocar o idioma
 function changeLanguage() {
-  const savedLang = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("language="))
-    ?.split("=")[1];
+  const savedLang = localStorage.getItem("language");
   const newLang = savedLang === "pt" ? "en" : "pt";
-  document.cookie = `language=${newLang}; path=/; max-age=31536000; SameSite=Lax`;
+  localStorage.setItem("language", newLang);
   document.documentElement.lang = newLang === "pt" ? "pt-BR" : "en-US";
   window.dispatchEvent(new Event("languageChanged"));
 }
@@ -83,10 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
     prefersDark.addListener(updateFavicon);
   }
 
-  const savedFontSize = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("fontSize="))
-    ?.split("=")[1];
+  const savedFontSize = localStorage.getItem("fontSize");
   if (savedFontSize) {
     document.body.style.fontSize = savedFontSize;
     const parsed = parseFloat(savedFontSize);
@@ -157,19 +261,18 @@ document.addEventListener("DOMContentLoaded", () => {
       .querySelectorAll(".filter-container, .btn.prev, .btn.next")
       .forEach((el) => el.remove());
 
-    const savedLang = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("language="))
-      ?.split("=")[1];
+    const storedLang = localStorage.getItem("language");
     const currentLang =
-      savedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
+      storedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
     const locale = currentLang === "pt" ? "pt-BR" : "en-US";
 
-    // use GitHub API for project list (fallback to local JSON handled in setupProjects)
+    // load projects from GitHub API instead of local json
+    const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
     const pProjects = setupProjects(
       "github",
       "projectsContainer",
       locale,
+      githubOwner,
     );
     const pFormations = setupFormations(
       "src/json/areas/formation.json",
@@ -301,7 +404,12 @@ function accessibilityToggle() {
 function updateFontSize(newSize) {
   fontSize = Math.max(0.6, Math.min(3.0, Math.round(newSize * 10) / 10));
   document.body.style.fontSize = fontSize + "em";
-  document.cookie = `fontSize=${fontSize}em; path=/; max-age=31536000; SameSite=Lax`;
+  // persist in localStorage instead of cookie
+  try {
+    localStorage.setItem("fontSize", `${fontSize}em`);
+  } catch (e) {
+    console.warn("Unable to save fontSize:", e);
+  }
 }
 
 function increaseFont() {
@@ -395,110 +503,71 @@ function parseDate(dateStr) {
   return 0;
 }
 
+function setupProjects(source, containerId, language, owner) {
+  // source may be a local path or the literal string 'github' to indicate using
+  // the GitHub API for the given owner.
+  return loadProjectsData(source, owner)
+    .then((data) => {
+      const container = document.getElementById(containerId);
+      if (!container || !data.cards) return;
+      const cards = data.cards;
+      const techCount = {};
+      const techFilter = {};
 
-// converts a Date object into a card-friendly string (MM/YYYY or YYYY)
-function formatCardDate(date) {
-  if (!(date instanceof Date) || isNaN(date.getTime())) return "";
-  const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  return m === 1 ? `${y}` : `${String(m).padStart(2, "0")}/${y}`;
-}
-
-// fetch public repos for owner; forks are included so participations appear too
-function fetchGithubRepos(owner) {
-  const url = `https://api.github.com/users/${owner}/repos?per_page=100`;
-  return fetch(url)
-    .then((res) => {
-      if (!res.ok) throw new Error(`GitHub API status ${res.status}`);
-      return res.json();
-    })
-    .then((repos) => {
-      if (!Array.isArray(repos)) return [];
-      return repos.map((repo) => {
-        const created = new Date(repo.created_at);
-        const pushed = new Date(repo.pushed_at || repo.updated_at);
-        return {
-          title: repo.name,
-          description: repo.description || "",
-          linkRepository: repo.html_url,
-          linkRepositoryTarget: "target='_blank' rel='noopener noreferrer'",
-          image: `https://opengraph.githubassets.com/1/${repo.full_name}`,
-          dateInit: formatCardDate(created),
-          dateEnd: formatCardDate(pushed),
-          // optionally include primary language as a technology
-          iconTechnologies: repo.language
-            ? [
-                {
-                  name: repo.language,
-                  icon: "",
-                },
-              ]
-            : [],
-        };
-      });
-    });
-}
-
-function populateProjectCards(container, cards, language) {
-  if (typeof container === "string") {
-    container = document.getElementById(container);
-  }
-  if (!container || !Array.isArray(cards)) return;
-
-  const techCount = {};
-  const techFilter = {};
-
-  cards.forEach((card) => {
-    if (card.iconTechnologies) {
-      card.iconTechnologies.forEach((tech) => {
-        if (tech.name) {
-          techCount[tech.name] = (techCount[tech.name] || 0) + 1;
-          if (tech.filter === "no") {
-            techFilter[tech.name] = true;
-          }
+      cards.forEach((card) => {
+        if (card.iconTechnologies) {
+          card.iconTechnologies.forEach((tech) => {
+            if (tech.name) {
+              techCount[tech.name] = (techCount[tech.name] || 0) + 1;
+              if (tech.filter === "no") {
+                techFilter[tech.name] = true;
+              }
+            }
+          });
         }
       });
-    }
-  });
 
-  if (Object.keys(techCount).length > 1) {
-    const filterContainer = document.createElement("div");
-    filterContainer.className = "filter-container";
-    const btnAll = document.createElement("button");
-    btnAll.className = "filter-button active";
-    btnAll.dataset.filter = "all";
-    btnAll.textContent = language === "pt-BR" ? "Todos" : "All";
-    btnAll.onclick = () => filterProjectsByTechnology("all");
-    filterContainer.appendChild(btnAll);
+      if (Object.keys(techCount).length > 1) {
+        const filterContainer = document.createElement("div");
+        filterContainer.className = "filter-container";
+        const btnAll = document.createElement("button");
+        btnAll.className = "filter-button active";
+        btnAll.dataset.filter = "all";
+        btnAll.textContent = language === "pt-BR" ? "Todos" : "All";
+        btnAll.onclick = () => filterProjectsByTechnology("all");
+        filterContainer.appendChild(btnAll);
 
-    const sortedTechs = Object.entries(techCount).sort(([nameA], [nameB]) =>
-      nameA.localeCompare(nameB),
-    );
+        const sortedTechs = Object.entries(techCount).sort(([nameA], [nameB]) =>
+          nameA.localeCompare(nameB),
+        );
 
-    sortedTechs.forEach(([name, count]) => {
-      if (techFilter[name]) return;
-      const btn = document.createElement("button");
-      btn.className = "filter-button";
-      btn.dataset.filter = name;
-      btn.textContent = `${name} (${count})`;
-      btn.onclick = () => filterProjectsByTechnology(name);
-      filterContainer.appendChild(btn);
-    });
-    container.parentNode.insertBefore(filterContainer, container);
-  }
+        sortedTechs.forEach(([name, count]) => {
+          if (techFilter[name]) return;
+          const btn = document.createElement("button");
+          btn.className = "filter-button";
+          btn.dataset.filter = name;
+          btn.textContent = `${name} (${count})`;
+          btn.onclick = () => filterProjectsByTechnology(name);
+          filterContainer.appendChild(btn);
+        });
+        container.parentNode.insertBefore(filterContainer, container);
+      }
 
-  const fragment = document.createDocumentFragment();
+      const fragment = document.createDocumentFragment();
 
-  const sortedCards = [...cards].sort((a, b) => {
-    const initA = parseDate(a.dateInit);
-    const initB = parseDate(b.dateInit);
-    if (initA !== initB) {
-      return initB - initA;
-    }
-    const endA = parseDate(a.dateEnd);
-    const endB = parseDate(b.dateEnd);
-    return endB - endA;
-  });
+      // sort by most recent start date first; if starts are equal (or missing),
+      // then sort by most recent end date.  This puts cards that began in a given
+      // year ahead of cards that only ended in that year.
+      const sortedCards = [...cards].sort((a, b) => {
+        const initA = parseDate(a.dateInit);
+        const initB = parseDate(b.dateInit);
+        if (initA !== initB) {
+          return initB - initA;
+        }
+        const endA = parseDate(a.dateEnd);
+        const endB = parseDate(b.dateEnd);
+        return endB - endA;
+      });
 
       sortedCards.forEach((card) => {
         const div = document.createElement("div");
@@ -560,31 +629,8 @@ function populateProjectCards(container, cards, language) {
         fragment.appendChild(div);
       });
       container.appendChild(fragment);
-}
-
-// top-level function that chooses between static JSON or GitHub API
-function setupProjects(source, containerId, language) {
-  if (source === "github") {
-    const owner = document.body.dataset.githubOwner || "JLBBARCO";
-    return fetchGithubRepos(owner)
-      .then((cards) => populateProjectCards(containerId, cards, language))
-      .catch((err) => {
-        console.warn("Erro GitHub, usando fallback local:", err);
-        return fetchJsonWithFallback("src/json/areas/projects.json").then((data) => {
-          if (data && data.cards) {
-            populateProjectCards(containerId, data.cards, language);
-          }
-        });
-      });
-  } else {
-    return fetchJsonWithFallback(source)
-      .then((data) => {
-        if (data && data.cards) {
-          populateProjectCards(containerId, data.cards, language);
-        }
-      })
-      .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
-  }
+    })
+    .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
 }
 
 function setupFormations(fileURL, containerId, language) {
@@ -767,22 +813,18 @@ function setupTechnologies(container, cards, language = "pt-BR") {
 }
 
 function loadAllTechnologies(language = "pt-BR") {
-  const owner = document.body.dataset.githubOwner || "JLBBARCO";
-  // get project cards either from GitHub API or, if that fails, local JSON
-  const pProjects = fetchGithubRepos(owner).catch(() =>
-    fetchJsonWithFallback("src/json/areas/projects.json").then((data) =>
-      data.cards || [],
-    ),
-  );
-  const pFormations = fetchJsonWithFallback("src/json/areas/formation.json").then(
-    (data) => data.cards || [],
-  );
-
-  return Promise.all([pProjects, pFormations])
-    .then(([projCards, formCards]) => {
+  const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
+  return Promise.all([
+    // when the projects source was switched we still want the cards shape
+    loadProjectsData('github', githubOwner),
+    fetchJsonWithFallback("src/json/areas/formation.json"),
+  ])
+    .then(([projectsData, formationsData]) => {
       const container = document.getElementById("technologiesContainer");
       if (!container) return;
-      const allCards = [...projCards, ...formCards];
+      const allCards = [];
+      if (projectsData.cards) allCards.push(...projectsData.cards);
+      if (formationsData.cards) allCards.push(...formationsData.cards);
       setupTechnologies(container, allCards, language);
     })
     .catch((err) => console.error("Erro ao carregar tecnologias:", err));

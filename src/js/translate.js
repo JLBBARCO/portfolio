@@ -2,26 +2,9 @@
 let currentLanguage = "pt";
 let translations = {};
 
-// Função para obter cookie por nome
-function getCookie(name) {
-  const nameEQ = name + "=";
-  const cookies = document.cookie.split(";");
-  for (let cookie of cookies) {
-    cookie = cookie.trim();
-    if (cookie.indexOf(nameEQ) === 0) {
-      return cookie.substring(nameEQ.length);
-    }
-  }
-  return null;
-}
-
-// Função para definir cookie
-function setCookie(name, value, days = 365) {
-  const date = new Date();
-  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-  const expires = "expires=" + date.toUTCString();
-  document.cookie = name + "=" + value + ";" + expires + ";path=/";
-}
+// previously there were helper functions to read/write cookies; the
+// language preference is now stored in localStorage instead, so those are
+// no longer needed.
 
 // Sanitizador simples — permite apenas <span class="emphasis"> e texto.
 // Remove outros elementos/atributos para evitar injeção.
@@ -69,8 +52,8 @@ async function loadTranslations() {
       pt: translations.pt?.lastUpdate || "Última atualização: {{date}}",
     };
 
-    const savedLanguage = getCookie("language");
-    if (savedLanguage && (savedLanguage === "pt" || savedLanguage === "en")) {
+    const savedLanguage = localStorage.getItem("language");
+    if (savedLanguage === "pt" || savedLanguage === "en") {
       currentLanguage = savedLanguage;
     } else {
       const navLang = (
@@ -214,7 +197,11 @@ function setTextPreserveSpans(element, text) {
 function applyTranslations(language) {
   currentLanguage = language.startsWith("pt") ? "pt" : "en";
   document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en-US";
-  setCookie("language", currentLanguage);
+  try {
+    localStorage.setItem("language", currentLanguage);
+  } catch (e) {
+    console.warn("Unable to persist language selection:", e);
+  }
   updateLanguageSelector();
 
   document.querySelectorAll("[data-i18n]").forEach((element) => {
