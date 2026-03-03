@@ -320,7 +320,6 @@ function loadProjectsData(source, owner) {
           // account or a collaborator.
           name !== repoOwner &&
           name !== "portfolio" &&
-          name !== "study" &&
           name !== `${owner.toLowerCase()}.github.io`
         );
       });
