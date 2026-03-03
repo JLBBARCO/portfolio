@@ -898,18 +898,20 @@ function setupProjects(source, containerId, language, owner, loadId) {
 
       const fragment = document.createDocumentFragment();
 
-      // sort by most recent start date first; if starts are equal (or missing),
-      // then sort by most recent end date.  This puts cards that began in a given
-      // year ahead of cards that only ended in that year.
+      // Nova lógica de ordenação:
+      // 1. Primeiro pela data de fim (dateEnd) mais recente.
+      // 2. Se houver empate (ou se ambas forem nulas), pela data de início (dateInit) mais recente.
       const sortedCards = [...cards].sort((a, b) => {
-        const initA = parseDate(a.dateInit);
-        const initB = parseDate(b.dateInit);
-        if (initA !== initB) {
-          return initB - initA;
-        }
         const endA = parseDate(a.dateEnd);
         const endB = parseDate(b.dateEnd);
-        return endB - endA;
+
+        if (endA !== endB) {
+          return endB - endA;
+        }
+
+        const initA = parseDate(a.dateInit);
+        const initB = parseDate(b.dateInit);
+        return initB - initA;
       });
 
       sortedCards.forEach((card) => {
