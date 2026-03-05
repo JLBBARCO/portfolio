@@ -1,5 +1,3 @@
-const windowWidth = 990;
-
 // unique identifier for the most recent dynamic-content load; used to
 // ignore stale async results (e.g. user switched language mid-load).
 let _currentLoadId = 0;
@@ -156,83 +154,26 @@ function fetchAny(...paths) {
  * Returns a promise that resolves to the raw array returned by the GitHub API.
  */
 function fetchGitHubRepos(owner) {
-  const cacheKey = `githubRepos_${owner}`;
-  const now = Date.now();
-  let cached;
-  try {
-    cached = localStorage.getItem(cacheKey);
-  } catch (e) {
-    console.warn("localStorage unavailable when reading repos cache:", e);
-    cached = null;
-  }
-  if (cached) {
-    try {
-      const { timestamp, data } = JSON.parse(cached);
-      // 1‑hour freshness window
-      if (now - timestamp < 1000 * 60 * 60) {
-        return Promise.resolve(data);
-      }
-    } catch (e) {
-      console.warn("Failed to parse cached repos:", e);
-    }
-  }
+  // Detecta se está rodando no localhost
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
 
-  // try fetching both owned repos and, if available, memberships
-  const baseHeaders = {
-    // topic support, harmless if ignored
-    Accept: "application/vnd.github.mercy-preview+json",
-  };
-  const urls = [
-    `https://api.github.com/users/${owner}/repos?per_page=100&sort=updated&direction=desc&type=owner`,
-    `https://api.github.com/users/${owner}/repos?per_page=100&sort=updated&direction=desc&type=member`,
-  ];
+  // Se for localhost e você NÃO estiver usando 'vercel dev',
+  // ele chama o GitHub diretamente para não travar o desenvolvimento.
+  // Se estiver na Vercel, usa a rota segura.
+  const apiUrl = isLocalhost
+    ? `https://api.github.com/users/${owner}/repos?per_page=100&sort=updated`
+    : "/api/github";
 
-  return Promise.all(
-    urls.map((u) =>
-      fetch(u, { headers: baseHeaders })
-        .then((res) => (res.ok ? res.json() : []))
-        .catch(() => []),
-    ),
-  )
-    .then((arrays) => {
-      // merge and dedupe by repo id
-      const combined = [];
-      const seen = new Set();
-      // arrays may be [ownerRepos, memberRepos]; flatten manually for older browsers
-      arrays.forEach((arr) => {
-        if (Array.isArray(arr)) {
-          arr.forEach((repo) => {
-            if (repo && repo.id && !seen.has(repo.id)) {
-              seen.add(repo.id);
-              combined.push(repo);
-            }
-          });
-        }
-      });
-      // sort by updated_at descending
-      combined.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-      try {
-        localStorage.setItem(
-          cacheKey,
-          JSON.stringify({ timestamp: now, data: combined }),
-        );
-      } catch (e) {
-        console.warn("Unable to cache repos in localStorage:", e);
-      }
-      return combined;
+  return fetch(apiUrl)
+    .then((res) => {
+      if (!res.ok) throw new Error("Erro ao obter repositórios");
+      return res.json();
     })
     .catch((err) => {
-      console.warn("GitHub fetch failed, attempting cached data:", err);
-      if (cached) {
-        try {
-          const { data } = JSON.parse(cached);
-          return data;
-        } catch (e) {
-          console.warn("Cached repos malformed:", e);
-        }
-      }
-      // rethrow so caller can handle
-      throw err;
+      console.error("Erro na API:", err);
+      return [];
     });
 }
 
@@ -443,6 +384,35 @@ function fetchJsonWithFallback(path) {
   );
 }
 
+// Função para trocar o idioma
+function changeLanguage() {
+  const languageBtn = document.getElementById("languageBtn");
+  if (!languageBtn) return;
+
+  // 1. Sua lógica atual de alternar PT/EN
+  const newLanguage = currentLanguage === "pt" ? "en" : "pt";
+
+  // 2. Disparar a tradução do Google
+  // O Google usa um seletor select interno. Vamos simular a mudança nele.
+  const googleCombo = document.querySelector(".goog-te-combo");
+  if (googleCombo) {
+    googleCombo.value = newLanguage === "en" ? "en" : "pt";
+    googleCombo.dispatchEvent(new Event("change"));
+  }
+
+  // 3. Continuar com a sua tradução manual (JSON) para manter a qualidade
+  applyTranslations(newLanguage);
+  setCVLink(newLanguage);
+
+  // Atualizar o botão visualmente
+  languageBtn.setAttribute(
+    "aria-label",
+    newLanguage === "pt" ? "pt-br" : "en-us",
+  );
+
+  console.log(`Sistema Híbrido: JSON + Google Auto (${newLanguage})`);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const faviconLink = document.getElementById("favicon");
   const prefersDark =
@@ -456,7 +426,9 @@ document.addEventListener("DOMContentLoaded", () => {
         ? eventOrBool
         : eventOrBool && typeof eventOrBool.matches !== "undefined"
           ? eventOrBool.matches
-          : prefersDark.matches;
+          : prefersDark
+            ? prefersDark.matches
+            : false;
     if (!faviconLink) return;
     const newHref = isDark
       ? "src/assets/favicon/code-dark.svg"
@@ -485,9 +457,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const parsed = parseFloat(savedFontSize);
     if (!isNaN(parsed)) fontSize = parsed;
   }
-
-  resize();
-  window.addEventListener("resize", resize);
 
   const menuButton = document.getElementById("menu-button");
   if (menuButton) {
@@ -658,19 +627,6 @@ function calcularIdade() {
   const mes = hoje.getMonth() - nascimento.getMonth();
   if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) idade--;
   return idade;
-}
-
-function resize() {
-  const navLinks = document.querySelector(".nav-links");
-  const menuButton = document.getElementById("menu-button");
-  if (!navLinks) return;
-  if (window.innerWidth > windowWidth) {
-    navLinks.style.display = "flex";
-    if (menuButton) menuButton.setAttribute("aria-expanded", "true");
-  } else {
-    navLinks.style.display = "none";
-    if (menuButton) menuButton.setAttribute("aria-expanded", "false");
-  }
 }
 
 function toggleMenu() {
@@ -1034,17 +990,16 @@ function setupFormations(fileURL, containerId, language, loadId) {
         container.parentNode.insertBefore(filterContainer, container);
       }
 
-      // sort formation entries the same way as projects: recent starts first
-      // then recent ends.
+      // sort by most recent end date first (knowledge preference)
       const sortedCards = [...cards].sort((a, b) => {
-        const initA = parseDate(a.dateInit);
-        const initB = parseDate(b.dateInit);
-        if (initA !== initB) {
-          return initB - initA;
-        }
         const endA = parseDate(a.dateEnd);
         const endB = parseDate(b.dateEnd);
-        return endB - endA;
+        if (endA !== endB) {
+          return endB - endA;
+        }
+        const initA = parseDate(a.dateInit);
+        const initB = parseDate(b.dateInit);
+        return initB - initA;
       });
 
       const fragment = document.createDocumentFragment();
