@@ -261,7 +261,6 @@ function loadProjectsData(source, owner) {
           // account or a collaborator.
           name !== repoOwner &&
           name !== "portfolio" &&
-          name !== "study" &&
           name !== `${owner.toLowerCase()}.github.io`
         );
       });
@@ -855,13 +854,17 @@ function setupProjects(source, containerId, language, owner, loadId) {
 
       const fragment = document.createDocumentFragment();
 
-      // sort by most recent end date first (knowledge preference)
+      // Nova lógica de ordenação:
+      // 1. Primeiro pela data de fim (dateEnd) mais recente.
+      // 2. Se houver empate (ou se ambas forem nulas), pela data de início (dateInit) mais recente.
       const sortedCards = [...cards].sort((a, b) => {
         const endA = parseDate(a.dateEnd);
         const endB = parseDate(b.dateEnd);
+
         if (endA !== endB) {
           return endB - endA;
         }
+
         const initA = parseDate(a.dateInit);
         const initB = parseDate(b.dateInit);
         return initB - initA;
