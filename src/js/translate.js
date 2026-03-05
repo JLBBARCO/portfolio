@@ -327,8 +327,8 @@ function setCVLink(language) {
   if (!downloadCV) return;
   const linkToCV =
     language === "pt"
-      ? "src/assets/documents/Curriculo_Jose_Luiz_Bruiani_Barco_pt-BR.pdf"
-      : "src/assets/documents/Resume_Jose_Luiz_Bruiani_Barco_en-US.pdf";
+      ? "https://docs.google.com/document/d/155TwYXH4HsTpv7LjGJDIkfX_zpsXXFUc/export?format=pdf"
+      : "https://docs.google.com/document/d/1cCq1NBFGyd4UfvSOWplguJuYAvBQHdt5/export?format=pdf";
   // update aria-label in case language changed outside of applyTranslations
   downloadCV.setAttribute("aria-label", t("downloadCVTitle"));
 
@@ -400,3 +400,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.addEventListener("dynamicContentReady", fillReusableTitles);
+
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement(
+    {
+      pageLanguage: "pt",
+      // Adicione os idiomas que deseja suportar
+      includedLanguages: "en,es,fr,de",
+      autoDisplay: false,
+    },
+    "google_translate_element",
+  );
+}

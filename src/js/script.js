@@ -387,19 +387,31 @@ function fetchJsonWithFallback(path) {
 
 // Função para trocar o idioma
 function changeLanguage() {
-  let currentLang;
-  try {
-    currentLang = localStorage.getItem("language");
-  } catch (e) {
-    currentLang = null;
+  const languageBtn = document.getElementById("languageBtn");
+  if (!languageBtn) return;
+
+  // 1. Sua lógica atual de alternar PT/EN
+  const newLanguage = currentLanguage === "pt" ? "en" : "pt";
+
+  // 2. Disparar a tradução do Google
+  // O Google usa um seletor select interno. Vamos simular a mudança nele.
+  const googleCombo = document.querySelector(".goog-te-combo");
+  if (googleCombo) {
+    googleCombo.value = newLanguage === "en" ? "en" : "pt";
+    googleCombo.dispatchEvent(new Event("change"));
   }
-  const newLang = currentLang === "pt" ? "en" : "pt";
-  try {
-    localStorage.setItem("language", newLang);
-  } catch (e) {
-    console.warn("Unable to save language:", e);
-  }
-  window.dispatchEvent(new Event("languageChanged"));
+
+  // 3. Continuar com a sua tradução manual (JSON) para manter a qualidade
+  applyTranslations(newLanguage);
+  setCVLink(newLanguage);
+
+  // Atualizar o botão visualmente
+  languageBtn.setAttribute(
+    "aria-label",
+    newLanguage === "pt" ? "pt-br" : "en-us",
+  );
+
+  console.log(`Sistema Híbrido: JSON + Google Auto (${newLanguage})`);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
