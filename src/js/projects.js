@@ -1,3 +1,16 @@
+function getScreenshotUrl(demoUrl) {
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+  if (isLocalhost) {
+    return `https://api.microlink.io/?url=${encodeURIComponent(
+      demoUrl,
+    )}&screenshot=true&meta=false&embed=screenshot.url`;
+  } else {
+    return `/api/screenshot?url=${encodeURIComponent(demoUrl)}`;
+  }
+}
+
 function setupProjects(source, containerId, language, owner, loadId) {
   // when we start working with a container we tag it with the load id so
   // stale async results know to bail out.  loadId is produced by
@@ -24,10 +37,7 @@ function setupProjects(source, containerId, language, owner, loadId) {
       // is supplied (local JSON cards may already provide their own).
       cards.forEach((card) => {
         if (card.linkDemo && !card.image) {
-          const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(
-            card.linkDemo,
-          )}&screenshot=true&meta=false&embed=screenshot.url`;
-          card.image = screenshot;
+          card.image = getScreenshotUrl(card.linkDemo);
         }
       });
       const seen = new Set();
@@ -326,9 +336,7 @@ function loadProjectsData(source, owner) {
             }
             card.linkDemo = url;
             card.linkDemoTarget = "target='_blank' rel='noopener noreferrer'";
-            const screenshot = `https://api.microlink.io/?url=${encodeURIComponent(
-              url,
-            )}&screenshot=true&meta=false&embed=screenshot.url`;
+            const screenshot = getScreenshotUrl(url);
             card.image = screenshot;
             card.imageMobile = screenshot;
             return Promise.resolve(card);
