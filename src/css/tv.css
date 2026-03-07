@@ -1,0 +1,29 @@
+@charset "UTF-8";
+
+body {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+}
+
+header {
+    grid-column: 1 / -1;
+}
+
+main,
+aside {
+    grid-column: 2 / -2;
+    width: 100%;
+    margin: 0;
+}
+
+.carrousel {
+    width: 50dvw;
+}
+
+.person {
+    width: 10%;
+}
+
+footer {
+    grid-column: 1 / 1;
+}

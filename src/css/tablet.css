@@ -6,7 +6,7 @@
 
 section {
   min-height: 75dvh;
-  padding: 50px;
+  padding: 50px 0;
   scroll-margin-top: var(--navbar-height);
 }
 
@@ -47,7 +47,7 @@ main .container {
 .text-with-image {
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
 .person {

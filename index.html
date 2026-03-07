@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="src/css/style.css" media="screen" />
   <link rel="stylesheet" href="src/css/tablet.css" media="(min-width: 724px)" />
   <link rel="stylesheet" href="src/css/pc.css" media="(min-width: 990px)" />
+  <link rel="stylesheet" href="src/css/tv.css" media="(min-width: 1920px)" />
   <!-- use CDN stylesheet so all free brand icons are available immediately -->
   <!-- updated to latest FontAwesome and removed integrity check to avoid
        accidental mismatches when the CDN updates the file. -->
@@ -17,6 +18,12 @@
   <link rel="shortcut icon" href="src/assets/favicon/code-light.svg" type="image/x-icon" id="favicon">
   <script src="src/js/script.js"></script>
   <script src="src/js/translate.js"></script>
+  <script src="src/js/header.js"></script>
+  <script src="src/js/projects.js"></script>
+  <script src="src/js/technologies.js"></script>
+  <script src="src/js/formations.js"></script>
+  <script src="src/js/more.js"></script>
+  <script src="src/js/contact.js"></script>
   <script type="text/javascript"
     src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
@@ -24,32 +31,6 @@
 <body data-github-owner="JLBBARCO" data-github-repo="portfolio">
   <a id="skip_link" class="skip-link" href="#main" data-i18n="skip_link" aria-label="Skip to main content">Pular para o
     conteúdo principal</a>
-  <header>
-    <nav>
-      <a href="#Home">
-        <h1>JLBBARCO</h1>
-      </a>
-    </nav>
-    <div class="nav-menu">
-      <button id="menu-button" data-i18n="toggle_menu" data-i18n-attr="aria-label" aria-expanded="false"
-        aria-controls="nav-links">
-        <i id="menuIcon" class="fa-solid fa-bars" style="color: #fff"></i>
-      </button>
-      <div id="nav-links" class="nav-links">
-        <a href="#Home" class="links" id="link0" data-i18n="link0">Home</a>
-        <a href="#Projects" class="links" id="link1" data-i18n="link1">Projects</a>
-        <a href="#Technologies" class="links" id="link2" data-i18n="link2">Technologies</a>
-        <a href="#AboutMe" class="links" id="link3" data-i18n="link3">About Me</a>
-        <a href="#Formations" class="links" id="link4" data-i18n="link4">Formation</a>
-        <a href="#More" class="links" id="link5" data-i18n="link5">More</a>
-        <a href="#Contact" class="links" id="link6" data-i18n="link6">Contact</a>
-      </div>
-    </div>
-    <div id="google_translate_element" style="display:none;"></div>
-    <button id="languageBtn" class="language" aria-label="pt-br">
-      <i class="fa-solid fa-globe icon"></i>
-    </button>
-  </header>
   <main id="main">
     <section id="Home">
       <div>
@@ -74,10 +55,9 @@
           data-i18n-attr="alt" crossorigin="anonymous" class="person" loading="lazy" />
         <div class="text">
           <p id="aboutMeText"></p>
-          <div class="cv">
-            <h3 id="downloadCVTitle"></h3>
+          <div class="links">
             <a type="application/pdf" id="linkDownloadCV" href="#" aria-label="Download CV" style="display:none">
-              <i class="fa-solid fa-download icon"></i>
+              <h3 id="downloadCVTitle"></h3>
             </a>
           </div>
         </div>
@@ -111,7 +91,7 @@
           <i class="fa-solid fa-decrease-font icon"></i>
         </button>
         <button id="reset-font" data-i18n="reset_font" data-i18n-attr="aria-label">
-          <i class="fa-solid fa-font-slash icon"></i>
+          <i class="fa-solid fa-text-slash icon"></i>
         </button>
       </div>
     </article>

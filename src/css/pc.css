@@ -4,10 +4,6 @@
   font-size: 2.5em;
 }
 
-section {
-  padding: 50px;
-}
-
 nav h1 {
   font-size: 1.5em;
 }
@@ -46,7 +42,7 @@ main .container {
 .text-with-image {
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
 .person {

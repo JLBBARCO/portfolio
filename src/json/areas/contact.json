@@ -7,16 +7,22 @@
       "name": "joseluizbarco@gmail.com"
     },
     {
+      "icon": "fa-github",
+      "style": "fa-brands",
+      "url": "https://github.com/JLBBARCO",
+      "name": "GitHub.com/JLBBARCO"
+    },
+    {
       "icon": "fa-linkedin",
       "style": "fa-brands",
       "url": "https://linkedin.com/in/joseluizbbarco",
       "name": "LinkedIn.com/in/joseluizbbarco"
     },
     {
-      "icon": "fa-github",
+      "icon": "fa-instagram",
       "style": "fa-brands",
-      "url": "https://github.com/JLBBARCO",
-      "name": "GitHub.com/JLBBARCO"
+      "url": "https://instagram.com/joseluizbbarco",
+      "name": "Instagram.com/joseluizbbarco"
     }
   ]
 }
