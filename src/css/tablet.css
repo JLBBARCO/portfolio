@@ -47,7 +47,7 @@ main .container {
 .text-with-image {
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
 .person {

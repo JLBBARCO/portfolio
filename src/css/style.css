@@ -64,12 +64,14 @@ html {
 }
 
 body {
+  display: block;
   background-color: var(--primary-bg);
   color: var(--text-primary);
   font-family: var(--font0);
   font-size: 1em;
   line-height: 1.5;
   top: 0 !important;
+  overflow-x: hidden;
 }
 
 .goog-te-banner-frame.skiptranslate {
@@ -374,6 +376,10 @@ div.links {
 }
 
 .text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: justify;
 }
 
@@ -713,4 +719,8 @@ button .icon:hover {
 
 .carrousel::-webkit-scrollbar-thumb:hover {
   background: var(--hover-accent);
+}
+
+#contactContainer {
+  margin: 5%;
 }
