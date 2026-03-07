@@ -276,7 +276,7 @@ section {
 .card {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: center;
   text-align: justify;
   border-radius: 10px;
@@ -311,7 +311,7 @@ section {
 .card img,
 .card source {
   width: 100%;
-  height: 100%;
+  height: auto;
   border-radius: 8px 8px 0 0;
 }
 
@@ -434,13 +434,6 @@ div.links {
 
 .icon-container:hover .icon {
   color: var(--secondary-bg);
-}
-
-.cv {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1em;
 }
 
 #accessibility {
