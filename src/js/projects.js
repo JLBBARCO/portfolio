@@ -1,14 +1,7 @@
 function getScreenshotUrl(demoUrl) {
-  const isLocalhost =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-  if (isLocalhost) {
-    return `https://api.microlink.io/?url=${encodeURIComponent(
-      demoUrl,
-    )}&screenshot=true&meta=false&embed=screenshot.url`;
-  } else {
-    return `/api/screenshot?url=${encodeURIComponent(demoUrl)}`;
-  }
+  return `https://api.microlink.io/?url=${encodeURIComponent(
+    demoUrl,
+  )}&screenshot=true&meta=false&embed=screenshot.url`;
 }
 
 function setupProjects(source, containerId, language, owner, loadId) {
