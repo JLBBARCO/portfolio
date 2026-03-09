@@ -64,9 +64,23 @@ function setupTechnologies(container, cards, language = "pt-BR") {
 
 function loadAllTechnologies(language = "pt-BR", loadId) {
   const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
-  const container = document.getElementById("technologiesContainer");
+
+  const main = document.querySelector("main");
+  const section = document.createElement("section");
+  section.id = "Technologies";
+
+  const title = document.createElement("h2");
+  title.id = "technologiesTitle";
+  title.setAttribute("data-i18n", "section_technologies_title");
+  title.innerHTML = "Technologies";
+  section.append(title);
+
+  const container = document.createElement("article");
+  container.id = "technologiesContainer";
+  container.className = "block";
+
   if (container && loadId !== undefined) container.dataset.loadId = loadId;
-  return Promise.all([
+  Promise.all([
     // when the projects source was switched we still want the cards shape
     loadProjectsData("github", githubOwner),
     fetchJsonWithFallback("src/json/areas/formation.json"),
@@ -81,6 +95,9 @@ function loadAllTechnologies(language = "pt-BR", loadId) {
       setupTechnologies(container, allCards, language);
     })
     .catch((err) => console.error("Erro ao carregar tecnologias:", err));
+
+  section.appendChild(container);
+  main.appendChild(section);
 }
 
 function filterProjectsByTechnology(tech) {

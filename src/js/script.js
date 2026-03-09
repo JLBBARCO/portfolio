@@ -163,37 +163,20 @@ function fetchJsonWithFallback(path) {
   );
 }
 
-// Função para trocar o idioma
-function changeLanguage() {
-  const languageBtn = document.getElementById("languageBtn");
-  if (!languageBtn) return;
-
-  // 1. Sua lógica atual de alternar PT/EN
-  const newLanguage = currentLanguage === "pt" ? "en" : "pt";
-
-  // 2. Disparar a tradução do Google
-  // O Google usa um seletor select interno. Vamos simular a mudança nele.
-  const googleCombo = document.querySelector(".goog-te-combo");
-  if (googleCombo) {
-    googleCombo.value = newLanguage === "en" ? "en" : "pt";
-    googleCombo.dispatchEvent(new Event("change"));
-  }
-
-  // 3. Continuar com a sua tradução manual (JSON) para manter a qualidade
-  applyTranslations(newLanguage);
-  setCVLink(newLanguage);
-
-  // Atualizar o botão visualmente
-  languageBtn.setAttribute(
-    "aria-label",
-    newLanguage === "pt" ? "pt-br" : "en-us",
-  );
-
-  console.log(`Sistema Híbrido: JSON + Google Auto (${newLanguage})`);
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-  header();
+  function bindDynamicHeaderControls() {
+    const menuButton = document.getElementById("menu-button");
+    if (menuButton && !menuButton.dataset.boundToggle) {
+      menuButton.addEventListener("click", toggleMenu);
+      menuButton.dataset.boundToggle = "true";
+    }
+
+    const languageBtn = document.getElementById("languageBtn");
+    if (languageBtn && !languageBtn.dataset.boundLanguage) {
+      languageBtn.addEventListener("click", changeLanguage);
+      languageBtn.dataset.boundLanguage = "true";
+    }
+  }
 
   const faviconLink = document.getElementById("favicon");
   const prefersDark =
@@ -239,21 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!isNaN(parsed)) fontSize = parsed;
   }
 
-  const menuButton = document.getElementById("menu-button");
-  if (menuButton) {
-    const menuIcon = document.getElementById("menuIcon");
-    if (menuIcon) {
-      menuIcon.classList.remove("fa-xmark", "fa-close", "fa-menu");
-      if (!menuIcon.classList.contains("fa-bars"))
-        menuIcon.classList.add("fa-bars");
-    }
-    menuButton.addEventListener("click", toggleMenu);
-  }
-
-  const languageBtn = document.getElementById("languageBtn");
-  if (languageBtn) {
-    languageBtn.addEventListener("click", changeLanguage);
-  }
+  bindDynamicHeaderControls();
 
   const accessibilityButton = document.getElementById("accessibility-button");
   const increaseFontButton = document.getElementById("increase-font");
@@ -287,17 +256,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // bump token for this run; any previous promises will become stale
     const myLoadId = ++_currentLoadId;
 
-    const containers = [
-      "projectsContainer",
-      "technologiesContainer",
-      "techsThisSite",
-      "contactContainer",
-      "formationsContainer",
-    ];
-
-    containers.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = "";
+    // Remove only dynamic sections; keep static Home section intact.
+    const dynamicSectionIds = new Set([
+      "Projects",
+      "Technologies",
+      "AboutMe",
+      "Formations",
+      "Contact",
+      "More",
+    ]);
+    Array.from(document.querySelectorAll("main > section")).forEach((el) => {
+      if (dynamicSectionIds.has(el.id)) el.remove();
     });
 
     Array.from(
@@ -317,22 +286,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // load projects from GitHub API instead of local json
     const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
-    const pProjects = setupProjects(
-      "github",
-      "projectsContainer",
-      locale,
-      githubOwner,
-      myLoadId,
-    );
+    const pProjects = setupProjects("github", locale, githubOwner, myLoadId);
+    const pTechnologies = loadAllTechnologies(locale, myLoadId);
+    const pAbout =
+      typeof aboutMe === "function"
+        ? Promise.resolve(aboutMe())
+        : Promise.resolve();
     const pFormations = setupFormations(
       "src/json/areas/formation.json",
-      "formationsContainer",
       locale,
-      myLoadId,
-    );
-    const pIcons = setIconsTechsSite(
-      "src/json/areas/techs-this-site.json",
-      "techsThisSite",
       myLoadId,
     );
     const pLinks = setIconsContact(
@@ -340,13 +302,36 @@ document.addEventListener("DOMContentLoaded", () => {
       "contactContainer",
       myLoadId,
     );
+    const pIcons = setIconsTechsSite(
+      "src/json/areas/techs-this-site.json",
+      "techsThisSite",
+      myLoadId,
+    );
+    const pHeader = header();
 
-    const pTechnologies = loadAllTechnologies(locale, myLoadId);
-
-    Promise.all([pProjects, pIcons, pLinks, pFormations, pTechnologies])
+    Promise.all([
+      pHeader,
+      pProjects,
+      pTechnologies,
+      pAbout,
+      pFormations,
+      pLinks,
+      pIcons,
+    ])
       .then(() => {
+        bindDynamicHeaderControls();
+
+        const menuIcon = document.getElementById("menuIcon");
+        if (menuIcon) {
+          menuIcon.classList.remove("fa-xmark", "fa-close", "fa-menu");
+          if (!menuIcon.classList.contains("fa-bars")) {
+            menuIcon.classList.add("fa-bars");
+          }
+        }
+
         setupCarouselButtons();
         addNewIcons("src/assets/icons/svg.json");
+        initializeProfileImage();
         window.dispatchEvent(new Event("dynamicContentReady"));
       })
       .catch((err) => {
@@ -524,25 +509,45 @@ function addNewIcons(linkFile) {
           .replace(/stroke=['"]#[^'"]*['"]/g, "");
         Array.from(document.querySelectorAll(`i.${icon.class}`)).forEach(
           (el) => {
-            el.innerHTML = svg;
-            const s = el.querySelector("svg");
+            if (el.dataset.svgReplaced === "true") return;
+
+            const wrapper = document.createElement("span");
+            wrapper.className = el.className
+              .split(/\s+/)
+              .filter((c) => c && !c.startsWith("fa-"))
+              .join(" ");
+            if (!wrapper.className.includes("icon")) {
+              wrapper.className = `${wrapper.className} icon`.trim();
+            }
+            if (el.getAttribute("title")) {
+              wrapper.setAttribute("title", el.getAttribute("title"));
+            }
+
+            wrapper.innerHTML = svg;
+            const s = wrapper.querySelector("svg");
             if (s) {
               s.classList.add("svg-icon");
               s.removeAttribute("width");
               s.removeAttribute("height");
-              if (!s.getAttribute("viewBox"))
+              if (!s.getAttribute("viewBox")) {
                 s.setAttribute("viewBox", "0 0 24 24");
+              }
               Array.from(
                 s.querySelectorAll(
                   "path, circle, rect, line, polygon, ellipse",
                 ),
               ).forEach((shape) => {
-                if (shape.getAttribute("fill") !== "none")
+                if (shape.getAttribute("fill") !== "none") {
                   shape.setAttribute("fill", "currentColor");
-                if (shape.getAttribute("stroke"))
+                }
+                if (shape.getAttribute("stroke")) {
                   shape.setAttribute("stroke", "currentColor");
+                }
               });
             }
+
+            wrapper.dataset.svgReplaced = "true";
+            el.replaceWith(wrapper);
           },
         );
       });

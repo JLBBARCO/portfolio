@@ -1,9 +1,20 @@
-function setupFormations(fileURL, containerId, language, loadId) {
-  const container = document.getElementById(containerId);
+function setupFormations(fileURL, language, loadId) {
+  const main = document.querySelector("main");
+  const section = document.createElement("section");
+  section.id = "Formations";
+
+  const title = document.createElement("h2");
+  title.id = "formationsTitle";
+  title.setAttribute("data-i18n", "section_formations_title");
+  section.append(title);
+
+  const container = document.createElement("article");
+  container.id = "formationsContainer";
+  container.className = "block";
+
   if (container && loadId !== undefined) container.dataset.loadId = loadId;
-  return fetchJsonWithFallback(fileURL)
+  fetchJsonWithFallback(fileURL)
     .then((data) => {
-      const container = document.getElementById(containerId);
       if (!container || !data.cards) return;
       if (loadId !== undefined && container.dataset.loadId != loadId) {
         return;
@@ -117,7 +128,10 @@ function setupFormations(fileURL, containerId, language, loadId) {
       if (loadId !== undefined && container.dataset.loadId != loadId) return;
       container.appendChild(fragment);
     })
-    .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
+    .catch((err) => console.error(`Erro ao carregar ${container}:`, err));
+
+  section.appendChild(container);
+  main.appendChild(section);
 }
 
 function filterFormationsByType(type) {

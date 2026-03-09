@@ -3,7 +3,6 @@ let currentLanguage = "pt";
 let translations = {};
 // cache nodeLists for efficiency
 let _i18nElements = null;
-let _idElements = null;
 
 // previously there were helper functions to read/write cookies; the
 // language preference is now stored in localStorage instead, so those are
@@ -37,26 +36,16 @@ function sanitizeTranslationHTML(html) {
   return template.innerHTML;
 }
 
-// Carrega as traduções (com fallback)
+// Carrega as traduções do arquivo unificado strings.json
 function loadTranslations() {
-  // returns promise
   return fetchJsonWithFallback("src/json/translate/strings.json")
     .then((combined) => {
-      if (combined && combined.en && combined.pt) {
-        return [combined.en, combined.pt];
+      if (!combined || !combined.en || !combined.pt) {
+        throw new Error("Invalid translation file format. Expected { en: {...}, pt: {...} }");
       }
-      throw new Error("combined file missing expected keys");
-    })
-    .catch(() => {
-      // fallback to separate files
-      return Promise.all([
-        fetchJsonWithFallback("src/json/translate/en-us.json"),
-        fetchJsonWithFallback("src/json/translate/pt-br.json"),
-      ]);
-    })
-    .then(([en, pt]) => {
-      translations.en = en;
-      translations.pt = pt;
+      
+      translations.en = combined.en;
+      translations.pt = combined.pt;
 
       // sincroniza chaves (preenchendo com a outra língua quando faltar)
       const allKeys = new Set([
@@ -140,21 +129,21 @@ window.setTranslationDate = function (rawDate) {
 
   const templateEn =
     (window.__translationTemplates && window.__translationTemplates.en) ||
-    (translations.en && translations.en.lastUpdate) ||
+    (translations.en && translations.en.meta_last_update) ||
     "Last Update: {{date}}";
   const templatePt =
     (window.__translationTemplates && window.__translationTemplates.pt) ||
-    (translations.pt && translations.pt.lastUpdate) ||
+    (translations.pt && translations.pt.meta_last_update) ||
     "Última atualização: {{date}}";
 
   if (!translations.en) translations.en = {};
   if (!translations.pt) translations.pt = {};
 
-  translations.en.lastUpdate = templateEn.replace(
+  translations.en.meta_last_update = templateEn.replace(
     /\{\{date\}\}/g,
     formatted.en,
   );
-  translations.pt.lastUpdate = templatePt.replace(
+  translations.pt.meta_last_update = templatePt.replace(
     /\{\{date\}\}/g,
     formatted.pt,
   );
@@ -163,7 +152,7 @@ window.setTranslationDate = function (rawDate) {
   if (el) {
     el.textContent =
       (translations[currentLanguage] &&
-        translations[currentLanguage].lastUpdate) ||
+        translations[currentLanguage].meta_last_update) ||
       "";
   }
 
@@ -243,7 +232,8 @@ function setTextPreserveSpans(element, text) {
   }
 }
 
-function applyTranslations(language) {
+function applyTranslations(language, options) {
+  const emitLanguageChanged = !(options && options.emitLanguageChanged === false);
   currentLanguage = language.startsWith("pt") ? "pt" : "en";
   document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en-US";
   try {
@@ -257,9 +247,8 @@ function applyTranslations(language) {
   }
   updateLanguageSelector();
 
-  if (!_i18nElements) {
-    _i18nElements = document.querySelectorAll("[data-i18n]");
-  }
+  // Always refresh i18n elements to include dynamically created content
+  _i18nElements = document.querySelectorAll("[data-i18n]");
   _i18nElements.forEach((element) => {
     const key = element.getAttribute("data-i18n");
     const translation = t(key);
@@ -271,6 +260,11 @@ function applyTranslations(language) {
     }
 
     const tag = element.tagName;
+    if (tag === "TITLE") {
+      document.title = translation;
+      element.textContent = translation;
+      return;
+    }
     if (tag === "INPUT" || tag === "TEXTAREA") {
       element.value = translation;
       element.placeholder = translation;
@@ -279,41 +273,28 @@ function applyTranslations(language) {
     }
   });
 
-  if (translations[currentLanguage]) {
-    if (!_idElements) {
-      _idElements = {};
-      Object.keys(translations[currentLanguage]).forEach((k) => {
-        const el = document.getElementById(k);
-        if (el) _idElements[k] = el;
-      });
-    }
-    Object.entries(_idElements).forEach(([key, element]) => {
-      if (key === "webTitle") document.title = t(key);
-      setTextPreserveSpans(element, t(key));
-      if (element.tagName === "A") element.setAttribute("aria-label", t(key));
-    });
-  }
-
   fillReusableTitles();
 
   // also update known aria-labels that are not captured by data-i18n
   const ariaMap = {
-    "menu-button": "toggle_menu",
-    "increase-font": "increase_font",
-    "decrease-font": "decrease_font",
-    "reset-font": "reset_font",
-    linkDownloadCV: "downloadCVTitle",
+    "menu-button": "aria_toggle_menu",
+    "increase-font": "aria_increase_font",
+    "decrease-font": "aria_decrease_font",
+    "reset-font": "aria_reset_font",
+    linkDownloadCV: "action_download_cv",
   };
   Object.entries(ariaMap).forEach(([id, key]) => {
     const el = document.getElementById(id);
     if (el) el.setAttribute("aria-label", t(key));
   });
 
-  window.dispatchEvent(
-    new CustomEvent("languageChanged", {
-      detail: { language: document.documentElement.lang },
-    }),
-  );
+  if (emitLanguageChanged) {
+    window.dispatchEvent(
+      new CustomEvent("languageChanged", {
+        detail: { language: document.documentElement.lang },
+      }),
+    );
+  }
 }
 
 function updateLanguageSelector() {
@@ -330,7 +311,7 @@ function setCVLink(language) {
       ? "https://docs.google.com/document/d/155TwYXH4HsTpv7LjGJDIkfX_zpsXXFUc/export?format=pdf"
       : "https://docs.google.com/document/d/1cCq1NBFGyd4UfvSOWplguJuYAvBQHdt5/export?format=pdf";
   // update aria-label in case language changed outside of applyTranslations
-  downloadCV.setAttribute("aria-label", t("downloadCVTitle"));
+  downloadCV.setAttribute("aria-label", t("action_download_cv"));
 
   // usa fetchAny (definida em script.js)
   fetchAny(linkToCV, linkToCV.split("/").pop())
@@ -378,8 +359,8 @@ function changeLanguage() {
 
 function fillReusableTitles() {
   const titleMap = {
-    "title-technologies": "technologiesTitle",
-    "title-links": "linksTitle",
+    "title-technologies": "section_technologies_title",
+    "title-links": "block_links_title",
   };
   Object.entries(titleMap).forEach(([className, translationKey]) => {
     const elements = document.querySelectorAll(`.${className}`);
@@ -399,16 +380,13 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(onceLoad, 500);
 });
 
-window.addEventListener("dynamicContentReady", fillReusableTitles);
+window.addEventListener("dynamicContentReady", () => {
+  fillReusableTitles();
 
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement(
-    {
-      pageLanguage: "pt",
-      // Adicione os idiomas que deseja suportar
-      includedLanguages: "en,es,fr,de",
-      autoDisplay: false,
-    },
-    "google_translate_element",
-  );
-}
+  // Dynamic sections are created after initial page load.
+  // Re-apply i18n without firing languageChanged to avoid render loops.
+  if (translations.en && translations.pt) {
+    applyTranslations(currentLanguage, { emitLanguageChanged: false });
+    setCVLink(currentLanguage);
+  }
+});

@@ -6,11 +6,86 @@ This project contains the main projects I've developed and a brief summary of th
 
 [Web site](https://portfolio-jlbbarco.vercel.app)
 
-## Translation workflow 🈯
+## Local GitHub Token (.env) 🔐
+
+When running locally, GitHub requests can use your personal token via serverless
+API routes, avoiding public rate limits.
+
+1. Copy `.env.example` to `.env.local` (or `.env`).
+2. Set `GITHUB_TOKEN` with your personal access token.
+3. Run using `vercel dev` so `/api/*` routes are available locally.
+
+The frontend calls:
+
+- `/api/github?owner=...` for repository listing
+- `/api/github-languages?owner=...&repo=...` for language breakdown
+
+Both routes read `process.env.GITHUB_TOKEN` server-side, so the token is not
+exposed in browser code.
+
+### Troubleshooting token issues
+
+- Ensure the value is a real token, not `ghp_your_token_here`.
+- Restart `vercel dev` after changing `.env`/`.env.local`.
+- Fine-grained token: grant read access to the target repositories.
+- Classic token: include at least `public_repo` for public repositories.
+- Test locally in browser:
+  - `/api/github?owner=JLBBARCO`
+  - `/api/github-languages?owner=JLBBARCO&repo=portfolio`
+
+If auth fails, the API now retries once without token and returns a descriptive
+error payload for easier diagnosis.
+
+## Translation workflow
+
+The project now features **automatic translation powered by MyMemory API**.
+
+### 🚀 Quick Start
+
+```bash
+# 1. Add translation keys to your HTML/JS
+<h1 data-i18n="section_new_title">Title</h1>
+
+# 2. Run auto-translator
+npm run i18n:translate-missing
+
+# 3. Done! Translations added automatically
+```
+
+### Documentation
+
+- **[Translation System Guide](docs/TRANSLATION.md)** - Complete workflow and features
+- **[Documentation Index](docs/README.md)** - Translation documentation hub
+
+### Key Features
+
+- **MyMemory API Integration** - Automatic translations with no API key
+- **Smart Key Detection** - Scans HTML/JS for translation keys
+- **Intelligent Inference** - Generates English text from key names
+- **Single Source of Truth** - Only `strings.json` needed
+- **Multi-language Ready** - Supports many language pairs
+- **Free Usage** - No paid setup required for common portfolio usage
+
+### Available Commands
+
+```bash
+npm run i18n:sync                # Sync keys without translating
+npm run i18n:translate-missing   # Auto-translate new keys only (recommended)
+npm run i18n:translate           # Force translate all empty keys
+```
+
+### Legacy Information
 
 To make localization easier you no longer have to edit two separate JSON
 files (`en-us.json` and `pt-br.json`). All strings are now stored in
 `src/json/translate/strings.json`, which has the structure:
+
+```json
+{
+  "en": { "key": "English text" },
+  "pt": { "key": "Texto em português" }
+}
+```
 
 ### Accessibility and dynamic labels
 
