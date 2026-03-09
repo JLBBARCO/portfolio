@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title id="webTitle">JLBBARCO's Portfolio</title>
+  <title id="webTitle" data-i18n="page_title">JLBBARCO's Portfolio</title>
   <link rel="stylesheet" href="src/css/style.css" media="screen" />
   <link rel="stylesheet" href="src/css/tablet.css" media="(min-width: 724px)" />
   <link rel="stylesheet" href="src/css/pc.css" media="(min-width: 990px)" />
@@ -17,64 +17,27 @@
   <!-- Inicialmente use o ícone dark para reduzir flash enquanto o script ajusta conforme preferência -->
   <link rel="shortcut icon" href="src/assets/favicon/code-light.svg" type="image/x-icon" id="favicon">
   <script src="src/js/script.js"></script>
-  <script src="src/js/translate.js"></script>
   <script src="src/js/header.js"></script>
   <script src="src/js/projects.js"></script>
   <script src="src/js/technologies.js"></script>
+  <script src="src/js/about.js"></script>
   <script src="src/js/formations.js"></script>
   <script src="src/js/more.js"></script>
   <script src="src/js/contact.js"></script>
-  <script type="text/javascript"
-    src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script src="src/js/translate.js"></script>
 </head>
 
 <body data-github-owner="JLBBARCO" data-github-repo="portfolio">
-  <a id="skip_link" class="skip-link" href="#main" data-i18n="skip_link" aria-label="Skip to main content">Pular para o
+  <a id="skip_link" class="skip-link" href="#main" data-i18n="link_skip_to_main" aria-label="Skip to main content">Pular
+    para o
     conteúdo principal</a>
   <main id="main">
     <section id="Home">
       <div>
-        <h2 id="welcome_title" data-i18n="welcome_title">Welcome to My Portfolio</h2>
-        <p id="welcome_message" data-i18n="welcome_message">I'm a developer passionate about creating innovative web
+        <h2 id="welcome_title" data-i18n="section_home_title">Welcome to My Portfolio</h2>
+        <p id="welcome_message" data-i18n="section_home_message">I'm a developer passionate about creating innovative
+          web
           solutions</p>
-      </div>
-    </section>
-    <section id="Projects" class="portfolio">
-      <h2 id="projectsTitle" data-i18n="projectsTitle">Projects</h2>
-      <article id="projectsContainer" class="carrousel"></article>
-    </section>
-    <section id="Technologies">
-      <h2 id="technologiesTitle" data-i18n="technologiesTitle">Technologies</h2>
-      <article id="technologiesContainer" class="block">
-      </article>
-    </section>
-    <section id="AboutMe">
-      <h2 id="aboutMeTitle"></h2>
-      <article class="text-with-image">
-        <img src="https://avatars.githubusercontent.com/u/159829462?v=4" alt="" id="profile" data-i18n="profileAlt"
-          data-i18n-attr="alt" crossorigin="anonymous" class="person" loading="lazy" />
-        <div class="text">
-          <p id="aboutMeText"></p>
-          <div class="links">
-            <a type="application/pdf" id="linkDownloadCV" href="#" aria-label="Download CV" style="display:none">
-              <h3 id="downloadCVTitle"></h3>
-            </a>
-          </div>
-        </div>
-      </article>
-    </section>
-    <section id="Formations">
-      <h2 id="formationsTitle"></h2>
-      <article id="formationsContainer" class="block"></article>
-    </section>
-    <section id="More">
-      <h2 id="moreTitle"></h2>
-      <article id="techsThisSite"></article>
-    </section>
-    <section id="Contact">
-      <h2 id="contactTitle"></h2>
-      <div class="container-contact block">
-        <article id="contactContainer" class="block"></article>
       </div>
     </section>
   </main>
@@ -84,13 +47,13 @@
         <i class="fa-solid fa-universal-access icon"></i>
       </button>
       <div id="accessibility-menu" aria-hidden="true">
-        <button id="increase-font" data-i18n="increase_font" data-i18n-attr="aria-label">
+        <button id="increase-font" data-i18n="aria_increase_font" data-i18n-attr="aria-label">
           <i class="fa-solid fa-increase-font icon"></i>
         </button>
-        <button id="decrease-font" data-i18n="decrease_font" data-i18n-attr="aria-label">
+        <button id="decrease-font" data-i18n="aria_decrease_font" data-i18n-attr="aria-label">
           <i class="fa-solid fa-decrease-font icon"></i>
         </button>
-        <button id="reset-font" data-i18n="reset_font" data-i18n-attr="aria-label">
+        <button id="reset-font" data-i18n="aria_reset_font" data-i18n-attr="aria-label">
           <i class="fa-solid fa-text-slash icon"></i>
         </button>
       </div>

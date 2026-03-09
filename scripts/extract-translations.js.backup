@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Automatic Translation Key Extractor with MyMemory Translation API
+ * Automatic Translation Key Extractor with DeepL AI Integration
  * 
  * Scans HTML and JS files for i18n keys and syncs with strings.json
  * Run: npm run i18n:extract or node scripts/extract-translations.js
@@ -10,7 +10,7 @@
  * - Detects missing translations
  * - Reports unused keys
  * - Validates key naming conventions
- * - MyMemory API automatic translation (FREE - 10,000 words/day, no API key needed!)
+ * - DeepL AI automatic translation (with --auto-translate or --translate-missing)
  * 
  * Usage:
  *   npm run i18n:sync              # Sync keys without translation
@@ -18,10 +18,11 @@
  *   npm run i18n:translate-missing # Translate only new keys (safer)
  */
 
+require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const glob = require("glob");
-const https = require("https");
+const deepl = require("deepl-node");
 
 const rootDir = path.join(__dirname, "..");
 const combinedPath = path.join(rootDir, "src", "json", "translate", "strings.json");
@@ -34,7 +35,7 @@ const enPath = path.join(rootDir, "src", "json", "translate", "en-us.json");
 const args = process.argv.slice(2);
 const AUTO_TRANSLATE = args.includes("--auto-translate");
 const TRANSLATE_MISSING = args.includes("--translate-missing");
-const TRANSLATION_ENABLED = AUTO_TRANSLATE || TRANSLATE_MISSING;
+const DEEPL_ENABLED = AUTO_TRANSLATE || TRANSLATE_MISSING;
 
 function readJSON(p) {
   try {
@@ -117,141 +118,6 @@ function validateKeyNaming(key) {
   }
 }
 
-/**
- * Translate text using MyMemory Translation API (FREE - no API key needed!)
- * @param {string} text - Text to translate
- * @param {string} targetLang - Target language code ('pt-BR', 'en-US')
- * @param {string} sourceLang - Source language code ('en', 'pt')
- * @returns {Promise<string>}
- */
-async function translateText(text, targetLang, sourceLang = 'en') {
-  return new Promise((resolve, reject) => {
-    // MyMemory API expects langpair format: 'en|pt-BR'
-    const langPair = `${sourceLang}|${targetLang}`;
-    const encodedText = encodeURIComponent(text);
-    const url = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=${langPair}`;
-    
-    https.get(url, (res) => {
-      let data = '';
-      
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-      
-      res.on('end', () => {
-        try {
-          const response = JSON.parse(data);
-          
-          if (response.responseStatus === 200 && response.responseData) {
-            resolve(response.responseData.translatedText);
-          } else {
-            console.error(`   ⚠️  Translation warning: ${response.responseDetails || 'Unknown error'}`);
-            resolve(text); // Return original on error
-          }
-        } catch (error) {
-          console.error(`   ❌ Translation failed for "${text}": ${error.message}`);
-          resolve(text); // Return original on error
-        }
-      });
-    }).on('error', (error) => {
-      console.error(`   ❌ Network error: ${error.message}`);
-      resolve(text); // Return original on error
-    });
-  });
-}
-
-/**
- * Intelligently translate based on key naming
- * Uses the key itself to infer likely English text
- */
-function inferEnglishFromKey(key) {
-  // Remove prefix (nav_, section_, etc)
-  const withoutPrefix = key.replace(/^[a-z]+_/, "");
-  
-  // Replace underscores with spaces
-  const words = withoutPrefix.split("_");
-  
-  // Capitalize first letter of each word for titles
-  if (key.startsWith("nav_") || key.startsWith("section_") || key.startsWith("page_")) {
-    return words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-  }
-  
-  // Sentence case for actions
-  if (key.startsWith("action_")) {
-    return words[0].charAt(0).toUpperCase() + words.slice(0).join(" ").slice(1);
-  }
-  
-  // Default: capitalize first letter only
-  const text = words.join(" ");
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-/**
- * Auto-translate missing keys using MyMemory Translation API
- */
-async function autoTranslateMissing(result, missingTranslations, onlyNew = false) {
-  if (missingTranslations.length === 0) {
-    return { translated: 0, skipped: 0 };
-  }
-  
-  console.log(`\n🤖 Using MyMemory Translation API (FREE - no setup required!)...`);
-  
-  // Group by key to translate both languages
-  const keysToTranslate = new Map();
-  missingTranslations.forEach(({ key, lang }) => {
-    if (!keysToTranslate.has(key)) {
-      keysToTranslate.set(key, { en: false, pt: false });
-    }
-    keysToTranslate.get(key)[lang] = true;
-  });
-  
-  let translated = 0;
-  let skipped = 0;
-  const total = keysToTranslate.size;
-  let current = 0;
-  
-  console.log(`🔄 Translating ${total} keys...\n`);
-  
-  for (const [key, langs] of keysToTranslate) {
-    current++;
-    
-    // Skip if only translating new keys and this key already has a translation
-    if (onlyNew && (result.en[key] || result.pt[key])) {
-      skipped++;
-      continue;
-    }
-    
-    process.stdout.write(`   [${current}/${total}] ${key}... `);
-    
-    try {
-      // If EN is missing, infer from key name
-      if (langs.en && !result.en[key]) {
-        result.en[key] = inferEnglishFromKey(key);
-        process.stdout.write(`📝 EN (inferred) `);
-      }
-      
-      // If PT is missing, translate from EN
-      if (langs.pt && !result.pt[key]) {
-        const sourceText = result.en[key] || inferEnglishFromKey(key);
-        result.pt[key] = await translateText(sourceText, "pt-BR", "en");
-        console.log(`✅ PT translated`);
-        translated++;
-        
-        // Rate limiting: be nice to the free API (500ms delay)
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } else if (!langs.pt) {
-        console.log(`✅`);
-      }
-      
-    } catch (error) {
-      console.log(`❌ ${error.message}`);
-      skipped++;
-    }
-  }
-  
-  return { translated, skipped };
-}
-
 async function main() {
   console.log("🔍 Scanning files for i18n keys...\n");
   
@@ -290,7 +156,7 @@ async function main() {
   });
   
   // Auto-translate missing keys if requested
-  if (TRANSLATION_ENABLED && missingTranslations.length > 0) {
+  if (DEEPL_ENABLED && missingTranslations.length > 0) {
     const stats = await autoTranslateMissing(result, missingTranslations, TRANSLATE_MISSING);
     
     // Update missing translations list
@@ -331,8 +197,8 @@ async function main() {
       console.log(`   ... and ${missingTranslations.length - 10} more`);
     }
     
-    if (!TRANSLATION_ENABLED) {
-      console.log(`\n   💡 Run 'npm run i18n:translate-missing' to auto-translate with MyMemory (FREE!)`);
+    if (!DEEPL_ENABLED) {
+      console.log(`\n   💡 Run 'npm run i18n:translate-missing' to auto-translate with DeepL`);
     }
   }
   
@@ -353,4 +219,140 @@ async function main() {
 main().catch((error) => {
   console.error("\n❌ Fatal error:", error.message);
   process.exit(1);
-});
+}Group by key to translate both languages
+  const keysToTranslate = new Map();
+  missingTranslations.forEach(({ key, lang }) => {
+    if (!keysToTranslate.has(key)) {
+      keysToTranslate.set(key, { en: false, pt: false });
+    }
+    keysToTranslate.get(key)[lang] = true;
+  });
+  
+  let translated = 0;
+  let skipped = 0;
+  const total = keysToTranslate.size;
+  let current = 0;
+  
+  console.log(`\n🔄 Translating ${total} keys...\n`);
+  
+  for (const [key, langs] of keysToTranslate) {
+    current++;
+    
+    // Skip if only translating new keys and this key already has a translation
+    if (onlyNew && (result.en[key] || result.pt[key])) {
+      skipped++;
+      continue;
+    }
+    
+    process.stdout.write(`   [${current}/${total}] ${key}... `);
+    
+    try {
+      // If EN is missing, infer from key name
+      if (langs.en && !result.en[key]) {
+        result.en[key] = inferEnglishFromKey(key);
+        console.log(`📝 EN (inferred)`);
+      }
+      
+      // If PT is missing, translate from EN
+      if (langs.pt && !result.pt[key]) {
+        const sourceText = result.en[key] || inferEnglishFromKey(key);
+        result.pt[key] = await translateText(translator, sourceText, "pt-BR", "en");
+        console.log(`✅ PT translated`);
+        translated++;
+        
+        // Rate limiting: small delay between translations
+        await new Promise(resolve => setTimeout(resolve, 200));
+      } else if (!langs.pt) {
+        console.log(`✅`);
+      }
+      
+    } catch (error) {
+      console.log(`❌ ${error.message}`);
+      skipped++;
+    }
+  }
+  
+  return { translated, skipped };
+}
+
+function main() {
+  console.log("🔍 Scanning files for i18n keys...\n");
+  
+  const discoveredKeys = scanFiles();
+  console.log(`✅ Found ${discoveredKeys.size} unique keys in codebase\n`);
+  
+  // Load existing translations
+  const existing = readJSON(combinedPath);
+  const result = existing.en && existing.pt ? existing : { en: {}, pt: {} };
+  
+  // Load legacy files for migration
+  const legacyPt = readJSON(ptPath);
+  const legacyEn = readJSON(enPath);
+  
+  let newKeysCount = 0;
+  let missingTranslations = [];
+  
+  // Add newly discovered keys
+  discoveredKeys.forEach((key) => {
+    validateKeyNaming(key);
+    
+    if (!(key in result.en)) {
+      result.en[key] = legacyEn[key] || "";
+      newKeysCount++;
+      if (!result.en[key]) {
+        missingTranslations.push({ key, lang: "en" });
+      }
+    }
+    
+    if (!(key in result.pt)) {
+      result.pt[key] = legacyPt[key] || "";
+      if (!result.pt[key]) {
+        missingTranslations.push({ key, lang: "pt" });
+      }
+    }
+  });
+  
+  // Detect unused keys (keys in strings.json but not in code)
+  const unusedKeys = [];
+  Object.keys(result.en).forEach((key) => {
+    if (!discoveredKeys.has(key) && key !== "meta_translation_key_pattern") {
+      unusedKeys.push(key);
+    }
+  });
+  
+  // Write updated translations
+  writeJSON(combinedPath, result);
+  
+  // Report
+  console.log(`📝 Updated ${combinedPath}`);
+  console.log(`   Total keys: ${Object.keys(result.en).length}`);
+  
+  if (newKeysCount > 0) {
+    console.log(`\n🆕 ${newKeysCount} new keys added`);
+  }
+  
+  if (missingTranslations.length > 0) {
+    console.log(`\n⚠️  ${missingTranslations.length} missing translations:`);
+    missingTranslations.slice(0, 10).forEach(({ key, lang }) => {
+      console.log(`   - ${key} [${lang}]`);
+    });
+    if (missingTranslations.length > 10) {
+      console.log(`   ... and ${missingTranslations.length - 10} more`);
+    }
+  }
+  
+  if (unusedKeys.length > 0) {
+    console.log(`\n🗑️  ${unusedKeys.length} unused keys (not found in code):`);
+    unusedKeys.slice(0, 5).forEach((key) => {
+      console.log(`   - ${key}`);
+    });
+    if (unusedKeys.length > 5) {
+      console.log(`   ... and ${unusedKeys.length - 5} more`);
+    }
+    console.log("\n   💡 Consider removing these keys or they may be used dynamically");
+  }
+  
+  console.log("\n✨ Sync complete!");
+}
+
+main();

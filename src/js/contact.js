@@ -1,9 +1,20 @@
-function setIconsContact(fileURL, containerId, loadId) {
-  const container = document.getElementById(containerId);
+function setIconsContact(fileURL, containerID, loadId) {
+  const main = document.querySelector("main");
+  const section = document.createElement("section");
+  section.id = "Contact";
+
+  const title = document.createElement("h2");
+  title.id = "contactTitle";
+  title.setAttribute("data-i18n", "section_contact_title");
+  section.append(title);
+
+  const container = document.createElement("article");
+  container.id = containerID;
+  container.className = "block";
+
   if (container && loadId !== undefined) container.dataset.loadId = loadId;
-  return fetchJsonWithFallback(fileURL)
+  fetchJsonWithFallback(fileURL)
     .then((data) => {
-      const container = document.getElementById(containerId);
       if (!container || !Array.isArray(data.cards)) return;
       if (loadId !== undefined && container.dataset.loadId != loadId) return;
       const fragment = document.createDocumentFragment();
@@ -26,4 +37,7 @@ function setIconsContact(fileURL, containerId, loadId) {
       container.appendChild(fragment);
     })
     .catch((err) => console.error("Erro ao carregar contatos:", err));
+
+  section.appendChild(container);
+  main.appendChild(section);
 }

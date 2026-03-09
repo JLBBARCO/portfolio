@@ -12,12 +12,7 @@ header {
 main,
 aside {
     grid-column: 2 / -2;
-    width: 100%;
     margin: 0;
-}
-
-.carrousel {
-    width: 50dvw;
 }
 
 .person {

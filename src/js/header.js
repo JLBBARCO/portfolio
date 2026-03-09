@@ -1,7 +1,10 @@
-const { createElement } = require("react");
-
 function header() {
   const body = document.querySelector("body");
+  if (!body) return;
+
+  const existingHeader = body.querySelector("header");
+  if (existingHeader) existingHeader.remove();
+
   const header = document.createElement("header");
 
   const navTitle = document.createElement("nav");
@@ -18,14 +21,14 @@ function header() {
 
   const menuButton = document.createElement("button");
   menuButton.id = "menu-button";
-  menuButton["data-i18n"] = "toggle_menu";
-  menuButton["data-i18n-attr"] = "aria-label";
+  menuButton.setAttribute("data-i18n", "aria_toggle_menu");
+  menuButton.setAttribute("data-i18n-attr", "aria-label");
   menuButton.ariaExpanded = false;
   menuButton.ariaControls = "nav-links";
 
   const menuIcon = document.createElement("i");
   menuIcon.id = "menuIcon";
-  menuIcon.classList = "fa-solid fa-bars icon";
+  menuIcon.className = "fa-solid fa-bars icon";
   menuIcon.style.color = "#fff";
 
   menuButton.append(menuIcon);
@@ -35,7 +38,29 @@ function header() {
   navLinks.id = "nav-links";
   navLinks.className = "nav-links";
   const containers = document.querySelectorAll("main>section");
-  let counter = 0;
+
+  const navI18nKeyBySectionId = {
+    Home: "nav_home",
+    Projects: "nav_projects",
+    Technologies: "nav_technologies",
+    AboutMe: "nav_about_me",
+    Formations: "nav_formations",
+    Contact: "nav_contact",
+    More: "nav_more",
+  };
+
+  const navFallbackTextBySectionId = {
+    Home: { pt: "Inicio", en: "Home" },
+    Projects: { pt: "Projetos", en: "Projects" },
+    Technologies: { pt: "Tecnologias", en: "Technologies" },
+    AboutMe: { pt: "Sobre mim", en: "About me" },
+    Formations: { pt: "Formacoes", en: "Formations" },
+    Contact: { pt: "Contato", en: "Contact" },
+    More: { pt: "Mais", en: "More" },
+  };
+
+  const docLang = (document.documentElement.lang || "pt-BR").toLowerCase();
+  const locale = docLang.startsWith("pt") ? "pt" : "en";
 
   containers.forEach((container) => {
     const containerId = container.id;
@@ -44,12 +69,16 @@ function header() {
       const link = document.createElement("a");
       link.href = `#${containerId}`;
       link.className = "links";
-      link.id = `link${counter}`;
-      link["data-i18n"] = `link${counter}`;
-      link.innerHTML = containerId;
+      const i18nKey = navI18nKeyBySectionId[containerId];
+      if (i18nKey) {
+        link.setAttribute("data-i18n", i18nKey);
+        const fallback = navFallbackTextBySectionId[containerId];
+        link.textContent = fallback ? fallback[locale] : containerId;
+      } else {
+        link.textContent = containerId;
+      }
 
       navLinks.appendChild(link);
-      counter += 1;
     }
   });
   navMenu.appendChild(navLinks);
@@ -57,17 +86,12 @@ function header() {
 
   const navLanguage = document.createElement("nav");
 
-  const googleTranslateElement = document.createElement("div");
-  googleTranslateElement.id = "google_translate_element";
-  googleTranslateElement.style.display = "none";
-  navLanguage.append(googleTranslateElement);
-
   const languageButton = document.createElement("button");
   languageButton.id = "languageBtn";
   languageButton.className = "language";
   languageButton.ariaLabel = "pt-br";
   const languageIcon = document.createElement("i");
-  languageIcon.classList = "fa-solid fa-globe icon";
+  languageIcon.className = "fa-solid fa-globe icon";
   languageButton.append(languageIcon);
   navLanguage.appendChild(languageButton);
 

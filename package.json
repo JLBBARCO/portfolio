@@ -2,7 +2,14 @@
   "dependencies": {
     "i18next": "^25.6.3"
   },
+  "devDependencies": {
+    "glob": "^10.3.10"
+  },
   "scripts": {
-    "extract-translations": "node scripts/extract-translations.js"
+    "extract-translations": "node scripts/extract-translations.js",
+    "i18n:extract": "node scripts/extract-translations.js",
+    "i18n:sync": "node scripts/extract-translations.js",
+    "i18n:translate": "node scripts/extract-translations.js --auto-translate",
+    "i18n:translate-missing": "node scripts/extract-translations.js --translate-missing"
   }
 }

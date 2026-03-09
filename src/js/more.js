@@ -1,7 +1,19 @@
 function setIconsTechsSite(fileURL, containerID, loadId) {
-  const container = document.getElementById(containerID);
+  const main = document.querySelector("main");
+  const section = document.createElement("section");
+  section.id = "More";
+
+  const title = document.createElement("h2");
+  title.id = "moreTitle";
+  title.setAttribute("data-i18n", "section_more_title");
+  section.append(title);
+
+  const container = document.createElement("article");
+  container.id = "techsThisSite";
+  container.className = "block";
+
   if (container && loadId !== undefined) container.dataset.loadId = loadId;
-  return fetchJsonWithFallback(fileURL)
+  fetchJsonWithFallback(fileURL)
     .then((data) => {
       const container = document.getElementById(containerID);
       if (!container || !data.icons) return;
@@ -20,4 +32,7 @@ function setIconsTechsSite(fileURL, containerID, loadId) {
     .catch((err) =>
       console.error("Erro ao carregar ícones techs-this-site:", err),
     );
+
+  section.appendChild(container);
+  main.appendChild(section);
 }

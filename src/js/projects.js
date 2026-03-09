@@ -4,20 +4,37 @@ function getScreenshotUrl(demoUrl) {
   )}&screenshot=true&meta=false&embed=screenshot.url`;
 }
 
-function setupProjects(source, containerId, language, owner, loadId) {
+// Cache GitHub project loads to avoid duplicated network calls when multiple
+// sections request the same data during one render cycle.
+const _projectsDataCache = new Map();
+
+function setupProjects(source, language, owner, loadId) {
   // when we start working with a container we tag it with the load id so
   // stale async results know to bail out.  loadId is produced by
   // loadDynamicContent and incremented on each invocation.
-  const container = document.getElementById(containerId);
+  const main = document.querySelector("main");
+  const section = document.createElement("section");
+  section.id = "Projects";
+  section.className = "portfolio";
+
+  const title = document.createElement("h2");
+  title.id = "projectsTitle";
+  title.setAttribute("data-i18n", "section_projects_title");
+  title.innerHTML = "Projects";
+  section.append(title);
+
+  const container = document.createElement("article");
+  container.id = "projectsContainer";
+  container.className = "carrousel";
+
   if (container && loadId !== undefined) {
     container.dataset.loadId = loadId;
   }
 
   // source may be a local path or the literal string 'github' to indicate using
   // the GitHub API for the given owner.
-  return loadProjectsData(source, owner)
+  loadProjectsData(source, owner)
     .then((data) => {
-      const container = document.getElementById(containerId);
       if (!container || !data.cards) return;
       if (loadId !== undefined && container.dataset.loadId != loadId) {
         // load was superseded by a newer one, nothing to do
@@ -173,29 +190,34 @@ function setupProjects(source, containerId, language, owner, loadId) {
       });
       container.appendChild(fragment);
     })
-    .catch((err) => console.error(`Erro ao carregar ${containerId}:`, err));
+    .catch((err) => console.error("[projects] Failed to load projects:", err));
+
+  section.appendChild(container);
+  main.appendChild(section);
 }
 
 function fetchGitHubRepos(owner) {
-  // Detecta se está rodando no localhost
-  const isLocalhost =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-
-  // Se for localhost e você NÃO estiver usando 'vercel dev',
-  // ele chama o GitHub diretamente para não travar o desenvolvimento.
-  // Se estiver na Vercel, usa a rota segura.
-  const apiUrl = isLocalhost
-    ? `https://api.github.com/users/${owner}/repos?per_page=100&sort=updated`
-    : "/api/github";
+  // Prefer backend API route (supports token). If unavailable (e.g. Live Server),
+  // fall back to direct GitHub API so localhost still works.
+  const apiUrl = `/api/github?owner=${encodeURIComponent(owner)}`;
+  const directUrl = `https://api.github.com/users/${encodeURIComponent(owner)}/repos?per_page=100&sort=updated&direction=desc`;
 
   return fetch(apiUrl)
     .then((res) => {
-      if (!res.ok) throw new Error("Erro ao obter repositórios");
+      if (!res.ok) {
+        if (res.status === 404 || res.status === 500) {
+          // Silent fallback to direct API
+          return fetch(directUrl).then((fallbackRes) => {
+            if (!fallbackRes.ok) throw new Error("Erro ao obter repositórios");
+            return fallbackRes.json();
+          });
+        }
+        throw new Error("Erro ao obter repositórios");
+      }
       return res.json();
     })
     .catch((err) => {
-      console.error("Erro na API:", err);
+      console.error("[projects] Failed to fetch repositories:", err);
       return [];
     });
 }
@@ -226,8 +248,27 @@ function fetchRepoLanguages(owner, repoName) {
       console.warn("Bad cached languages for", repoName, e);
     }
   }
-  return fetch(`https://api.github.com/repos/${owner}/${repoName}/languages`)
-    .then((res) => (res.ok ? res.json() : {}))
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+  const languagesUrl = isLocalhost
+    ? `/api/github-languages?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repoName)}`
+    : `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/languages`;
+  const directLanguagesUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/languages`;
+
+  return fetch(languagesUrl)
+    .then((res) => {
+      if (res.ok) return res.json();
+      if (isLocalhost && (res.status === 404 || res.status === 500)) {
+        console.info(
+          `[projects] /api/github-languages unavailable for ${repoName}, using direct GitHub API fallback.`,
+        );
+        return fetch(directLanguagesUrl).then((fallbackRes) =>
+          fallbackRes.ok ? fallbackRes.json() : {},
+        );
+      }
+      return {};
+    })
     .then((data) => {
       try {
         localStorage.setItem(key, JSON.stringify(data));
@@ -264,6 +305,11 @@ function loadProjectsData(source, owner) {
   }
 
   if (source === "github") {
+    const cacheKey = `${source}:${owner || ""}`;
+    if (_projectsDataCache.has(cacheKey)) {
+      return _projectsDataCache.get(cacheKey);
+    }
+
     // load the list of repos, convert them into card objects, then
     // merge with whatever is defined locally (useful for collaborations or
     // projects that don't live under the user's account).  setupProjects
@@ -303,8 +349,7 @@ function loadProjectsData(source, owner) {
           return parts[0];
         };
 
-        // makeCard returns a promise because we may need to probe GitHub for
-        // an existing thumbnail file when no homepage is provided.
+        // makeCard returns a promise to keep the same flow for language lookup.
         const makeCard = (unique) => {
           const techObjects = unique
             .map(makeTechObject)
@@ -335,30 +380,25 @@ function loadProjectsData(source, owner) {
             return Promise.resolve(card);
           }
 
-          const rawThumb = `https://raw.githubusercontent.com/${repoOwnerName}/${repo.name}/main/src/assets/img/thumbnail.webp`;
-          return fetch(rawThumb, { method: "HEAD" })
-            .then((resp) => {
-              if (!resp.ok) {
-                return fetch(rawThumb);
+          // Try to fetch thumbnail.webp from repository
+          const thumbnailUrl = `https://raw.githubusercontent.com/${repoOwnerName}/${repo.name}/${repo.default_branch || "main"}/src/assets/img/thumbnail.webp`;
+
+          return fetch(thumbnailUrl, { method: "HEAD" })
+            .then((response) => {
+              if (response.ok) {
+                card.image = thumbnailUrl;
+                card.imageMobile = thumbnailUrl;
+                card.imageType = "image/webp";
               }
-              return resp;
-            })
-            .then((resp) => {
-              if (resp.ok) {
-                card.image = rawThumb;
-                card.imageMobile = rawThumb;
+              if (repo.fork && repo.parent) {
+                card.description =
+                  (card.description ? card.description + " " : "") +
+                  `(fork of ${repo.parent.full_name})`;
               }
+              return card;
             })
             .catch(() => {
-              // any failure treated as missing file
-            })
-            .then(() => {
-              if (!card.image) {
-                delete card.image;
-                delete card.imageMobile;
-                delete card.imageType;
-              }
-
+              // If thumbnail doesn't exist, continue without image
               if (repo.fork && repo.parent) {
                 card.description =
                   (card.description ? card.description + " " : "") +
@@ -388,8 +428,19 @@ function loadProjectsData(source, owner) {
       "src/json/areas/projects.json",
     ).catch(() => ({ cards: [] }));
 
-    return Promise.all([ghPromise, localPromise]).then(([ghCards, local]) => {
-      return { cards: [...ghCards, ...(local.cards || [])] };
+    const resultPromise = Promise.all([ghPromise, localPromise]).then(
+      ([ghCards, local]) => {
+        return { cards: [...ghCards, ...(local.cards || [])] };
+      },
+    );
+
+    _projectsDataCache.set(cacheKey, resultPromise);
+    resultPromise.catch(() => {
+      _projectsDataCache.delete(cacheKey);
+    });
+
+    return resultPromise.then((result) => {
+      return result;
     });
   }
   // default behaviour: local JSON file
