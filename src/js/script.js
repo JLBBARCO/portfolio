@@ -499,20 +499,24 @@ function updateFilterButtons(activeFilter) {
 }
 
 function addNewIcons(linkFile) {
-  // make sure we build an absolute URL so the fetch works regardless of the
-  // base path the site is served from (GitHub Pages, subfolder, etc).
-  const url = linkFile.match(/^https?:\/\//)
+  const basename = String(linkFile || "")
+    .split("/")
+    .pop();
+  const absoluteUrl = linkFile.match(/^https?:\/\//)
     ? linkFile
     : new URL(linkFile, document.baseURI).href;
 
-  fetch(url)
+  // Try absolute path first, then basename fallback for local/dev servers.
+  fetchAny(absoluteUrl, linkFile, basename)
     .then((res) =>
       res.ok
         ? res.json()
         : Promise.reject(new Error(`Fetch failed with status: ${res.status}`)),
     )
     .then((data) => {
-      if (!data.icons) return;
+      if (!data || !Array.isArray(data.icons)) {
+        throw new Error("Invalid svg.json format: missing icons array.");
+      }
       data.icons.forEach((icon) => {
         if (!icon.class || !icon.svg) return;
         const svg = icon.svg

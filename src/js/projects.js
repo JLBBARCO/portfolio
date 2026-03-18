@@ -7,6 +7,8 @@ function getScreenshotUrl(demoUrl) {
 // Cache GitHub project loads to avoid duplicated network calls when multiple
 // sections request the same data during one render cycle.
 const _projectsDataCache = new Map();
+const _projectCardTranslations = Object.create(null);
+let _projectTranslationsLoadPromise = null;
 
 // Translation dictionary for project cards, keyed by card id.
 // Each entry can define title/description/institution/descriptionImage.
@@ -40,16 +42,77 @@ function ensureProjectCardId(card) {
   return id;
 }
 
+function loadProjectCardTranslations() {
+  if (_projectTranslationsLoadPromise) {
+    return _projectTranslationsLoadPromise;
+  }
+
+  _projectTranslationsLoadPromise = fetchJsonWithFallback(
+    "src/json/areas/projects.json",
+  )
+    .then((data) => {
+      if (!data || !data.cards || typeof data.cards !== "object") return;
+
+      Object.entries(data.cards).forEach(([rawId, rawCard]) => {
+        if (!rawCard || typeof rawCard !== "object") return;
+        const cardId = slugifyCardId(rawId || rawCard.id) || "project";
+        if (!_projectCardTranslations[cardId]) {
+          _projectCardTranslations[cardId] = {};
+        }
+
+        const entry = _projectCardTranslations[cardId];
+        ["title", "description", "institution", "descriptionImage"].forEach(
+          (field) => {
+            const normalized = normalizeLocalizedFieldValue(rawCard[field]);
+            if (normalized) entry[field] = normalized;
+          },
+        );
+      });
+    })
+    .catch((err) => {
+      console.warn("[projects] Failed to preload card translations:", err);
+    });
+
+  return _projectTranslationsLoadPromise;
+}
+
+function translationProjects() {
+  return loadProjectCardTranslations();
+}
+
+function getLocalizedCardFieldValue(value, locale) {
+  const normalized = normalizeLocalizedFieldValue(value);
+  if (!normalized) return "";
+  return normalized[locale] || normalized["en-US"] || normalized["pt-BR"] || "";
+}
+
 function getProjectCardTranslation(card, field, language) {
   if (!card || !field) return "";
   const locale = normalizeLocale(language);
   const cardId = ensureProjectCardId(card);
-  const byId = _projectCardTranslations[cardId];
-  if (byId && byId[field]) {
-    const fromMap = getLocalized(byId[field], locale);
-    if (fromMap) return fromMap;
+
+  const dictionaryEntry = _projectCardTranslations[cardId];
+  if (dictionaryEntry && dictionaryEntry[field]) {
+    const value =
+      dictionaryEntry[field][locale] ||
+      dictionaryEntry[field]["en-US"] ||
+      dictionaryEntry[field]["pt-BR"] ||
+      "";
+    if (value) return value;
   }
-  return getLocalized(card[field], locale);
+
+  if (
+    card.githubFallbackTranslations &&
+    card.githubFallbackTranslations[field]
+  ) {
+    const value = getLocalizedCardFieldValue(
+      card.githubFallbackTranslations[field],
+      locale,
+    );
+    if (value) return value;
+  }
+
+  return getLocalizedCardFieldValue(card[field], locale);
 }
 
 function normalizeLocalizedFieldValue(value) {
@@ -135,8 +198,8 @@ function setupProjects(source, language, owner, loadId) {
 
   // source may be a local path or the literal string 'github' to indicate using
   // the GitHub API for the given owner.
-  loadProjectsData(source, owner)
-    .then((data) => {
+  Promise.all([loadProjectCardTranslations(), loadProjectsData(source, owner)])
+    .then(([, data]) => {
       if (!container || !data.cards) return;
       if (loadId !== undefined && container.dataset.loadId != loadId) {
         // load was superseded by a newer one, nothing to do
@@ -425,11 +488,7 @@ function loadProjectsData(source, owner) {
       return _projectsDataCache.get(cacheKey);
     }
 
-    // load the list of repos, convert them into card objects, then
-    // merge with whatever is defined locally (useful for collaborations or
-    // projects that don't live under the user's account).  setupProjects
-    // already deduplicates by link/title so we don't need to worry about
-    // collisions here.
+    // load the list of repos and convert them into card objects.
     const ghPromise = fetchGitHubRepos(owner).then((repos) => {
       // ignore a few special repositories that aren't really projects
       const filtered = repos.filter((repo) => {
@@ -480,6 +539,13 @@ function loadProjectsData(source, owner) {
             dateInit: makeDate(repo.created_at),
             dateEnd: makeDate(repo.pushed_at),
             iconTechnologies: techObjects,
+            githubFallbackTranslations: {
+              title: { "pt-BR": repo.name, "en-US": repo.name },
+              description: {
+                "pt-BR": repo.description || "",
+                "en-US": repo.description || "",
+              },
+            },
           };
 
           if (repo.homepage) {
@@ -538,9 +604,7 @@ function loadProjectsData(source, owner) {
       return Promise.all(cardsPromises).then((cards) => cards);
     });
 
-    const resultPromise = Promise.all([ghPromise]).then(([ghCards, local]) => {
-      return { cards: [...ghCards, ...(local.cards || [])] };
-    });
+    const resultPromise = ghPromise.then((ghCards) => ({ cards: ghCards }));
 
     _projectsDataCache.set(cacheKey, resultPromise);
     resultPromise.catch(() => {
@@ -552,27 +616,22 @@ function loadProjectsData(source, owner) {
     });
   }
   // default behaviour: local JSON file
-  return fetchJsonWithFallback(source);
-}
-
-function translationProjects(language) {
-  fetchJsonWithFallback("src/json/areas/projects.json")
-    .then((data) => {
-      data.cards.forEach((card) => {
-        const projectCard = document.getElementById(card.id);
-
-        if (projectCard) {
-          const title = document.querySelector(`#${projectCard.id} h3.title`);
-          title.innerHTML = card.title[language];
-
-          const description = document.querySelector(
-            `#${projectCard.id} p.description`,
-          );
-          description.innerHTML = card.description[language];
-        }
-      });
-    })
-    .catch((error) =>
-      console.log("Error to load project translations:" + error),
-    );
+  return fetchJsonWithFallback(source).then((data) => {
+    if (!data || !data.cards) return { cards: [] };
+    if (Array.isArray(data.cards)) return data;
+    if (typeof data.cards === "object") {
+      return {
+        cards: Object.entries(data.cards)
+          .map(([rawId, rawCard]) => {
+            if (!rawCard || typeof rawCard !== "object") return null;
+            return {
+              id: slugifyCardId(rawCard.id || rawId),
+              ...rawCard,
+            };
+          })
+          .filter(Boolean),
+      };
+    }
+    return { cards: [] };
+  });
 }

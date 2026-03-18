@@ -61,6 +61,12 @@ function loadTranslations() {
           translations.pt[k] = translations.en[k] || "";
       });
 
+      // Preserve templates with placeholders for dynamic replacement.
+      window.__translationTemplates = {
+        en: translations.en.meta_last_update || "Last Update: {{date}}",
+        pt: translations.pt.meta_last_update || "Última atualização: {{date}}",
+      };
+
       let savedLanguage;
       try {
         savedLanguage = localStorage.getItem("language");
@@ -84,6 +90,10 @@ function loadTranslations() {
       applyTranslations(currentLanguage, { emitLanguageChanged: false });
       updateLanguageSelector();
       setCVLink(currentLanguage);
+
+      if (window.__lastUpdateRawDate) {
+        window.setTranslationDate(window.__lastUpdateRawDate);
+      }
 
       window.dispatchEvent(new Event("translationsReady"));
 
@@ -388,5 +398,8 @@ window.addEventListener("dynamicContentReady", () => {
   if (translations.en && translations.pt) {
     applyTranslations(currentLanguage, { emitLanguageChanged: false });
     setCVLink(currentLanguage);
+    if (window.__lastUpdateRawDate) {
+      window.setTranslationDate(window.__lastUpdateRawDate);
+    }
   }
 });
