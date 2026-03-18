@@ -41,9 +41,11 @@ function loadTranslations() {
   return fetchJsonWithFallback("src/json/translate/strings.json")
     .then((combined) => {
       if (!combined || !combined.en || !combined.pt) {
-        throw new Error("Invalid translation file format. Expected { en: {...}, pt: {...} }");
+        throw new Error(
+          "Invalid translation file format. Expected { en: {...}, pt: {...} }",
+        );
       }
-      
+
       translations.en = combined.en;
       translations.pt = combined.pt;
 
@@ -69,11 +71,7 @@ function loadTranslations() {
       if (savedLanguage === "pt" || savedLanguage === "en") {
         currentLanguage = savedLanguage;
       } else {
-        const navLang = (
-          navigator.language ||
-          navigator.userLanguage ||
-          ""
-        ).toLowerCase();
+        const navLang = (navigator.language || "").toLowerCase();
         currentLanguage = navLang.startsWith("pt") ? "pt" : "en";
       }
 
@@ -83,7 +81,7 @@ function loadTranslations() {
         languageBtn.setAttribute("aria-label", newAria);
       }
 
-      applyTranslations(currentLanguage);
+      applyTranslations(currentLanguage, { emitLanguageChanged: false });
       updateLanguageSelector();
       setCVLink(currentLanguage);
 
@@ -233,7 +231,9 @@ function setTextPreserveSpans(element, text) {
 }
 
 function applyTranslations(language, options) {
-  const emitLanguageChanged = !(options && options.emitLanguageChanged === false);
+  const emitLanguageChanged = !(
+    options && options.emitLanguageChanged === false
+  );
   currentLanguage = language.startsWith("pt") ? "pt" : "en";
   document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en-US";
   try {
@@ -314,7 +314,7 @@ function setCVLink(language) {
   downloadCV.setAttribute("aria-label", t("action_download_cv"));
 
   // usa fetchAny (definida em script.js)
-  fetchAny(linkToCV, linkToCV.split("/").pop())
+  fetchAny(linkToCV)
     .then((resp) => {
       if (resp.ok) {
         downloadCV.style.display = "";

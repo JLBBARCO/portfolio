@@ -34,5 +34,10 @@ function setIconsTechsSite(fileURL, containerID, loadId) {
     );
 
   section.appendChild(container);
+
+  const update = document.createElement("p");
+  update.setAttribute("data-i18n", "meta_last_update");
+  section.appendChild(update);
+
   main.appendChild(section);
 }

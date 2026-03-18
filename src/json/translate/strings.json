@@ -1,6 +1,5 @@
 {
   "pt": {
-    "meta_translation_key_pattern": "Use namespaces: page_, section_, nav_, aria_, action_, link_, block_, meta_.",
     "nav_home": "Início",
     "nav_projects": "Projetos",
     "nav_technologies": "Tecnologias",
@@ -29,7 +28,6 @@
     "section_contact_title": "Contato"
   },
   "en": {
-    "meta_translation_key_pattern": "Use namespaces: page_, section_, nav_, aria_, action_, link_, block_, meta_.",
     "nav_home": "Home",
     "nav_projects": "Projects",
     "nav_technologies": "Technologies",

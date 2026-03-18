@@ -8,6 +8,108 @@ function getScreenshotUrl(demoUrl) {
 // sections request the same data during one render cycle.
 const _projectsDataCache = new Map();
 
+// Translation dictionary for project cards, keyed by card id.
+// Each entry can define title/description/institution/descriptionImage.
+// If a field is missing, the renderer falls back to the card payload.
+function normalizeLocale(language) {
+  return language === "pt" || language === "pt-BR" ? "pt-BR" : "en-US";
+}
+
+function slugifyCardId(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function ensureProjectCardId(card) {
+  if (card && card.id) return card.id;
+  const idSource =
+    (card &&
+      (card.linkRepository ||
+        card.linkDemo ||
+        (typeof getLocalized === "function"
+          ? getLocalized(card.title, "en-US")
+          : card.title))) ||
+    "project";
+
+  const id = slugifyCardId(idSource) || "project";
+  if (card) card.id = id;
+  return id;
+}
+
+function getProjectCardTranslation(card, field, language) {
+  if (!card || !field) return "";
+  const locale = normalizeLocale(language);
+  const cardId = ensureProjectCardId(card);
+  const byId = _projectCardTranslations[cardId];
+  if (byId && byId[field]) {
+    const fromMap = getLocalized(byId[field], locale);
+    if (fromMap) return fromMap;
+  }
+  return getLocalized(card[field], locale);
+}
+
+function normalizeLocalizedFieldValue(value) {
+  if (!value) return null;
+  if (typeof value === "string") {
+    return { "pt-BR": value, "en-US": value };
+  }
+  if (typeof value === "object") {
+    const pt = value["pt-BR"] || value.pt || value["en-US"] || value.en || "";
+    const en = value["en-US"] || value.en || value["pt-BR"] || value.pt || "";
+    if (!pt && !en) return null;
+    return { "pt-BR": pt, "en-US": en };
+  }
+  return null;
+}
+
+function isLikelyVercelProjectMetadata(value) {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    ("projectId" in value || "orgId" in value || "projectName" in value),
+  );
+}
+
+function isValidProjectCard(card) {
+  if (!card || typeof card !== "object" || Array.isArray(card)) return false;
+  if (isLikelyVercelProjectMetadata(card)) return false;
+
+  const hasIdentity = Boolean(card.id || card.title || card.linkRepository);
+  const hasContent = Boolean(
+    card.description ||
+    card.institution ||
+    card.linkDemo ||
+    card.iconTechnologies ||
+    card.image ||
+    card.dateInit ||
+    card.dateEnd,
+  );
+  return hasIdentity || hasContent;
+}
+
+function registerProjectCardTranslations(card) {
+  if (!isValidProjectCard(card)) return;
+  const cardId = ensureProjectCardId(card);
+  if (!cardId) return;
+
+  if (!_projectCardTranslations[cardId]) {
+    _projectCardTranslations[cardId] = {};
+  }
+
+  const entry = _projectCardTranslations[cardId];
+  ["title", "description", "institution", "descriptionImage"].forEach(
+    (field) => {
+      if (entry[field]) return;
+      const normalized = normalizeLocalizedFieldValue(card[field]);
+      if (normalized) entry[field] = normalized;
+    },
+  );
+}
+
 function setupProjects(source, language, owner, loadId) {
   // when we start working with a container we tag it with the load id so
   // stale async results know to bail out.  loadId is produced by
@@ -41,11 +143,14 @@ function setupProjects(source, language, owner, loadId) {
         return;
       }
       // deduplicate by repository link or title (covers mixed JSON/github sources)
-      let cards = data.cards || [];
+      let cards = Array.isArray(data.cards) ? data.cards : [];
+      cards = cards.filter(isValidProjectCard);
 
       // ensure demo links have screenshot images when no explicit image
       // is supplied (local JSON cards may already provide their own).
       cards.forEach((card) => {
+        ensureProjectCardId(card);
+        registerProjectCardTranslations(card);
         if (card.linkDemo && !card.image) {
           card.image = getScreenshotUrl(card.linkDemo);
         }
@@ -54,6 +159,7 @@ function setupProjects(source, language, owner, loadId) {
       cards = cards.filter((c) => {
         const key =
           c.linkRepository ||
+          c.id ||
           getLocalized(c.title, language) ||
           JSON.stringify(c);
         if (seen.has(key)) return false;
@@ -139,18 +245,27 @@ function setupProjects(source, language, owner, loadId) {
         }
 
         let html = "";
+        const translatedImageAlt =
+          getProjectCardTranslation(card, "descriptionImage", language) || "";
+        const translatedTitle =
+          getProjectCardTranslation(card, "title", language) || "";
+        const translatedInstitution =
+          getProjectCardTranslation(card, "institution", language) || "";
+        const translatedDescription =
+          getProjectCardTranslation(card, "description", language) || "";
+
         if (card.image) {
           html += `<picture>`;
           if (card.imageMobile)
             html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
-          html += `<img src="${card.image}" alt="${getLocalized(card.descriptionImage, language)}" loading="lazy" onerror="var p=this.closest('picture'); if(p) p.remove();"></picture>`;
+          html += `<img src="${card.image}" alt="${escapeHTML(translatedImageAlt)}" loading="lazy" onerror="var p=this.closest('picture'); if(p) p.remove();"></picture>`;
         }
-        if (card.title)
-          html += `<h3>${getLocalized(card.title, language)}</h3>`;
-        if (card.institution)
-          html += `<p class="institution">${getLocalized(card.institution, language)}</p>`;
-        if (card.description)
-          html += `<p>${getLocalized(card.description, language)}</p>`;
+        if (translatedTitle)
+          html += `<h3 class="title">${escapeHTML(translatedTitle)}</h3>`;
+        if (translatedInstitution)
+          html += `<p class="institution">${escapeHTML(translatedInstitution)}</p>`;
+        if (translatedDescription)
+          html += `<p class="description">${escapeHTML(translatedDescription)}</p>`;
 
         if (card.iconTechnologies) {
           const techTitle =
@@ -358,10 +473,10 @@ function loadProjectsData(source, owner) {
           const repoOwnerName = (repo.owner && repo.owner.login) || owner;
 
           const card = {
+            id: slugifyCardId(repo.name),
             title: { "pt-BR": repo.name, "en-US": repo.name },
             description: repo.description || "",
             linkRepository: repo.html_url,
-            linkRepositoryTarget: "target='_blank' rel='noopener noreferrer'",
             dateInit: makeDate(repo.created_at),
             dateEnd: makeDate(repo.pushed_at),
             iconTechnologies: techObjects,
@@ -373,7 +488,6 @@ function loadProjectsData(source, owner) {
               url = `https://${url}`;
             }
             card.linkDemo = url;
-            card.linkDemoTarget = "target='_blank' rel='noopener noreferrer'";
             const screenshot = getScreenshotUrl(url);
             card.image = screenshot;
             card.imageMobile = screenshot;
@@ -424,15 +538,9 @@ function loadProjectsData(source, owner) {
       return Promise.all(cardsPromises).then((cards) => cards);
     });
 
-    const localPromise = fetchJsonWithFallback(
-      "src/json/areas/projects.json",
-    ).catch(() => ({ cards: [] }));
-
-    const resultPromise = Promise.all([ghPromise, localPromise]).then(
-      ([ghCards, local]) => {
-        return { cards: [...ghCards, ...(local.cards || [])] };
-      },
-    );
+    const resultPromise = Promise.all([ghPromise]).then(([ghCards, local]) => {
+      return { cards: [...ghCards, ...(local.cards || [])] };
+    });
 
     _projectsDataCache.set(cacheKey, resultPromise);
     resultPromise.catch(() => {
@@ -445,4 +553,26 @@ function loadProjectsData(source, owner) {
   }
   // default behaviour: local JSON file
   return fetchJsonWithFallback(source);
+}
+
+function translationProjects(language) {
+  fetchJsonWithFallback("src/json/areas/projects.json")
+    .then((data) => {
+      data.cards.forEach((card) => {
+        const projectCard = document.getElementById(card.id);
+
+        if (projectCard) {
+          const title = document.querySelector(`#${projectCard.id} h3.title`);
+          title.innerHTML = card.title[language];
+
+          const description = document.querySelector(
+            `#${projectCard.id} p.description`,
+          );
+          description.innerHTML = card.description[language];
+        }
+      });
+    })
+    .catch((error) =>
+      console.log("Error to load project translations:" + error),
+    );
 }

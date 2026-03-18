@@ -308,10 +308,12 @@ document.addEventListener("DOMContentLoaded", () => {
       myLoadId,
     );
     const pHeader = header();
+    const pCardProjectTranslation = translationProjects(locale);
 
     Promise.all([
       pHeader,
       pProjects,
+      pCardProjectTranslation,
       pTechnologies,
       pAbout,
       pFormations,
@@ -460,6 +462,15 @@ function getLocalized(value, language) {
     Object.values(value)[0] ||
     ""
   );
+}
+
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 /**
@@ -662,10 +673,4 @@ function initializeProfileImage() {
       setCSSVariables({ r: 124, g: 77, b: 255 });
     });
   }
-}
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initializeProfileImage);
-} else {
-  initializeProfileImage();
 }

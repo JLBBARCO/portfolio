@@ -6,6 +6,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "URL parameter is required" });
   }
 
+  if (!/^https?:\/\//i.test(url)) {
+    return res.status(400).json({ error: "Invalid URL" });
+  }
+
   try {
     // Chama a API do Microlink para obter a screenshot
     const microlinkUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`;
