@@ -24,9 +24,10 @@ function setupFormations(fileURL, language, loadId) {
       const typeCount = {};
       const typeNames = {};
       cards.forEach((card) => {
-        if (card.type && card.type.id) {
-          typeCount[card.type.id] = (typeCount[card.type.id] || 0) + 1;
-          typeNames[card.type.id] = getLocalized(card.type, language);
+        if (card.type && card.type[language]) {
+          typeCount[card.type[language]] =
+            (typeCount[card.type[language]] || 0) + 1;
+          typeNames[card.type[language]] = getLocalized(card.type, language);
         }
       });
 
@@ -71,7 +72,8 @@ function setupFormations(fileURL, language, loadId) {
       sortedCards.forEach((card) => {
         const div = document.createElement("div");
         div.className = "card card-formation";
-        if (card.type && card.type.id) div.dataset.type = card.type.id;
+        if (card.type && card.type[language])
+          div.dataset.type = card.type[language];
 
         let html = "";
         if (card.title)
@@ -128,7 +130,7 @@ function setupFormations(fileURL, language, loadId) {
       if (loadId !== undefined && container.dataset.loadId != loadId) return;
       container.appendChild(fragment);
     })
-    .catch((err) => console.error(`Erro ao carregar ${container}:`, err));
+    .catch((err) => console.error(`Erro ao carregar ${fileURL}:`, err));
 
   section.appendChild(container);
   main.appendChild(section);
@@ -138,7 +140,7 @@ function filterFormationsByType(type) {
   Array.from(document.querySelectorAll(".card.card-formation")).forEach(
     (card) => {
       card.style.display =
-        type === "all" || card.dataset.type === type ? "block" : "none";
+        type === "all" || card.dataset.type === type ? "flex" : "none";
     },
   );
   updateFilterButtons(type);

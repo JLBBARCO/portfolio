@@ -1,0 +1,115 @@
+{
+  "cards": {
+    "agrinho2024": {
+      "title": { "pt-BR": "Agrinho 2024" },
+      "description": {
+        "pt-BR": "Site informativo sobre o agronegócio. Este site foi criado com o propósito de concorrer ao programa governamental do Paraná chamado Agrinho, na edição de 2024."
+      }
+    },
+    "study": {
+      "title": {
+        "en-US": "Study",
+        "pt-BR": "Estudos"
+      },
+      "description": {
+        "en-US": "This repository contains school projects related to programming studies.",
+        "pt-BR": "Este repositório contém trabalhos escolares relacionados ao estudo de programação"
+      }
+    },
+    "unit-converter": {
+      "title": {
+        "en-US": "Unit Converter",
+        "pt-BR": "Conversor de Unidades"
+      },
+      "description": {
+        "en-US": "A tool to convert between different units of measurement",
+        "pt-BR": "Uma ferramenta para converter entre diferentes unidades de medida"
+      }
+    },
+    "random-generator": {
+      "title": { "en-US": "Random Generator", "pt-BR": "Gerador Aleatório" },
+      "description": {
+        "en-US": "System that generates random names and numbers in the quantity defined by the user.",
+        "pt-BR": "Sistema que gera nomes e números aleatórios com a quantidade informada pelo usuário"
+      }
+    },
+    "total-score": {
+      "title": {
+        "en-US": "Total Score",
+        "pt-BR": "Pontuação Total"
+      },
+      "description": {
+        "en-US": "Repository with summation tests to discover your score based on your answers and the answer key. Only .csv and .tsv files are accepted.",
+        "pt-BR": "Repositório de testes de somatória para descobrir a pontuação com base nas respostas e no gabarito. Os arquivos aceitos são .csv e .tsv"
+      }
+    },
+    "tecnoverde": {
+      "title": { "en-US": "GreenTech", "pt-BR": "TecnoVerde" },
+      "description": {
+        "en-US": "A website for teaching the cultivation of Parsley",
+        "pt-BR": "Um site para ensino de cultivo de salsa"
+      }
+    },
+    "receipt-generator": {
+      "title": {
+        "en-US": "Receipt Generator",
+        "pt-BR": "Gerador de Recibos"
+      },
+      "description": {
+        "en-US": "System with a receipt generator where the user enters basic information.",
+        "pt-BR": "Sistema com gerador de recibos no qual o usuário insere informações básicas"
+      }
+    },
+    "colegio-adolpho": {
+      "title": { "en-US": "Adolpho College", "pt-BR": "Colégio Adolpho" },
+      "description": {
+        "en-US": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news",
+        "pt-BR": "Site da Escola Estadual Adolpho de Oliveira Franco com informações institucionais, cursos e notícias"
+      }
+    },
+    "passwords-manager": {
+      "title": {
+        "en-US": "Passwords Manager",
+        "pt-BR": "Gerenciador de Senhas"
+      },
+      "description": {
+        "en-US": "A system to save your passwords",
+        "pt-BR": "Um sistema para salvar suas senhas"
+      }
+    },
+    "auto-programs": {
+      "title": {
+        "en-US": "Auto Programs",
+        "pt-BR": "Automatizador de Programas"
+      },
+      "description": {
+        "en-US": "System that automatically installs and uninstalls programs, giving the user full control over program management.",
+        "pt-BR": "Sistema que instala e desinstala programas automaticamente, no qual o usuário tem total controle do gerenciamento de programas"
+      }
+    },
+    "orbit-games-archive": {
+      "title": {
+        "en-US": "Orbit Games Archive",
+        "pt-BR": "Orbit Games Archive"
+      },
+      "description": {
+        "en-US": "Website that stores games, synopses, gameplay, community comments, and more.",
+        "pt-BR": "Site que armazena jogos, sinopses, gameplay, comentários da comunidade, entre outros"
+      }
+    },
+    "winget-pkgs": {
+      "title": { "en-US": "Winget Packages", "pt-BR": "Winget Packages" },
+      "description": {
+        "en-US": "The Microsoft community Windows Package Manager manifest repository",
+        "pt-BR": "Fork do repositório de manifestos do Windows Package Manager da comunidade Microsoft"
+      }
+    },
+    "homebrew-tap": {
+      "title": { "en-US": "Homebrew Tap", "pt-BR": "Homebrew Tap" },
+      "description": {
+        "en-US": "GitHub workflow for creating a compiler for macOS.",
+        "pt-BR": "Workflow do GitHub para criar um compilador para macOS"
+      }
+    }
+  }
+}

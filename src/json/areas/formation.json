@@ -10,7 +10,6 @@
         "pt-BR": "Colégio Estadual Adolpho de Oliveira Franco"
       },
       "type": {
-        "id": "technicalCourse",
         "en-US": "Technical Course",
         "pt-BR": "Curso Técnico"
       },
@@ -157,7 +156,6 @@
         "pt-BR": "Curso que abrange tecnologias de desenvolvimento web (front-end e back-end) e melhores práticas"
       },
       "type": {
-        "id": "onlineCourse",
         "en-US": "Online Course",
         "pt-BR": "Curso Online"
       },
@@ -273,7 +271,6 @@
         "pt-BR": "Curso de Bacharelado em Engenharia de Software, abrangendo fundamentos de desenvolvimento, arquitetura de software, metodologias ágeis e práticas de engenharia para criação de soluções digitais robustas e escaláveis"
       },
       "type": {
-        "id": "bachelor",
         "en-US": "Bachelor's Degree",
         "pt-BR": "Bacharelado"
       },
@@ -284,6 +281,35 @@
           "name": {
             "en-US": "Certificate Bachelor's Degree in Software Engineering (in progress)",
             "pt-BR": "Certificado de Bacharelado em Engenharia de Software (em andamento)"
+          },
+          "url": ""
+        }
+      ]
+    },
+    {
+      "title": {
+        "en-US": "English Course",
+        "pt-BR": "Curso de Inglês"
+      },
+      "institution": {
+        "en-US": "Athus Languages",
+        "pt-BR": "Athus Idiomas"
+      },
+      "description": {
+        "en-US": "",
+        "pt-BR": ""
+      },
+      "type": {
+        "en-US": "Language Courses",
+        "pt-BR": "Cursos de Idiomas"
+      },
+      "dateInit": "2022",
+      "dateEnd": "2026",
+      "certificates": [
+        {
+          "name": {
+            "en-US": "Certificate English Fluence (in progress)",
+            "pt-BR": "Certificado de Fluência em Inglês (em andamento)"
           },
           "url": ""
         }

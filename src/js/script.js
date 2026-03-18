@@ -308,10 +308,12 @@ document.addEventListener("DOMContentLoaded", () => {
       myLoadId,
     );
     const pHeader = header();
+    const pCardProjectTranslation = translationProjects(locale);
 
     Promise.all([
       pHeader,
       pProjects,
+      pCardProjectTranslation,
       pTechnologies,
       pAbout,
       pFormations,
@@ -462,6 +464,15 @@ function getLocalized(value, language) {
   );
 }
 
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /**
  * Converte string de data (MM/AAAA ou AAAA) em timestamp.
  * retorna 0 se a data for inválida ou ausente, facilitando comparações
@@ -488,20 +499,24 @@ function updateFilterButtons(activeFilter) {
 }
 
 function addNewIcons(linkFile) {
-  // make sure we build an absolute URL so the fetch works regardless of the
-  // base path the site is served from (GitHub Pages, subfolder, etc).
-  const url = linkFile.match(/^https?:\/\//)
+  const basename = String(linkFile || "")
+    .split("/")
+    .pop();
+  const absoluteUrl = linkFile.match(/^https?:\/\//)
     ? linkFile
     : new URL(linkFile, document.baseURI).href;
 
-  fetch(url)
+  // Try absolute path first, then basename fallback for local/dev servers.
+  fetchAny(absoluteUrl, linkFile, basename)
     .then((res) =>
       res.ok
         ? res.json()
         : Promise.reject(new Error(`Fetch failed with status: ${res.status}`)),
     )
     .then((data) => {
-      if (!data.icons) return;
+      if (!data || !Array.isArray(data.icons)) {
+        throw new Error("Invalid svg.json format: missing icons array.");
+      }
       data.icons.forEach((icon) => {
         if (!icon.class || !icon.svg) return;
         const svg = icon.svg
@@ -662,10 +677,4 @@ function initializeProfileImage() {
       setCSSVariables({ r: 124, g: 77, b: 255 });
     });
   }
-}
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initializeProfileImage);
-} else {
-  initializeProfileImage();
 }
