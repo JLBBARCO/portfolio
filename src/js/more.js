@@ -82,6 +82,15 @@ function setIconsTechsSite(fileURL, containerID, loadId) {
   container.id = "techsThisSite";
   container.className = "block";
 
+  section.appendChild(container);
+
+  const update = document.createElement("p");
+  update.id = "lastUpdate";
+  update.setAttribute("data-i18n", "meta_last_update");
+  section.appendChild(update);
+
+  main.appendChild(section);
+
   if (container && loadId !== undefined) container.dataset.loadId = loadId;
   const owner =
     (document.body &&
@@ -94,7 +103,24 @@ function setIconsTechsSite(fileURL, containerID, loadId) {
       document.body.dataset.githubRepo) ||
     "portfolio";
 
-  Promise.all([
+  function renderIconsFromData(data) {
+    const container = document.getElementById(containerID);
+    if (!container || !data || !Array.isArray(data.icons)) return;
+    if (loadId !== undefined && container.dataset.loadId != loadId) return;
+
+    const fragment = document.createDocumentFragment();
+    data.icons.forEach((icon) => {
+      const div = document.createElement("div");
+      div.className = "icon-container";
+      const classes = faClass(icon.style, icon.class);
+      div.innerHTML = `<i class="${classes} icon" title="${icon.name || icon.class || ""}"></i>`;
+      fragment.appendChild(div);
+    });
+
+    container.appendChild(fragment);
+  }
+
+  return Promise.all([
     fetchRepositoryMetadata(owner, repo),
     fetchRepositoryLanguages(owner, repo),
     fetchMainBranchLastUpdate(owner, repo),
@@ -150,13 +176,4 @@ function setIconsTechsSite(fileURL, containerID, loadId) {
         err,
       ),
     );
-
-  section.appendChild(container);
-
-  const update = document.createElement("p");
-  update.id = "lastUpdate";
-  update.setAttribute("data-i18n", "meta_last_update");
-  section.appendChild(update);
-
-  main.appendChild(section);
 }

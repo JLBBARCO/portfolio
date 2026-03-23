@@ -190,7 +190,7 @@ function setupProjects(source, language, owner, loadId) {
 
   const container = document.createElement("article");
   container.id = "projectsContainer";
-  container.className = "carrousel";
+  container.className = "block semi-hidden";
 
   if (container && loadId !== undefined) {
     container.dataset.loadId = loadId;
@@ -235,7 +235,7 @@ function setupProjects(source, language, owner, loadId) {
       cards.forEach((card) => {
         if (card.iconTechnologies) {
           card.iconTechnologies.forEach((tech) => {
-            if (!tech.name || !tech.style || !tech.icon) return;
+            if (!tech.name) return;
             techCount[tech.name] = (techCount[tech.name] || 0) + 1;
             if (tech.filter === "no") {
               techFilter[tech.name] = true;
@@ -267,7 +267,8 @@ function setupProjects(source, language, owner, loadId) {
           btn.onclick = () => filterProjectsByTechnology(name);
           filterContainer.appendChild(btn);
         });
-        container.parentNode.insertBefore(filterContainer, container);
+        const parent = container.parentNode || section;
+        if (parent) parent.insertBefore(filterContainer, container);
       }
 
       const fragment = document.createDocumentFragment();
@@ -288,7 +289,10 @@ function setupProjects(source, language, owner, loadId) {
         return initB - initA;
       });
 
+      let cardCounter = 0;
+
       sortedCards.forEach((card) => {
+        cardCounter++;
         // ignore stale loads that finished after a later one started
         if (
           loadId !== undefined &&
@@ -300,6 +304,7 @@ function setupProjects(source, language, owner, loadId) {
 
         const div = document.createElement("div");
         div.className = "card card-projects";
+        div.dataset.index = cardCounter; // for testing purposes
         if (card.iconTechnologies) {
           div.dataset.technologies = card.iconTechnologies
             .map((t) => t.name)
@@ -339,8 +344,8 @@ function setupProjects(source, language, owner, loadId) {
             (a.name || "").localeCompare(b.name || ""),
           );
           sortedTechs.forEach((tech) => {
-            if (!tech.style || !tech.icon) return; // omit unknown icons
-            html += `<i class="${faClass(tech.style, tech.icon)} icon" title="${tech.name || ""}"></i>`;
+            const resolved = resolveIconSpec(tech, tech.name || "");
+            html += `<i class="${faClass(resolved.style, resolved.icon)} icon" title="${tech.name || ""}"></i>`;
           });
           html += `</div>`;
         }
@@ -376,7 +381,7 @@ function setupProjects(source, language, owner, loadId) {
 
 function fetchGitHubRepos(owner) {
   // Prefer backend API route (supports token). If unavailable (e.g. Live Server),
-  // fall back to direct GitHub API so localhost still works.
+  // fall back to direct GitHub API, then finally to local JSON fallback.
   const apiUrl = `/api/github?owner=${encodeURIComponent(owner)}`;
   const directUrl = `https://api.github.com/users/${encodeURIComponent(owner)}/repos?per_page=100&sort=updated&direction=desc`;
 
@@ -384,7 +389,7 @@ function fetchGitHubRepos(owner) {
     .then((res) => {
       if (!res.ok) {
         if (res.status === 404 || res.status === 500) {
-          // Silent fallback to direct API
+          // Silent fallback to direct GitHub API
           return fetch(directUrl).then((fallbackRes) => {
             if (!fallbackRes.ok) throw new Error("Erro ao obter repositórios");
             return fallbackRes.json();
@@ -395,7 +400,10 @@ function fetchGitHubRepos(owner) {
       return res.json();
     })
     .catch((err) => {
-      console.error("[projects] Failed to fetch repositories:", err);
+      console.error(
+        "[projects] Failed to fetch from GitHub, will use local fallback",
+        err,
+      );
       return [];
     });
 }

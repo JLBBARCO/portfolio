@@ -2,6 +2,35 @@
   "cards": [
     {
       "title": {
+        "en-US": "English Course",
+        "pt-BR": "Curso de Inglês"
+      },
+      "institution": {
+        "en-US": "Athus Languages",
+        "pt-BR": "Athus Idiomas"
+      },
+      "description": {
+        "en-US": "Curse of proficiency in English",
+        "pt-BR": "Curso de proficiência na língua inglesa"
+      },
+      "type": {
+        "en-US": "Language Courses",
+        "pt-BR": "Cursos de Idiomas"
+      },
+      "dateInit": "2022",
+      "dateEnd": "2026",
+      "certificates": [
+        {
+          "name": {
+            "en-US": "Certificate English Fluence (in progress)",
+            "pt-BR": "Certificado de Fluência em Inglês (em andamento)"
+          },
+          "url": ""
+        }
+      ]
+    },
+    {
+      "title": {
         "en-US": "System Analysis and Development (SAD)",
         "pt-BR": "Análise e Desenvolvimento de Sistemas (ADS)"
       },
@@ -281,35 +310,6 @@
           "name": {
             "en-US": "Certificate Bachelor's Degree in Software Engineering (in progress)",
             "pt-BR": "Certificado de Bacharelado em Engenharia de Software (em andamento)"
-          },
-          "url": ""
-        }
-      ]
-    },
-    {
-      "title": {
-        "en-US": "English Course",
-        "pt-BR": "Curso de Inglês"
-      },
-      "institution": {
-        "en-US": "Athus Languages",
-        "pt-BR": "Athus Idiomas"
-      },
-      "description": {
-        "en-US": "",
-        "pt-BR": ""
-      },
-      "type": {
-        "en-US": "Language Courses",
-        "pt-BR": "Cursos de Idiomas"
-      },
-      "dateInit": "2022",
-      "dateEnd": "2026",
-      "certificates": [
-        {
-          "name": {
-            "en-US": "Certificate English Fluence (in progress)",
-            "pt-BR": "Certificado de Fluência em Inglês (em andamento)"
           },
           "url": ""
         }

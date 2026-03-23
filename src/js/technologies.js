@@ -43,11 +43,11 @@ function setupTechnologies(container, cards, language = "pt-BR") {
 
     sortedTechs.forEach((tech) => {
       if (renderedTechs.has(tech.name)) return;
-      if (!tech.style || !tech.icon) return;
       renderedTechs.add(tech.name);
       const div = document.createElement("div");
       div.className = "card tech-cards";
-      const classes = faClass(tech.style, tech.icon);
+      const resolved = resolveIconSpec(tech, tech.name || "");
+      const classes = faClass(resolved.style, resolved.icon);
       div.innerHTML = `<i class="${classes} icon" title="${tech.name || ""}"></i>`;
       const p = document.createElement("p");
       p.textContent = tech.name || "";
@@ -64,6 +64,8 @@ function setupTechnologies(container, cards, language = "pt-BR") {
 
 function loadAllTechnologies(language = "pt-BR", loadId) {
   const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
+  // Always try GitHub API first; will fallback to local JSON if API fails
+  const projectsSource = "github";
 
   const main = document.querySelector("main");
   const section = document.createElement("section");
@@ -79,10 +81,13 @@ function loadAllTechnologies(language = "pt-BR", loadId) {
   container.id = "technologiesContainer";
   container.className = "block";
 
+  section.appendChild(container);
+  main.appendChild(section);
+
   if (container && loadId !== undefined) container.dataset.loadId = loadId;
-  Promise.all([
+  return Promise.all([
     // when the projects source was switched we still want the cards shape
-    loadProjectsData("github", githubOwner),
+    loadProjectsData(projectsSource, githubOwner),
     fetchJsonWithFallback("src/json/areas/formation.json"),
   ])
     .then(([projectsData, formationsData]) => {
@@ -95,20 +100,24 @@ function loadAllTechnologies(language = "pt-BR", loadId) {
       setupTechnologies(container, allCards, language);
     })
     .catch((err) => console.error("Erro ao carregar tecnologias:", err));
-
-  section.appendChild(container);
-  main.appendChild(section);
 }
 
 function filterProjectsByTechnology(tech) {
   Array.from(document.querySelectorAll(".card.card-projects")).forEach(
     (card) => {
+      const cardIndex = Number(card.dataset.index || 0);
       const techs = card.dataset.technologies
         ? card.dataset.technologies.split(",").map((t) => t.trim())
         : [];
-      card.style.display =
-        tech === "all" || techs.includes(tech) ? "flex" : "none";
+
+      if (tech === "all") {
+        card.style.display = cardIndex > 6 ? "none" : "flex";
+        return;
+      }
+
+      card.style.display = techs.includes(tech) ? "flex" : "none";
     },
   );
   updateFilterButtons(tech);
+  toggleShowAllButtonVisibility("Projects", tech === "all");
 }
