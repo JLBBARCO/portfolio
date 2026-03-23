@@ -12,8 +12,11 @@ function setIconsContact(fileURL, containerID, loadId) {
   container.id = containerID;
   container.className = "block";
 
+  section.appendChild(container);
+  main.appendChild(section);
+
   if (container && loadId !== undefined) container.dataset.loadId = loadId;
-  fetchJsonWithFallback(fileURL)
+  return fetchJsonWithFallback(fileURL)
     .then((data) => {
       if (!container || !Array.isArray(data.cards)) return;
       if (loadId !== undefined && container.dataset.loadId != loadId) return;
@@ -26,7 +29,8 @@ function setIconsContact(fileURL, containerID, loadId) {
         a.rel = "noopener noreferrer";
         a.className = "link-item";
 
-        const iconClasses = faClass(card.style, card.icon);
+        const resolved = resolveIconSpec(card, card.name || "");
+        const iconClasses = faClass(resolved.style, resolved.icon);
         a.innerHTML = `<i class="${iconClasses} icon"></i>`;
         a.setAttribute("aria-label", card.name);
         a.title = card.name;
@@ -37,7 +41,4 @@ function setIconsContact(fileURL, containerID, loadId) {
       container.appendChild(fragment);
     })
     .catch((err) => console.error("Erro ao carregar contatos:", err));
-
-  section.appendChild(container);
-  main.appendChild(section);
 }

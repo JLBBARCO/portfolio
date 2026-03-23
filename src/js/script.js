@@ -35,10 +35,83 @@ const _faAliasMap = {
   vue: "vuejs",
   angular: "angular",
 };
+
+const _customSvgIconMap = {
+  powershell: { style: "fa-solid", icon: "fa-powershell" },
+  pwsh: { style: "fa-solid", icon: "fa-powershell" },
+  shell: { style: "fa-solid", icon: "fa-shell" },
+  ssh: { style: "fa-solid", icon: "fa-shell" },
+  "secure-shell": { style: "fa-solid", icon: "fa-shell" },
+  batchfile: { style: "fa-solid", icon: "fa-batchfile" },
+  "batch-file": { style: "fa-solid", icon: "fa-batchfile" },
+  "batch-script": { style: "fa-solid", icon: "fa-batchfile" },
+  bat: { style: "fa-solid", icon: "fa-batchfile" },
+  cmd: { style: "fa-solid", icon: "fa-batchfile" },
+};
+
+function normalizeIconToken(value) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/^fa-/, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^a-z0-9\-]/g, "");
+}
+
+function getCustomSvgIcon(value) {
+  const key = normalizeIconToken(value);
+  return key ? _customSvgIconMap[key] || null : null;
+}
+
+function resolveIconSpec(iconData, fallbackName = "") {
+  const source =
+    iconData && typeof iconData === "object"
+      ? iconData
+      : { name: String(iconData || fallbackName || "") };
+
+  let style = source.style || "";
+  let icon = source.icon || "";
+
+  const customByIcon = getCustomSvgIcon(icon);
+  if (customByIcon) {
+    style = style || customByIcon.style;
+    icon = customByIcon.icon;
+  }
+
+  if (!icon) {
+    const fromName = getCustomSvgIcon(source.name || fallbackName);
+    if (fromName) {
+      style = style || fromName.style;
+      icon = fromName.icon;
+    }
+  }
+
+  if (!icon && (source.name || fallbackName)) {
+    const guessed = guessFaIcon(source.name || fallbackName);
+    if (guessed) {
+      style = style || guessed.style;
+      icon = guessed.icon;
+    }
+  }
+
+  if (!icon) {
+    style = style || "fa-solid";
+    icon = "fa-code";
+  }
+
+  return { style: style || "fa-solid", icon };
+}
+
 function guessFaIcon(name) {
   if (!name) return null;
   const key = name.toLowerCase().trim();
   if (_faGuessCache[key] !== undefined) return _faGuessCache[key];
+
+  const custom = getCustomSvgIcon(name);
+  if (custom) {
+    _faGuessCache[key] = custom;
+    return custom;
+  }
 
   // normalize to a candidate class name (drop spaces, punctuation)
   const candidate = key
@@ -284,9 +357,15 @@ document.addEventListener("DOMContentLoaded", () => {
       storedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
     const locale = currentLang === "pt" ? "pt-BR" : "en-US";
 
-    // load projects from GitHub API instead of local json
     const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
-    const pProjects = setupProjects("github", locale, githubOwner, myLoadId);
+    // Always try GitHub API first; setupProjects will fallback to local JSON if API fails
+    const projectsSource = "github";
+    const pProjects = setupProjects(
+      projectsSource,
+      locale,
+      githubOwner,
+      myLoadId,
+    );
     const pTechnologies = loadAllTechnologies(locale, myLoadId);
     const pAbout =
       typeof aboutMe === "function"
@@ -303,14 +382,14 @@ document.addEventListener("DOMContentLoaded", () => {
       myLoadId,
     );
     const pIcons = setIconsTechsSite(
-      "src/json/areas/techs-this-site.json",
+      "src/assets/icons/svg.json",
       "techsThisSite",
       myLoadId,
     );
     const pHeader = header();
     const pCardProjectTranslation = translationProjects(locale);
 
-    Promise.all([
+    Promise.allSettled([
       pHeader,
       pProjects,
       pCardProjectTranslation,
@@ -320,7 +399,15 @@ document.addEventListener("DOMContentLoaded", () => {
       pLinks,
       pIcons,
     ])
-      .then(() => {
+      .then((results) => {
+        const rejected = results.filter((r) => r.status === "rejected");
+        if (rejected.length) {
+          console.warn(
+            `Carregamento dinâmico concluído com ${rejected.length} falha(s).`,
+            rejected,
+          );
+        }
+
         bindDynamicHeaderControls();
 
         const menuIcon = document.getElementById("menuIcon");
@@ -334,12 +421,10 @@ document.addEventListener("DOMContentLoaded", () => {
         setupCarouselButtons();
         addNewIcons("src/assets/icons/svg.json");
         initializeProfileImage();
+        semiHiddenCards();
         window.dispatchEvent(new Event("dynamicContentReady"));
       })
-      .catch((err) => {
-        console.warn("Erro no carregamento dinâmico:", err);
-        window.dispatchEvent(new Event("dynamicContentReady"));
-      });
+      .catch((err) => console.warn("Erro no carregamento dinâmico:", err));
   }
 
   function setupCarouselButtons() {
@@ -498,7 +583,78 @@ function updateFilterButtons(activeFilter) {
   });
 }
 
+function toggleShowAllButtonVisibility(sectionId, isAllFilterActive) {
+  if (!sectionId) return;
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+
+  const button = section.querySelector(".show-all-button");
+  if (!button) return;
+
+  button.style.display = isAllFilterActive ? "" : "none";
+}
+
 function addNewIcons(linkFile) {
+  function uniquifySvgIds(svgElement, seed) {
+    if (!svgElement) return;
+    const idMap = new Map();
+    const prefix = `svg${seed}_`;
+
+    Array.from(svgElement.querySelectorAll("[id]")).forEach((node) => {
+      const oldId = node.getAttribute("id");
+      if (!oldId) return;
+      const newId = `${prefix}${oldId}`;
+      idMap.set(oldId, newId);
+      node.setAttribute("id", newId);
+    });
+
+    if (!idMap.size) return;
+
+    const all = [svgElement, ...Array.from(svgElement.querySelectorAll("*"))];
+    all.forEach((node) => {
+      Array.from(node.attributes || []).forEach((attr) => {
+        let value = attr.value;
+        let changed = false;
+
+        idMap.forEach((newId, oldId) => {
+          const withHash = `#${oldId}`;
+          if (value.includes(withHash)) {
+            value = value.split(withHash).join(`#${newId}`);
+            changed = true;
+          }
+          const withUrl = `url(#${oldId})`;
+          if (value.includes(withUrl)) {
+            value = value.split(withUrl).join(`url(#${newId})`);
+            changed = true;
+          }
+        });
+
+        if (changed) {
+          node.setAttribute(attr.name, value);
+        }
+      });
+    });
+  }
+
+  function normalizeSvgMarkup(rawSvg) {
+    if (!rawSvg) return "";
+
+    let svg = String(rawSvg).trim();
+    svg = svg
+      .replace(/<\?xml[^>]*\?>/gi, "")
+      .replace(/<!doctype[^>]*>/gi, "")
+      .replace(/<!--[\s\S]*?-->/g, "")
+      .trim();
+
+    const start = svg.search(/<svg\b/i);
+    if (start === -1) return "";
+    const sliced = svg.slice(start);
+    const endMatch = sliced.match(/<\/svg>/i);
+    if (!endMatch) return "";
+
+    return sliced.slice(0, endMatch.index + endMatch[0].length);
+  }
+
   const basename = String(linkFile || "")
     .split("/")
     .pop();
@@ -519,9 +675,11 @@ function addNewIcons(linkFile) {
       }
       data.icons.forEach((icon) => {
         if (!icon.class || !icon.svg) return;
-        const svg = icon.svg
+        const svg = normalizeSvgMarkup(icon.svg)
           .replace(/fill=['"]#[^'"]*['"]/g, "")
           .replace(/stroke=['"]#[^'"]*['"]/g, "");
+        if (!svg) return;
+
         Array.from(document.querySelectorAll(`i.${icon.class}`)).forEach(
           (el) => {
             if (el.dataset.svgReplaced === "true") return;
@@ -541,7 +699,14 @@ function addNewIcons(linkFile) {
             wrapper.innerHTML = svg;
             const s = wrapper.querySelector("svg");
             if (s) {
+              uniquifySvgIds(
+                s,
+                `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+              );
+
               s.classList.add("svg-icon");
+              s.setAttribute("aria-hidden", "true");
+              s.setAttribute("focusable", "false");
               s.removeAttribute("width");
               s.removeAttribute("height");
               if (!s.getAttribute("viewBox")) {
@@ -552,6 +717,14 @@ function addNewIcons(linkFile) {
                   "path, circle, rect, line, polygon, ellipse",
                 ),
               ).forEach((shape) => {
+                const style = shape.getAttribute("style");
+                if (style) {
+                  const nextStyle = style
+                    .replace(/fill\s*:\s*[^;]+/gi, "fill:currentColor")
+                    .replace(/stroke\s*:\s*[^;]+/gi, "stroke:currentColor");
+                  shape.setAttribute("style", nextStyle);
+                }
+
                 if (shape.getAttribute("fill") !== "none") {
                   shape.setAttribute("fill", "currentColor");
                 }
@@ -677,4 +850,53 @@ function initializeProfileImage() {
       setCSSVariables({ r: 124, g: 77, b: 255 });
     });
   }
+}
+
+function semiHiddenCards() {
+  const containers = document.querySelectorAll(".semi-hidden");
+  containers.forEach((container) => {
+    const cards = Array.from(
+      container.querySelectorAll(".card-projects, .card-formation"),
+    );
+    if (!cards.length) return;
+
+    cards.forEach((card, idx) => {
+      card.style.display = idx >= 6 ? "none" : "";
+    });
+
+    const hiddenCards = cards.filter((_, idx) => idx >= 6);
+    const section = container.closest("section");
+    if (!section || !hiddenCards.length) return;
+
+    const existingBtn = section.querySelector(".show-all-button");
+    if (existingBtn) existingBtn.remove();
+
+    let currentLang = "en";
+    try {
+      currentLang = localStorage.getItem("language") || "en";
+    } catch (e) {
+      currentLang = "en";
+    }
+
+    const showAllButton = document.createElement("button");
+    showAllButton.className = "filter-button show-all-button";
+    showAllButton.textContent =
+      currentLang === "pt" ? "Mostrar todos" : "Show all";
+    showAllButton.dataset.filter = "show-all";
+    showAllButton.addEventListener("click", () => {
+      hiddenCards.forEach((card) => {
+        card.style.display = "";
+      });
+      showAllButton.remove();
+    });
+
+    section.appendChild(showAllButton);
+
+    const activeFilterButton = section.querySelector(
+      ".filter-container .filter-button.active",
+    );
+    const isAllFilterActive =
+      !activeFilterButton || activeFilterButton.dataset.filter === "all";
+    toggleShowAllButtonVisibility(section.id, isAllFilterActive);
+  });
 }

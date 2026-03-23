@@ -10,10 +10,13 @@ function setupFormations(fileURL, language, loadId) {
 
   const container = document.createElement("article");
   container.id = "formationsContainer";
-  container.className = "block";
+  container.className = "block semi-hidden";
+
+  section.appendChild(container);
+  main.appendChild(section);
 
   if (container && loadId !== undefined) container.dataset.loadId = loadId;
-  fetchJsonWithFallback(fileURL)
+  return fetchJsonWithFallback(fileURL)
     .then((data) => {
       if (!container || !data.cards) return;
       if (loadId !== undefined && container.dataset.loadId != loadId) {
@@ -53,7 +56,8 @@ function setupFormations(fileURL, language, loadId) {
             filterContainer.appendChild(btn);
           });
 
-        container.parentNode.insertBefore(filterContainer, container);
+        const parent = container.parentNode || section;
+        if (parent) parent.insertBefore(filterContainer, container);
       }
 
       // sort by most recent end date first (knowledge preference)
@@ -68,10 +72,14 @@ function setupFormations(fileURL, language, loadId) {
         return initB - initA;
       });
 
+      let cardCounter = 0;
+
       const fragment = document.createDocumentFragment();
       sortedCards.forEach((card) => {
+        cardCounter++;
         const div = document.createElement("div");
         div.className = "card card-formation";
+        div.dataset.index = cardCounter; // for testing purposes
         if (card.type && card.type[language])
           div.dataset.type = card.type[language];
 
@@ -95,8 +103,8 @@ function setupFormations(fileURL, language, loadId) {
             (a.name || "").localeCompare(b.name || ""),
           );
           sortedTechs.forEach((tech) => {
-            if (!tech.style || !tech.icon) return;
-            const iconClass = faClass(tech.style, tech.icon);
+            const resolved = resolveIconSpec(tech, tech.name || "");
+            const iconClass = faClass(resolved.style, resolved.icon);
             techsDiv += `<i class="${iconClass} icon" title="${tech.name || ""}"></i>`;
           });
           html += techsDiv + `</div>`;
@@ -131,9 +139,6 @@ function setupFormations(fileURL, language, loadId) {
       container.appendChild(fragment);
     })
     .catch((err) => console.error(`Erro ao carregar ${fileURL}:`, err));
-
-  section.appendChild(container);
-  main.appendChild(section);
 }
 
 function filterFormationsByType(type) {
@@ -144,4 +149,5 @@ function filterFormationsByType(type) {
     },
   );
   updateFilterButtons(type);
+  toggleShowAllButtonVisibility("Formations", type === "all");
 }

@@ -2,7 +2,7 @@
 
 body {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: 1fr minmax(0, 1200px) 1fr;
 }
 
 header {

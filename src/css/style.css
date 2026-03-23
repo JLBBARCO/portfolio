@@ -306,7 +306,7 @@ section {
 .card h3,
 .card h4,
 .card p {
-  margin: 10px 25px;
+  margin: 5px 25px 0;
   text-align: center;
 }
 
@@ -651,6 +651,10 @@ button .icon:hover {
 .block .card {
   min-width: 300px;
   max-width: 400px;
+}
+
+#formationsContainer .card {
+  padding: 10px;
 }
 
 .tech-stack-group {
