@@ -759,6 +759,8 @@ function nextProjects() {
 }
 
 function getAverageColor(imgElement) {
+  const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
   if (!imgElement) {
     console.warn("Elemento de imagem não fornecido");
     return { r: 124, g: 77, b: 255 };
@@ -805,10 +807,18 @@ function getAverageColor(imgElement) {
       b += data[i + 2];
     }
 
+    percentageAddLightMode = 50;
+
     return {
-      r: Math.round(r / totalPixels),
-      g: Math.round(g / totalPixels),
-      b: Math.round(b / totalPixels),
+      r: isDark
+        ? Math.round(r / totalPixels)
+        : Math.round(r / totalPixels + percentageAddLightMode),
+      g: isDark
+        ? Math.round(g / totalPixels)
+        : Math.round(g / totalPixels + percentageAddLightMode),
+      b: isDark
+        ? Math.round(b / totalPixels)
+        : Math.round(b / totalPixels + percentageAddLightMode),
     };
   } catch (e) {
     console.warn("Erro ao processar dados da imagem:", e);
@@ -823,6 +833,7 @@ function setCSSVariables(color) {
     "--accent-transparent",
     `rgba(${color.r}, ${color.g}, ${color.b}, 0.67)`,
   );
+
   const hoverR = Math.max(0, color.r - 30),
     hoverG = Math.max(0, color.g - 30),
     hoverB = Math.max(0, color.b - 30);
