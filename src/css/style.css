@@ -38,7 +38,7 @@
   --font2: "Audiowide", sans-serif;
   --font3: "MedievalSharp", sans-serif;
   --shadow: 0 0 15px var(--hover-accent);
-  --icon-size: 1.5em;
+  --icon-size: 1.5rem;
   --navbar-height: 80px;
 }
 
@@ -69,7 +69,7 @@ body {
   background-color: var(--primary-bg);
   color: var(--text-primary);
   font-family: var(--font0);
-  font-size: 1em;
+  font-size: 1rem;
   line-height: 1.5;
   top: 0 !important;
   overflow-x: hidden;
@@ -110,17 +110,17 @@ h6 {
 
 h1 {
   font-family: var(--font1);
-  font-size: 5em;
+  font-size: 5rem;
 }
 
 h2 {
   font-family: var(--font2);
-  font-size: 2em;
+  font-size: 2rem;
 }
 
 h3 {
   font-family: var(--font3);
-  font-size: 1.5em;
+  font-size: 1.5rem;
 }
 
 span.emphasis {
@@ -157,7 +157,7 @@ nav {
 
 nav h1 {
   margin: 10px;
-  font-size: 1em;
+  font-size: 1rem;
 }
 
 nav a {
@@ -297,7 +297,7 @@ section {
 
 /* small indicator for participative projects */
 .card .participating {
-  font-size: 0.85em;
+  font-size: 0.85rem;
   font-style: italic;
   color: #666;
   margin: -8px 0 4px;
@@ -320,7 +320,7 @@ section {
 
 .card summary {
   text-align: center;
-  margin: 1em;
+  margin: 1rem;
 }
 
 .technologies {
@@ -328,18 +328,18 @@ section {
   flex-flow: row wrap;
   justify-content: center;
   align-items: center;
-  gap: 1em;
-  margin: 1em;
+  gap: 1rem;
+  margin: 1rem;
 }
 
 div.links {
   width: 100%;
   max-width: 100%;
-  margin: 1em;
+  margin: 1rem;
   display: flex;
   flex-direction: row;
   justify-content: center;
-  gap: 1em;
+  gap: 1rem;
 }
 
 .button {
@@ -434,7 +434,13 @@ div.links {
   z-index: 999;
 }
 
-#accessibility button {
+#accessibility .icon {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+#accessibility button,
+#forTop button {
   margin: 10px;
   padding: 5px;
   border: none;
@@ -444,12 +450,20 @@ div.links {
   cursor: pointer;
 }
 
-#accessibility button:hover {
+#accessibility button:hover,
+#forTop button:hover {
   box-shadow: var(--shadow);
 }
 
-#accessibility button:active {
+#accessibility button:active,
+#forTop button:active {
   background-color: var(--primary-bg);
+}
+
+#accessibility button:focus-visible,
+#forTop button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 #accessibility-button {
@@ -460,6 +474,12 @@ div.links {
   display: none;
   flex-flow: column wrap;
 }
+
+#back-to-top {
+  display: none;
+  border-radius: 10px 0 0 10px;
+}
+
 
 ul {
   display: flex;
@@ -552,7 +572,7 @@ button .icon:hover {
   font-weight: 500;
   transition: var(--transition);
   font-family: var(--font0);
-  font-size: 1em;
+  font-size: 1rem;
 }
 
 .filter-button:hover {
@@ -571,7 +591,7 @@ button .icon:hover {
 .title-technologies,
 .title-links {
   font-family: var(--font3);
-  font-size: 1.5em;
+  font-size: 1.5rem;
   margin: 10px;
   text-align: center;
 }
@@ -585,7 +605,7 @@ button .icon:hover {
   padding: 12px 20px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 1.2em;
+  font-size: 1.2rem;
   transition: var(--transition);
   display: flex;
   align-items: center;
@@ -629,7 +649,7 @@ button .icon:hover {
   overflow-x: auto;
   width: 100%;
   max-width: 100%;
-  gap: 2em;
+  gap: 2rem;
   padding: 10px 25px;
 }
 
@@ -642,10 +662,10 @@ button .icon:hover {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-around;
-  gap: 1em;
+  gap: 1rem;
   width: 100%;
   max-width: 100%;
-  padding: 1em 0;
+  padding: 1rem 0;
 }
 
 .block .card {
@@ -663,11 +683,11 @@ button .icon:hover {
   padding: 25px;
   width: 100%;
   max-width: 100%;
-  margin-bottom: 2em;
+  margin-bottom: 2rem;
 }
 
 .tech-stack-group h3 {
-  margin-bottom: 1.5em;
+  margin-bottom: 1.5rem;
 }
 
 .tech-stack-group .card {
@@ -678,18 +698,18 @@ button .icon:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.5em;
-  gap: 0.5em;
+  padding: 1.5rem;
+  gap: 0.5rem;
 }
 
 .tech-cards .icon {
-  font-size: 2.5em;
+  font-size: 2.5rem;
 }
 
 .tech-cards p {
   margin: 0;
   text-align: center;
-  font-size: 0.95em;
+  font-size: 0.95rem;
 }
 
 /* Scrollbar styling */
@@ -708,4 +728,136 @@ button .icon:hover {
 
 .carrousel::-webkit-scrollbar-thumb:hover {
   background: var(--hover-accent);
+}
+
+footer {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: space-around;
+  align-items: center;
+  background-color: var(--secondary-bg);
+  padding: 2rem 1rem;
+  text-align: center;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.footer-content-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.footer-section {
+  flex: 1 1 auto;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.footer-section:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.footer-section h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+footer .icon {
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+footer #techsThisSite {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0;
+}
+
+footer #contactContainer {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0;
+}
+
+.icon-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 4px;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.icon-container:hover {
+  background-color: var(--accent);
+  transform: scale(1.15);
+}
+
+.icon-container:hover .icon {
+  color: var(--primary-text);
+}
+
+footer .link-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: var(--accent);
+  color: var(--primary-text);
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+footer .link-item:hover {
+  background-color: var(--hover-accent);
+  transform: scale(1.15) rotate(5deg);
+}
+
+footer .link-item:active {
+  transform: scale(0.95);
+}
+
+footer #forTop {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+footer #forTop button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: var(--accent);
+  color: var(--primary-bg);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }

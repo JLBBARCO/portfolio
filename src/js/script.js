@@ -301,6 +301,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const increaseFontButton = document.getElementById("increase-font");
   const decreaseFontButton = document.getElementById("decrease-font");
   const resetFontButton = document.getElementById("reset-font");
+  const backToTopButton = document.getElementById("back-to-top");
+
+  function updateBackToTopVisibility() {
+    if (!backToTopButton) return;
+    const doc = document.documentElement;
+    const hasScrollableContent = doc.scrollHeight - window.innerHeight > 4;
+    const isAwayFromTop =
+      (window.scrollY || doc.scrollTop || document.body.scrollTop || 0) > 120;
+    const shouldShow = hasScrollableContent && isAwayFromTop;
+
+    backToTopButton.style.display = shouldShow ? "inline-flex" : "none";
+    backToTopButton.setAttribute("aria-hidden", shouldShow ? "false" : "true");
+  }
 
   if (accessibilityButton)
     accessibilityButton.addEventListener("click", accessibilityToggle);
@@ -309,6 +322,16 @@ document.addEventListener("DOMContentLoaded", () => {
   if (decreaseFontButton)
     decreaseFontButton.addEventListener("click", decreaseFont);
   if (resetFontButton) resetFontButton.addEventListener("click", resetFont);
+  if (backToTopButton) {
+    backToTopButton.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    window.addEventListener("scroll", updateBackToTopVisibility, {
+      passive: true,
+    });
+    window.addEventListener("resize", updateBackToTopVisibility);
+    updateBackToTopVisibility();
+  }
 
   document.addEventListener("click", (event) => {
     const accessibilityMenu = document.getElementById("accessibility-menu");
@@ -333,10 +356,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const dynamicSectionIds = new Set([
       "Projects",
       "Technologies",
-      "AboutMe",
       "Formations",
-      "Contact",
-      "More",
+      "AboutMe",
     ]);
     Array.from(document.querySelectorAll("main > section")).forEach((el) => {
       if (dynamicSectionIds.has(el.id)) el.remove();
@@ -367,25 +388,21 @@ document.addEventListener("DOMContentLoaded", () => {
       myLoadId,
     );
     const pTechnologies = loadAllTechnologies(locale, myLoadId);
-    const pAbout =
-      typeof aboutMe === "function"
-        ? Promise.resolve(aboutMe())
-        : Promise.resolve();
     const pFormations = setupFormations(
       "src/json/areas/formation.json",
       locale,
       myLoadId,
     );
-    const pLinks = setIconsContact(
-      "src/json/areas/contact.json",
-      "contactContainer",
-      myLoadId,
-    );
-    const pIcons = setIconsTechsSite(
-      "src/assets/icons/svg.json",
-      "techsThisSite",
-      myLoadId,
-    );
+    const pAbout =
+      typeof aboutMe === "function"
+        ? Promise.resolve(aboutMe())
+        : Promise.resolve();
+    const pFooter =
+      typeof footer === "function"
+        ? Promise.resolve(
+            footer("src/json/areas/contact.json", "contactContainer", myLoadId),
+          )
+        : Promise.resolve();
     const pHeader = header();
     const pCardProjectTranslation = translationProjects(locale);
 
@@ -394,10 +411,9 @@ document.addEventListener("DOMContentLoaded", () => {
       pProjects,
       pCardProjectTranslation,
       pTechnologies,
-      pAbout,
       pFormations,
-      pLinks,
-      pIcons,
+      pAbout,
+      pFooter,
     ])
       .then((results) => {
         const rejected = results.filter((r) => r.status === "rejected");
@@ -422,6 +438,7 @@ document.addEventListener("DOMContentLoaded", () => {
         addNewIcons("src/assets/icons/svg.json");
         initializeProfileImage();
         semiHiddenCards();
+        updateBackToTopVisibility();
         window.dispatchEvent(new Event("dynamicContentReady"));
       })
       .catch((err) => console.warn("Erro no carregamento dinâmico:", err));
