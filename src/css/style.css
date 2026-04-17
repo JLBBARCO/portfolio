@@ -466,6 +466,11 @@ div.links {
   flex-flow: column wrap;
 }
 
+#back-to-top {
+  display: none;
+  border-radius: 10px 0 0 10px;
+}
+
 
 ul {
   display: flex;
@@ -825,4 +830,25 @@ footer .link-item:hover {
 
 footer .link-item:active {
   transform: scale(0.95);
+}
+
+footer #forTop {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+footer #forTop button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: var(--accent);
+  color: var(--primary-bg);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }

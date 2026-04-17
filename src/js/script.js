@@ -301,6 +301,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const increaseFontButton = document.getElementById("increase-font");
   const decreaseFontButton = document.getElementById("decrease-font");
   const resetFontButton = document.getElementById("reset-font");
+  const backToTopButton = document.getElementById("back-to-top");
+
+  function updateBackToTopVisibility() {
+    if (!backToTopButton) return;
+    const doc = document.documentElement;
+    const hasScrollableContent = doc.scrollHeight - window.innerHeight > 4;
+    const isAwayFromTop =
+      (window.scrollY || doc.scrollTop || document.body.scrollTop || 0) > 120;
+    const shouldShow = hasScrollableContent && isAwayFromTop;
+
+    backToTopButton.style.display = shouldShow ? "inline-flex" : "none";
+    backToTopButton.setAttribute("aria-hidden", shouldShow ? "false" : "true");
+  }
 
   if (accessibilityButton)
     accessibilityButton.addEventListener("click", accessibilityToggle);
@@ -309,6 +322,16 @@ document.addEventListener("DOMContentLoaded", () => {
   if (decreaseFontButton)
     decreaseFontButton.addEventListener("click", decreaseFont);
   if (resetFontButton) resetFontButton.addEventListener("click", resetFont);
+  if (backToTopButton) {
+    backToTopButton.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    window.addEventListener("scroll", updateBackToTopVisibility, {
+      passive: true,
+    });
+    window.addEventListener("resize", updateBackToTopVisibility);
+    updateBackToTopVisibility();
+  }
 
   document.addEventListener("click", (event) => {
     const accessibilityMenu = document.getElementById("accessibility-menu");
@@ -415,6 +438,7 @@ document.addEventListener("DOMContentLoaded", () => {
         addNewIcons("src/assets/icons/svg.json");
         initializeProfileImage();
         semiHiddenCards();
+        updateBackToTopVisibility();
         window.dispatchEvent(new Event("dynamicContentReady"));
       })
       .catch((err) => console.warn("Erro no carregamento dinâmico:", err));

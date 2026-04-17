@@ -71,6 +71,12 @@ function footer(contactFileURL, contactContainerID, loadId) {
   }
 
   const footerElement = document.querySelector("footer");
+  if (!footerElement) return Promise.resolve();
+
+  // Keep static accessibility controls intact; replace only dynamic footer content.
+  Array.from(footerElement.querySelectorAll("#footerContent")).forEach((el) =>
+    el.remove(),
+  );
 
   // Create left section: "More about this site"
   const moreSection = document.createElement("article");
