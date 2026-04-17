@@ -291,11 +291,18 @@ function applyTranslations(language, options) {
     "increase-font": "aria_increase_font",
     "decrease-font": "aria_decrease_font",
     "reset-font": "aria_reset_font",
+    "back-to-top": "aria_back_to_top",
     linkDownloadCV: "action_download_cv",
   };
   Object.entries(ariaMap).forEach(([id, key]) => {
     const el = document.getElementById(id);
-    if (el) el.setAttribute("aria-label", t(key));
+    if (el) {
+      const label = t(key);
+      el.setAttribute("aria-label", label);
+      if (el.hasAttribute("title")) {
+        el.setAttribute("title", label);
+      }
+    }
   });
 
   if (emitLanguageChanged) {

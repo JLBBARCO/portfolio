@@ -23,7 +23,6 @@
   <script src="src/js/about.js" defer></script>
   <script src="src/js/formations.js" defer></script>
   <script src="src/js/footer.js" defer></script>
-  <script src="src/js/contact.js" defer></script>
   <script src="src/js/translate.js" defer></script>
 </head>
 
@@ -43,23 +42,24 @@
   </main>
   <footer>
     <article id="accessibility">
-      <button id="accessibility-button" aria-expanded="false" aria-controls="accessibility-menu">
+      <button type="button" id="accessibility-button" aria-expanded="false" aria-controls="accessibility-menu">
         <i class="fa-solid fa-universal-access icon"></i>
       </button>
       <div id="accessibility-menu" aria-hidden="true">
-        <button id="increase-font" data-i18n="aria_increase_font" data-i18n-attr="aria-label">
+        <button type="button" id="increase-font" data-i18n="aria_increase_font" data-i18n-attr="aria-label">
           <i class="fa-solid fa-plus icon"></i>
         </button>
-        <button id="decrease-font" data-i18n="aria_decrease_font" data-i18n-attr="aria-label">
+        <button type="button" id="decrease-font" data-i18n="aria_decrease_font" data-i18n-attr="aria-label">
           <i class="fa-solid fa-minus icon"></i>
         </button>
-        <button id="reset-font" data-i18n="aria_reset_font" data-i18n-attr="aria-label">
+        <button type="button" id="reset-font" data-i18n="aria_reset_font" data-i18n-attr="aria-label">
           <i class="fa-solid fa-text-slash icon"></i>
         </button>
       </div>
     </article>
     <article id="forTop">
-      <button id="back-to-top" aria-label="Voltar ao topo" title="Voltar ao topo" aria-hidden="true">
+      <button type="button" id="back-to-top" data-i18n="aria_back_to_top" data-i18n-attr="aria-label"
+        aria-label="Voltar ao topo" title="Voltar ao topo" aria-hidden="true">
         <i class="fa-solid fa-arrow-up icon"></i>
       </button>
     </article>
