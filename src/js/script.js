@@ -333,10 +333,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const dynamicSectionIds = new Set([
       "Projects",
       "Technologies",
-      "AboutMe",
       "Formations",
-      "Contact",
-      "More",
+      "AboutMe",
     ]);
     Array.from(document.querySelectorAll("main > section")).forEach((el) => {
       if (dynamicSectionIds.has(el.id)) el.remove();
@@ -367,25 +365,21 @@ document.addEventListener("DOMContentLoaded", () => {
       myLoadId,
     );
     const pTechnologies = loadAllTechnologies(locale, myLoadId);
-    const pAbout =
-      typeof aboutMe === "function"
-        ? Promise.resolve(aboutMe())
-        : Promise.resolve();
     const pFormations = setupFormations(
       "src/json/areas/formation.json",
       locale,
       myLoadId,
     );
-    const pLinks = setIconsContact(
-      "src/json/areas/contact.json",
-      "contactContainer",
-      myLoadId,
-    );
-    const pIcons = setIconsTechsSite(
-      "src/assets/icons/svg.json",
-      "techsThisSite",
-      myLoadId,
-    );
+    const pAbout =
+      typeof aboutMe === "function"
+        ? Promise.resolve(aboutMe())
+        : Promise.resolve();
+    const pFooter =
+      typeof footer === "function"
+        ? Promise.resolve(
+            footer("src/json/areas/contact.json", "contactContainer", myLoadId),
+          )
+        : Promise.resolve();
     const pHeader = header();
     const pCardProjectTranslation = translationProjects(locale);
 
@@ -394,10 +388,9 @@ document.addEventListener("DOMContentLoaded", () => {
       pProjects,
       pCardProjectTranslation,
       pTechnologies,
-      pAbout,
       pFormations,
-      pLinks,
-      pIcons,
+      pAbout,
+      pFooter,
     ])
       .then((results) => {
         const rejected = results.filter((r) => r.status === "rejected");
