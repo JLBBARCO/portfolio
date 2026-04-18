@@ -9,6 +9,8 @@ function getScreenshotUrl(demoUrl) {
 const _projectsDataCache = new Map();
 const _projectCardTranslations = Object.create(null);
 let _projectTranslationsLoadPromise = null;
+const _repoOwnerMainMasterCommitCache = new Map();
+const _repoMainMasterActivityCache = new Map();
 
 // Translation dictionary for project cards, keyed by card id.
 // Each entry can define title/description/institution/descriptionImage.
@@ -173,6 +175,101 @@ function registerProjectCardTranslations(card) {
   );
 }
 
+function parseDateToTimestamp(value) {
+  if (!value) return 0;
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function getLatestOwnerMainMasterCommitTimestamp(card) {
+  if (!card) return 0;
+  return parseDateToTimestamp(card.latestOwnerMainMasterCommitAt);
+}
+
+function getLatestMainMasterActivityTimestamp(card) {
+  if (!card) return 0;
+  return parseDateToTimestamp(card.latestMainMasterActivityAt);
+}
+
+function getRepositoryCreationTimestamp(card) {
+  if (!card) return 0;
+  const fromIso = parseDateToTimestamp(card.repoCreatedAtIso);
+  if (fromIso) return fromIso;
+  return parseDate(card.dateInit);
+}
+
+function hasOwnerMainMasterCommit(card) {
+  return Boolean(card && card.hasOwnerMainMasterCommit);
+}
+
+function hasMainMasterActivity(card) {
+  return Boolean(card && card.hasMainMasterActivity);
+}
+
+function shouldShowProjectEndDate(card) {
+  if (!card || !card.dateEnd) return false;
+  // For GitHub-derived cards, show date range only when there is an owner
+  // commit on main/master. Otherwise, show creation date only.
+  if (card.repoCreatedAtIso) {
+    return hasOwnerMainMasterCommit(card);
+  }
+  return true;
+}
+
+function compareProjectCardsByMaintenance(a, b) {
+  const aHasMainMasterActivity = hasMainMasterActivity(a);
+  const bHasMainMasterActivity = hasMainMasterActivity(b);
+
+  if (aHasMainMasterActivity !== bHasMainMasterActivity) {
+    return bHasMainMasterActivity - aHasMainMasterActivity;
+  }
+
+  const aMainMasterActivityTimestamp = aHasMainMasterActivity
+    ? getLatestMainMasterActivityTimestamp(a)
+    : getRepositoryCreationTimestamp(a);
+  const bMainMasterActivityTimestamp = bHasMainMasterActivity
+    ? getLatestMainMasterActivityTimestamp(b)
+    : getRepositoryCreationTimestamp(b);
+
+  if (aMainMasterActivityTimestamp !== bMainMasterActivityTimestamp) {
+    return bMainMasterActivityTimestamp - aMainMasterActivityTimestamp;
+  }
+
+  const aHasOwnerCommit = hasOwnerMainMasterCommit(a);
+  const bHasOwnerCommit = hasOwnerMainMasterCommit(b);
+
+  if (aHasOwnerCommit !== bHasOwnerCommit) {
+    return bHasOwnerCommit - aHasOwnerCommit;
+  }
+
+  const aMaintenanceTimestamp = aHasOwnerCommit
+    ? getLatestOwnerMainMasterCommitTimestamp(a)
+    : getRepositoryCreationTimestamp(a);
+  const bMaintenanceTimestamp = bHasOwnerCommit
+    ? getLatestOwnerMainMasterCommitTimestamp(b)
+    : getRepositoryCreationTimestamp(b);
+
+  if (aMaintenanceTimestamp !== bMaintenanceTimestamp) {
+    return bMaintenanceTimestamp - aMaintenanceTimestamp;
+  }
+
+  const aCreatedAt = getRepositoryCreationTimestamp(a);
+  const bCreatedAt = getRepositoryCreationTimestamp(b);
+  if (aCreatedAt !== bCreatedAt) {
+    return bCreatedAt - aCreatedAt;
+  }
+
+  const endA = parseDate(a.dateEnd);
+  const endB = parseDate(b.dateEnd);
+  if (endA !== endB) {
+    return endB - endA;
+  }
+
+  const initA = parseDate(a.dateInit);
+  const initB = parseDate(b.dateInit);
+  return initB - initA;
+}
+
 function setupProjects(source, language, owner, loadId) {
   // when we start working with a container we tag it with the load id so
   // stale async results know to bail out.  loadId is produced by
@@ -273,21 +370,12 @@ function setupProjects(source, language, owner, loadId) {
 
       const fragment = document.createDocumentFragment();
 
-      // Nova lógica de ordenação:
-      // 1. Primeiro pela data de fim (dateEnd) mais recente.
-      // 2. Se houver empate (ou se ambas forem nulas), pela data de início (dateInit) mais recente.
-      const sortedCards = [...cards].sort((a, b) => {
-        const endA = parseDate(a.dateEnd);
-        const endB = parseDate(b.dateEnd);
-
-        if (endA !== endB) {
-          return endB - endA;
-        }
-
-        const initA = parseDate(a.dateInit);
-        const initB = parseDate(b.dateInit);
-        return initB - initA;
-      });
+      // Ordenação com ênfase em manutenção:
+      // 1) Repositórios com commit seu em main/master primeiro.
+      // 2) Entre eles, commit autoral mais recente.
+      // 3) Se não houver commit seu em main/master, usar criação do repositório.
+      // 4) Empate: criação do repositório e depois datas exibidas no card.
+      const sortedCards = [...cards].sort(compareProjectCardsByMaintenance);
 
       let cardCounter = 0;
 
@@ -362,7 +450,7 @@ function setupProjects(source, language, owner, loadId) {
 
         if (card.dateInit) {
           html += `<div class="date"><p>${card.dateInit}`;
-          if (card.dateEnd) {
+          if (shouldShowProjectEndDate(card)) {
             html += ` - ${card.dateEnd}`;
           }
           html += "</p></div>";
@@ -469,6 +557,201 @@ function fetchRepoLanguages(owner, repoName) {
     });
 }
 
+function fetchLatestOwnerCommitOnBranch(owner, repoName, author, branch) {
+  const commitUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?sha=${encodeURIComponent(branch)}&author=${encodeURIComponent(author)}&per_page=1`;
+
+  return fetch(commitUrl)
+    .then((res) => {
+      if (!res.ok) return null;
+      return res.json();
+    })
+    .then((commits) => {
+      if (!Array.isArray(commits) || !commits.length) return null;
+      const latest = commits[0];
+      const date =
+        (latest &&
+          latest.commit &&
+          latest.commit.author &&
+          latest.commit.author.date) ||
+        "";
+      if (!date) return null;
+      const ts = parseDateToTimestamp(date);
+      if (!ts) return null;
+      return { iso: date, ts };
+    })
+    .catch(() => null);
+}
+
+function fetchLatestBranchCommitOnBranch(owner, repoName, branch) {
+  const commitUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?sha=${encodeURIComponent(branch)}&per_page=1`;
+
+  return fetch(commitUrl)
+    .then((res) => {
+      if (!res.ok) return null;
+      return res.json();
+    })
+    .then((commits) => {
+      if (!Array.isArray(commits) || !commits.length) return null;
+      const latest = commits[0];
+      const date =
+        (latest &&
+          latest.commit &&
+          latest.commit.author &&
+          latest.commit.author.date) ||
+        "";
+      if (!date) return null;
+      const ts = parseDateToTimestamp(date);
+      if (!ts) return null;
+      return { iso: date, ts };
+    })
+    .catch(() => null);
+}
+
+function extractPullRequestActivityTimestamp(pr) {
+  if (!pr || typeof pr !== "object") return 0;
+  const candidates = [pr.merged_at, pr.updated_at, pr.closed_at, pr.created_at]
+    .map(parseDateToTimestamp)
+    .filter((ts) => ts > 0);
+
+  if (!candidates.length) return 0;
+  return Math.max(...candidates);
+}
+
+function fetchLatestPullRequestActivityOnBase(owner, repoName, baseBranch) {
+  const pullsUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/pulls?state=all&base=${encodeURIComponent(baseBranch)}&sort=updated&direction=desc&per_page=20`;
+
+  return fetch(pullsUrl)
+    .then((res) => {
+      if (!res.ok) return null;
+      return res.json();
+    })
+    .then((pulls) => {
+      if (!Array.isArray(pulls) || !pulls.length) return null;
+      let latestTs = 0;
+      pulls.forEach((pr) => {
+        const ts = extractPullRequestActivityTimestamp(pr);
+        if (ts > latestTs) latestTs = ts;
+      });
+      if (!latestTs) return null;
+      return { iso: new Date(latestTs).toISOString(), ts: latestTs };
+    })
+    .catch(() => null);
+}
+
+function fetchLatestMainMasterActivity(owner, repoName) {
+  const key = `githubMainMasterActivity_${owner}_${repoName}`;
+  if (_repoMainMasterActivityCache.has(key)) {
+    return _repoMainMasterActivityCache.get(key);
+  }
+
+  const activityPromise = Promise.all([
+    fetchLatestBranchCommitOnBranch(owner, repoName, "main"),
+    fetchLatestBranchCommitOnBranch(owner, repoName, "master"),
+    fetchLatestPullRequestActivityOnBase(owner, repoName, "main"),
+    fetchLatestPullRequestActivityOnBase(owner, repoName, "master"),
+  ])
+    .then((signals) => {
+      const candidates = signals.filter(Boolean);
+      if (!candidates.length) {
+        return { hasActivity: false, iso: "", ts: 0 };
+      }
+
+      const latest = candidates.reduce((best, current) => {
+        if (!best) return current;
+        return current.ts > best.ts ? current : best;
+      }, null);
+
+      if (!latest || !latest.ts) {
+        return { hasActivity: false, iso: "", ts: 0 };
+      }
+
+      return {
+        hasActivity: true,
+        iso: latest.iso,
+        ts: latest.ts,
+      };
+    })
+    .catch(() => ({ hasActivity: false, iso: "", ts: 0 }));
+
+  _repoMainMasterActivityCache.set(key, activityPromise);
+  return activityPromise;
+}
+
+function fetchLatestOwnerMainMasterCommit(owner, repoName, author) {
+  const key = `githubOwnerMainMasterCommit_${owner}_${repoName}_${author}`;
+  if (_repoOwnerMainMasterCommitCache.has(key)) {
+    return _repoOwnerMainMasterCommitCache.get(key);
+  }
+
+  let cached = null;
+  try {
+    cached = localStorage.getItem(key);
+  } catch (e) {
+    cached = null;
+  }
+
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached);
+      const isValidShape =
+        parsed &&
+        typeof parsed.hasCommit === "boolean" &&
+        typeof parsed.ts === "number";
+      if (isValidShape) {
+        const fromCache = Promise.resolve(parsed);
+        _repoOwnerMainMasterCommitCache.set(key, fromCache);
+        return fromCache;
+      }
+    } catch (e) {
+      // ignore invalid cache and refetch
+    }
+  }
+
+  const commitPromise = Promise.all([
+    fetchLatestOwnerCommitOnBranch(owner, repoName, author, "main"),
+    fetchLatestOwnerCommitOnBranch(owner, repoName, author, "master"),
+  ])
+    .then(([mainCommit, masterCommit]) => {
+      const candidates = [mainCommit, masterCommit].filter(Boolean);
+      if (!candidates.length) {
+        return { hasCommit: false, iso: "", ts: 0 };
+      }
+
+      const latest = candidates.reduce((best, current) => {
+        if (!best) return current;
+        return current.ts > best.ts ? current : best;
+      }, null);
+
+      if (!latest) {
+        return { hasCommit: false, iso: "", ts: 0 };
+      }
+
+      return {
+        hasCommit: true,
+        iso: latest.iso,
+        ts: latest.ts,
+      };
+    })
+    .catch(() => ({ hasCommit: false, iso: "", ts: 0 }))
+    .then((result) => {
+      try {
+        // Persist positive matches to avoid stale false negatives that can
+        // distort ordering when API calls temporarily fail or are rate-limited.
+        if (result && result.hasCommit) {
+          localStorage.setItem(key, JSON.stringify(result));
+        } else {
+          localStorage.removeItem(key);
+        }
+      } catch (e) {
+        // ignore storage issues
+      }
+      return result;
+    });
+
+  _repoOwnerMainMasterCommitCache.set(key, commitPromise);
+  return commitPromise;
+}
+
 function loadProjectsData(source, owner) {
   // when building cards from github results, we convert simple strings into
   // full technology objects; this helper does that so the logic stays clean.
@@ -531,8 +814,8 @@ function loadProjectsData(source, owner) {
           return parts[0];
         };
 
-        // makeCard returns a promise to keep the same flow for language lookup.
-        const makeCard = (unique) => {
+        // makeCard returns a promise to keep the same flow for metadata lookup.
+        const makeCard = (unique, ownerCommitInfo, mainMasterActivityInfo) => {
           const techObjects = unique
             .map(makeTechObject)
             .filter((t) => t !== null);
@@ -546,6 +829,20 @@ function loadProjectsData(source, owner) {
             linkRepository: repo.html_url,
             dateInit: makeDate(repo.created_at),
             dateEnd: makeDate(repo.pushed_at),
+            repoCreatedAtIso: repo.created_at || "",
+            hasOwnerMainMasterCommit: Boolean(
+              ownerCommitInfo && ownerCommitInfo.hasCommit,
+            ),
+            latestOwnerMainMasterCommitAt:
+              (ownerCommitInfo && ownerCommitInfo.iso) || "",
+            hasMainMasterActivity: Boolean(
+              (mainMasterActivityInfo && mainMasterActivityInfo.hasActivity) ||
+              (ownerCommitInfo && ownerCommitInfo.hasCommit),
+            ),
+            latestMainMasterActivityAt:
+              (mainMasterActivityInfo && mainMasterActivityInfo.iso) ||
+              (ownerCommitInfo && ownerCommitInfo.iso) ||
+              "",
             iconTechnologies: techObjects,
             githubFallbackTranslations: {
               title: { "pt-BR": repo.name, "en-US": repo.name },
@@ -596,17 +893,30 @@ function loadProjectsData(source, owner) {
             });
         };
 
-        if (idx < maxLangCalls) {
-          return fetchRepoLanguages(owner, repo.name).then((langData) => {
-            const techs = [...baseTechs, ...Object.keys(langData)];
-            const unique = Array.from(new Set(techs)).filter(Boolean);
-            return makeCard(unique);
-          });
-        } else {
-          const unique = Array.from(new Set(baseTechs)).filter(Boolean);
-          // makeCard returns a promise already
-          return makeCard(unique);
-        }
+        const repoOwnerName = (repo.owner && repo.owner.login) || owner;
+        const languagePromise =
+          idx < maxLangCalls
+            ? fetchRepoLanguages(owner, repo.name)
+            : Promise.resolve({});
+        const ownerCommitPromise = fetchLatestOwnerMainMasterCommit(
+          repoOwnerName,
+          repo.name,
+          owner,
+        );
+        const mainMasterActivityPromise = fetchLatestMainMasterActivity(
+          repoOwnerName,
+          repo.name,
+        );
+
+        return Promise.all([
+          languagePromise,
+          ownerCommitPromise,
+          mainMasterActivityPromise,
+        ]).then(([langData, ownerCommitInfo, mainMasterActivityInfo]) => {
+          const techs = [...baseTechs, ...Object.keys(langData || {})];
+          const unique = Array.from(new Set(techs)).filter(Boolean);
+          return makeCard(unique, ownerCommitInfo, mainMasterActivityInfo);
+        });
       });
 
       return Promise.all(cardsPromises).then((cards) => cards);

@@ -39,7 +39,7 @@
   --font3: "MedievalSharp", sans-serif;
   --shadow: 0 0 15px var(--hover-accent);
   --icon-size: 1.5rem;
-  --navbar-height: 80px;
+  --navbar-height: 5rem;
 }
 
 @media (prefers-color-scheme: dark) {
