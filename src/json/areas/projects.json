@@ -68,6 +68,16 @@
         "pt-BR": "Site da Escola Estadual Adolpho de Oliveira Franco com informações institucionais, cursos e notícias"
       }
     },
+    "image-converter": {
+      "title": {
+        "en-US": "Image Converter",
+        "pt-BR": "Conversor de Imagens"
+      },
+      "description": {
+        "en-US": "A system that converts images to different formats, allowing users to easily change the format of their images.",
+        "pt-BR": "Um sistema que converte imagens para diferentes formatos, permitindo aos usuários alterar facilmente o formato de suas imagens"
+      }
+    },
     "passwords-manager": {
       "title": {
         "en-US": "Passwords Manager",
@@ -78,7 +88,7 @@
         "pt-BR": "Um sistema para salvar suas senhas"
       }
     },
-    "auto-programs": {
+    "programs-manager": {
       "title": {
         "en-US": "Auto Programs",
         "pt-BR": "Automatizador de Programas"
@@ -88,7 +98,7 @@
         "pt-BR": "Sistema que instala e desinstala programas automaticamente, no qual o usuário tem total controle do gerenciamento de programas"
       }
     },
-    "orbit-games-archive": {
+    "Orbity": {
       "title": {
         "en-US": "Orbit Games Archive",
         "pt-BR": "Orbit Games Archive"
@@ -111,6 +121,17 @@
         "en-US": "GitHub workflow for creating a compiler for macOS.",
         "pt-BR": "Workflow do GitHub para criar um compilador para macOS"
       }
+    },
+    "programs-manager-website": {
+      "title": {
+        "en-US": "Auto Programs Website",
+        "pt-BR": "Site do Auto Programs"
+      },
+      "description": {
+        "en-US": "Website for Auto Programs, a system that automatically installs and uninstalls programs, where users can see the programs that were installed, uninstalled, updated, those that had errors, among other information",
+        "pt-BR": "Site para o Auto Programs, sistema que instala e desinstala programas automaticamente, no qual o usuário pode ver os programas que foram instalados, desinstalados, atualizados, os que deram erro, entre outras informações"
+      }
     }
+
   }
 }
