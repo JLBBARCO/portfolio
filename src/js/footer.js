@@ -215,15 +215,25 @@ function loadContactSection(state, contactFileURL) {
 
       const fragment = document.createDocumentFragment();
       data.cards.forEach((card) => {
+        if (!card || !card.url) return;
+
         const link = document.createElement("a");
         link.href = card.url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
+        const isMailto = String(card.url).startsWith("mailto:");
+        if (!isMailto) {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
         link.className = "link-item";
         link.setAttribute("aria-label", card.name || "Contact link");
         if (card.name) link.title = card.name;
 
-        const resolved = resolveIconSpec(card, card.name || "");
+        const normalizedCard = {
+          ...card,
+          icon: card.icon || card.iconName || "",
+        };
+        const resolved = resolveIconSpec(normalizedCard, card.name || "");
+        link.dataset.iconName = resolved.iconName || "";
         const iconNode = document.createElement("i");
         iconNode.className = `${faClass(resolved.style, resolved.icon)} icon`;
 

@@ -1,25 +1,24 @@
 {
   "cards": [
     {
-      "icon": "fa-envelope",
-      "style": "fa-regular",
+      "iconName": "email",
       "url": "mailto:jbruianibarco@gmail.com",
       "name": "jbruianibarco@gmail.com"
     },
     {
-      "icon": "fa-github",
+      "iconName": "github",
       "style": "fa-brands",
       "url": "https://github.com/JLBBARCO",
       "name": "GitHub.com/JLBBARCO"
     },
     {
-      "icon": "fa-linkedin",
+      "iconName": "linkedin",
       "style": "fa-brands",
       "url": "https://linkedin.com/in/joseluizbbarco",
       "name": "LinkedIn.com/in/joseluizbbarco"
     },
     {
-      "icon": "fa-instagram",
+      "iconName": "instagram",
       "style": "fa-brands",
       "url": "https://instagram.com/joseluizbbarco",
       "name": "Instagram.com/joseluizbbarco"
