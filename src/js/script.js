@@ -49,6 +49,25 @@ const _customSvgIconMap = {
   cmd: { style: "fa-solid", icon: "fa-batchfile" },
 };
 
+const _iconExceptionRules = {
+  email: {
+    aliases: ["email", "e-mail", "mail"],
+    fa: { style: "fa-regular", icon: "fa-envelope" },
+  },
+  github: {
+    aliases: ["github", "git-hub"],
+    fa: { style: "fa-brands", icon: "fa-github" },
+  },
+  linkedin: {
+    aliases: ["linkedin", "linked-in"],
+    fa: { style: "fa-brands", icon: "fa-linkedin" },
+  },
+  instagram: {
+    aliases: ["instagram", "insta"],
+    fa: { style: "fa-brands", icon: "fa-instagram" },
+  },
+};
+
 function normalizeIconToken(value) {
   return String(value || "")
     .toLowerCase()
@@ -63,6 +82,44 @@ function getCustomSvgIcon(value) {
   return key ? _customSvgIconMap[key] || null : null;
 }
 
+function findIconException(token) {
+  const normalizedToken = normalizeIconToken(token);
+  if (!normalizedToken) return null;
+
+  const entries = Object.entries(_iconExceptionRules);
+  for (const [key, rule] of entries) {
+    const aliases = Array.isArray(rule.aliases) ? rule.aliases : [];
+    if (normalizedToken === normalizeIconToken(key)) {
+      return { key, rule };
+    }
+    if (
+      aliases.some((alias) => normalizeIconToken(alias) === normalizedToken)
+    ) {
+      return { key, rule };
+    }
+  }
+  return null;
+}
+
+function resolveIconName(iconData, fallbackName = "") {
+  const source =
+    iconData && typeof iconData === "object"
+      ? iconData
+      : { iconName: String(iconData || fallbackName || "") };
+
+  const candidates = [source.iconName, source.icon, source.name, fallbackName];
+
+  for (const candidate of candidates) {
+    const fromException = findIconException(candidate);
+    if (fromException) return fromException.key;
+
+    const normalized = normalizeIconToken(candidate);
+    if (normalized) return normalized;
+  }
+
+  return "code";
+}
+
 function resolveIconSpec(iconData, fallbackName = "") {
   const source =
     iconData && typeof iconData === "object"
@@ -71,6 +128,15 @@ function resolveIconSpec(iconData, fallbackName = "") {
 
   let style = source.style || "";
   let icon = source.icon || "";
+  const iconName = resolveIconName(source, fallbackName);
+  const hasExplicitFaIcon =
+    typeof icon === "string" && icon.trim().startsWith("fa-");
+
+  const fromException = findIconException(iconName);
+  if (fromException && (!icon || !hasExplicitFaIcon)) {
+    style = style || fromException.rule.fa.style;
+    icon = fromException.rule.fa.icon;
+  }
 
   const customByIcon = getCustomSvgIcon(icon);
   if (customByIcon) {
@@ -99,7 +165,7 @@ function resolveIconSpec(iconData, fallbackName = "") {
     icon = "fa-code";
   }
 
-  return { style: style || "fa-solid", icon };
+  return { style: style || "fa-solid", icon, iconName };
 }
 
 function guessFaIcon(name) {
