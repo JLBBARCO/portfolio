@@ -310,10 +310,8 @@ document.addEventListener("DOMContentLoaded", () => {
       menuButton.dataset.boundToggle = "true";
     }
 
-    const languageBtn = document.getElementById("languageBtn");
-    if (languageBtn && !languageBtn.dataset.boundLanguage) {
-      languageBtn.addEventListener("click", changeLanguage);
-      languageBtn.dataset.boundLanguage = "true";
+    if (typeof bindLanguageDropdown === "function") {
+      bindLanguageDropdown();
     }
   }
 
@@ -440,9 +438,12 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn("localStorage unavailable when reading language:", e);
       storedLang = null;
     }
-    const currentLang =
-      storedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
-    const locale = currentLang === "pt" ? "pt-BR" : "en-US";
+    const currentLang = (
+      storedLang ||
+      navigator.language ||
+      "pt-BR"
+    ).toLowerCase();
+    const locale = currentLang.startsWith("pt") ? "pt-BR" : "en-US";
 
     const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
     // Always try GitHub API first; setupProjects will fallback to local JSON if API fails
@@ -965,17 +966,18 @@ function semiHiddenCards() {
     const existingBtn = section.querySelector(".show-all-button");
     if (existingBtn) existingBtn.remove();
 
-    let currentLang = "en";
+    let currentLang = "en-us";
     try {
-      currentLang = localStorage.getItem("language") || "en";
+      currentLang = localStorage.getItem("language") || "en-us";
     } catch (e) {
-      currentLang = "en";
+      currentLang = "en-us";
     }
 
     const showAllButton = document.createElement("button");
     showAllButton.className = "filter-button show-all-button";
-    showAllButton.textContent =
-      currentLang === "pt" ? "Mostrar todos" : "Show all";
+    showAllButton.textContent = currentLang.startsWith("pt")
+      ? "Mostrar todos"
+      : "Show all";
     showAllButton.dataset.filter = "show-all";
     showAllButton.addEventListener("click", () => {
       hiddenCards.forEach((card) => {

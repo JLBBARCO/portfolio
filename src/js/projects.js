@@ -16,7 +16,8 @@ const _repoMainMasterActivityCache = new Map();
 // Each entry can define title/description/institution/descriptionImage.
 // If a field is missing, the renderer falls back to the card payload.
 function normalizeLocale(language) {
-  return language === "pt" || language === "pt-BR" ? "pt-BR" : "en-US";
+  const normalized = String(language || "").toLowerCase();
+  return normalized.startsWith("pt") ? "pt-BR" : "en-US";
 }
 
 function slugifyCardId(value) {
@@ -26,6 +27,39 @@ function slugifyCardId(value) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+}
+
+function normalizeGitHubLogin(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function isOwnedRepositoryByOwner(repo, owner) {
+  if (!repo || typeof repo !== "object") return false;
+  const requestedOwner = normalizeGitHubLogin(owner);
+  const repoOwner = normalizeGitHubLogin(repo.owner && repo.owner.login);
+
+  if (!requestedOwner || !repoOwner || repoOwner !== requestedOwner) {
+    return false;
+  }
+
+  return Boolean(repo.name);
+}
+
+function isEligibleGitHubProjectRepo(repo, owner) {
+  if (!isOwnedRepositoryByOwner(repo, owner)) return false;
+
+  const requestedOwner = normalizeGitHubLogin(owner);
+  const name = normalizeGitHubLogin(repo.name);
+
+  if (!name) return false;
+  // Exclude special profile/pages repositories.
+  if (name === requestedOwner) return false;
+  if (name === `${requestedOwner}.github.io`) return false;
+
+  // Any repository owned by the requested user is valid here, including forks.
+  return true;
 }
 
 function ensureProjectCardId(card) {
@@ -181,6 +215,15 @@ function parseDateToTimestamp(value) {
   return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
+function formatMonthYear(value) {
+  const timestamp = parseDateToTimestamp(value);
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear());
+  return `${month}/${year}`;
+}
+
 function getLatestOwnerMainMasterCommitTimestamp(card) {
   if (!card) return 0;
   return parseDateToTimestamp(card.latestOwnerMainMasterCommitAt);
@@ -206,48 +249,31 @@ function hasMainMasterActivity(card) {
   return Boolean(card && card.hasMainMasterActivity);
 }
 
-function shouldShowProjectEndDate(card) {
-  if (!card || !card.dateEnd) return false;
-  // For GitHub-derived cards, show date range only when there is an owner
-  // commit on main/master. Otherwise, show creation date only.
+function getProjectCreationDisplayDate(card) {
+  if (!card) return "";
   if (card.repoCreatedAtIso) {
-    return hasOwnerMainMasterCommit(card);
+    const formatted = formatMonthYear(card.repoCreatedAtIso);
+    if (formatted) return formatted;
   }
-  return true;
+  return card.dateInit || "";
+}
+
+function getProjectLatestOwnerUpdateDisplayDate(card) {
+  if (!card) return "";
+  const latestOwnerUpdate = formatMonthYear(card.latestOwnerMainMasterCommitAt);
+  if (latestOwnerUpdate) return latestOwnerUpdate;
+
+  if (card.repoCreatedAtIso) {
+    return getProjectCreationDisplayDate(card);
+  }
+
+  // Fallback for local/manual cards that may not carry GitHub metadata.
+  return card.dateEnd || getProjectCreationDisplayDate(card) || "";
 }
 
 function compareProjectCardsByMaintenance(a, b) {
-  const aHasMainMasterActivity = hasMainMasterActivity(a);
-  const bHasMainMasterActivity = hasMainMasterActivity(b);
-
-  if (aHasMainMasterActivity !== bHasMainMasterActivity) {
-    return bHasMainMasterActivity - aHasMainMasterActivity;
-  }
-
-  const aMainMasterActivityTimestamp = aHasMainMasterActivity
-    ? getLatestMainMasterActivityTimestamp(a)
-    : getRepositoryCreationTimestamp(a);
-  const bMainMasterActivityTimestamp = bHasMainMasterActivity
-    ? getLatestMainMasterActivityTimestamp(b)
-    : getRepositoryCreationTimestamp(b);
-
-  if (aMainMasterActivityTimestamp !== bMainMasterActivityTimestamp) {
-    return bMainMasterActivityTimestamp - aMainMasterActivityTimestamp;
-  }
-
-  const aHasOwnerCommit = hasOwnerMainMasterCommit(a);
-  const bHasOwnerCommit = hasOwnerMainMasterCommit(b);
-
-  if (aHasOwnerCommit !== bHasOwnerCommit) {
-    return bHasOwnerCommit - aHasOwnerCommit;
-  }
-
-  const aMaintenanceTimestamp = aHasOwnerCommit
-    ? getLatestOwnerMainMasterCommitTimestamp(a)
-    : getRepositoryCreationTimestamp(a);
-  const bMaintenanceTimestamp = bHasOwnerCommit
-    ? getLatestOwnerMainMasterCommitTimestamp(b)
-    : getRepositoryCreationTimestamp(b);
+  const aMaintenanceTimestamp = getLatestOwnerMainMasterCommitTimestamp(a);
+  const bMaintenanceTimestamp = getLatestOwnerMainMasterCommitTimestamp(b);
 
   if (aMaintenanceTimestamp !== bMaintenanceTimestamp) {
     return bMaintenanceTimestamp - aMaintenanceTimestamp;
@@ -259,15 +285,7 @@ function compareProjectCardsByMaintenance(a, b) {
     return bCreatedAt - aCreatedAt;
   }
 
-  const endA = parseDate(a.dateEnd);
-  const endB = parseDate(b.dateEnd);
-  if (endA !== endB) {
-    return endB - endA;
-  }
-
-  const initA = parseDate(a.dateInit);
-  const initB = parseDate(b.dateInit);
-  return initB - initA;
+  return 0;
 }
 
 function setupProjects(source, language, owner, loadId) {
@@ -291,6 +309,16 @@ function setupProjects(source, language, owner, loadId) {
 
   if (container && loadId !== undefined) {
     container.dataset.loadId = loadId;
+  }
+
+  function renderProjectsMessage(message, variant) {
+    if (!container) return;
+    container.innerHTML = "";
+    const feedback = document.createElement("p");
+    feedback.className =
+      variant === "error" ? "projects-feedback error" : "projects-feedback";
+    feedback.textContent = message;
+    container.appendChild(feedback);
   }
 
   // source may be a local path or the literal string 'github' to indicate using
@@ -326,6 +354,23 @@ function setupProjects(source, language, owner, loadId) {
         seen.add(key);
         return true;
       });
+
+      if (!cards.length && source === "github") {
+        const failed = Boolean(
+          data.githubFetchStatus && data.githubFetchStatus.failed,
+        );
+        renderProjectsMessage(
+          failed
+            ? language === "pt-BR"
+              ? "Nao foi possivel carregar os projetos do GitHub agora."
+              : "Unable to load GitHub projects right now."
+            : language === "pt-BR"
+              ? "Nenhum projeto encontrado para este perfil."
+              : "No projects found for this profile.",
+          failed ? "error" : "info",
+        );
+        return;
+      }
       const techCount = {};
       const techFilter = {};
 
@@ -448,10 +493,13 @@ function setupProjects(source, language, owner, loadId) {
           html += `</div>`;
         }
 
-        if (card.dateInit) {
-          html += `<div class="date"><p>${card.dateInit}`;
-          if (shouldShowProjectEndDate(card)) {
-            html += ` - ${card.dateEnd}`;
+        const createdDateLabel = getProjectCreationDisplayDate(card);
+        const latestOwnerUpdateLabel =
+          getProjectLatestOwnerUpdateDisplayDate(card);
+        if (createdDateLabel) {
+          html += `<div class="date"><p>${createdDateLabel}`;
+          if (latestOwnerUpdateLabel) {
+            html += ` - ${latestOwnerUpdateLabel}`;
           }
           html += "</p></div>";
         }
@@ -461,7 +509,22 @@ function setupProjects(source, language, owner, loadId) {
       });
       container.appendChild(fragment);
     })
-    .catch((err) => console.error("[projects] Failed to load projects:", err));
+    .catch((err) => {
+      console.error("[projects] Failed to load projects:", err);
+      if (
+        loadId !== undefined &&
+        container &&
+        container.dataset.loadId != loadId
+      ) {
+        return;
+      }
+      renderProjectsMessage(
+        language === "pt-BR"
+          ? "Erro ao montar a secao de projetos. Tente novamente."
+          : "Error rendering projects section. Please try again.",
+        "error",
+      );
+    });
 
   section.appendChild(container);
   main.appendChild(section);
@@ -471,28 +534,49 @@ function fetchGitHubRepos(owner) {
   // Prefer backend API route (supports token). If unavailable (e.g. Live Server),
   // fall back to direct GitHub API, then finally to local JSON fallback.
   const apiUrl = `/api/github?owner=${encodeURIComponent(owner)}`;
-  const directUrl = `https://api.github.com/users/${encodeURIComponent(owner)}/repos?per_page=100&sort=updated&direction=desc`;
+  const directUrl = `https://api.github.com/users/${encodeURIComponent(owner)}/repos?per_page=100&sort=updated&direction=desc&type=owner`;
+
+  function fetchDirectRepos() {
+    return fetch(directUrl).then((fallbackRes) => {
+      if (!fallbackRes.ok) throw new Error("Erro ao obter repositórios");
+      return fallbackRes.json();
+    });
+  }
 
   return fetch(apiUrl)
     .then((res) => {
       if (!res.ok) {
-        if (res.status === 404 || res.status === 500) {
+        if (
+          res.status === 401 ||
+          res.status === 403 ||
+          res.status === 404 ||
+          res.status === 429 ||
+          res.status === 500
+        ) {
           // Silent fallback to direct GitHub API
-          return fetch(directUrl).then((fallbackRes) => {
-            if (!fallbackRes.ok) throw new Error("Erro ao obter repositórios");
-            return fallbackRes.json();
-          });
+          return fetchDirectRepos().then((repos) => ({
+            repos,
+            failed: false,
+          }));
         }
         throw new Error("Erro ao obter repositórios");
       }
-      return res.json();
+      return res.json().then((repos) => ({ repos, failed: false }));
     })
     .catch((err) => {
       console.error(
-        "[projects] Failed to fetch from GitHub, will use local fallback",
+        "[projects] Failed to fetch from API route, trying direct GitHub API",
         err,
       );
-      return [];
+      return fetchDirectRepos()
+        .then((repos) => ({ repos, failed: false }))
+        .catch((fallbackErr) => {
+          console.error(
+            "[projects] Failed to fetch from direct GitHub API as well",
+            fallbackErr,
+          );
+          return { repos: [], failed: true };
+        });
     });
 }
 
@@ -558,7 +642,8 @@ function fetchRepoLanguages(owner, repoName) {
 }
 
 function fetchLatestOwnerCommitOnBranch(owner, repoName, author, branch) {
-  const commitUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?sha=${encodeURIComponent(branch)}&author=${encodeURIComponent(author)}&per_page=1`;
+  const commitUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?sha=${encodeURIComponent(branch)}&per_page=30`;
+  const normalizedAuthor = normalizeGitHubLogin(author);
 
   return fetch(commitUrl)
     .then((res) => {
@@ -567,7 +652,24 @@ function fetchLatestOwnerCommitOnBranch(owner, repoName, author, branch) {
     })
     .then((commits) => {
       if (!Array.isArray(commits) || !commits.length) return null;
-      const latest = commits[0];
+
+      const latest = commits.find((commit) => {
+        const authorLogin = normalizeGitHubLogin(
+          commit && commit.author && commit.author.login,
+        );
+        const committerLogin = normalizeGitHubLogin(
+          commit && commit.committer && commit.committer.login,
+        );
+
+        return (
+          normalizedAuthor &&
+          (authorLogin === normalizedAuthor ||
+            committerLogin === normalizedAuthor)
+        );
+      });
+
+      if (!latest) return null;
+
       const date =
         (latest &&
           latest.commit &&
@@ -677,42 +779,35 @@ function fetchLatestMainMasterActivity(owner, repoName) {
   return activityPromise;
 }
 
-function fetchLatestOwnerMainMasterCommit(owner, repoName, author) {
-  const key = `githubOwnerMainMasterCommit_${owner}_${repoName}_${author}`;
+function fetchLatestOwnerMainMasterCommit(
+  owner,
+  repoName,
+  author,
+  defaultBranch,
+) {
+  const normalizedDefaultBranch = String(defaultBranch || "")
+    .trim()
+    .toLowerCase();
+  const key = `githubOwnerMainMasterCommit_${owner}_${repoName}_${author}_${normalizedDefaultBranch || "none"}`;
   if (_repoOwnerMainMasterCommitCache.has(key)) {
     return _repoOwnerMainMasterCommitCache.get(key);
   }
 
-  let cached = null;
-  try {
-    cached = localStorage.getItem(key);
-  } catch (e) {
-    cached = null;
-  }
+  const branches = Array.from(
+    new Set(
+      [normalizedDefaultBranch, "main", "master"].filter(
+        (branch) => typeof branch === "string" && branch.length,
+      ),
+    ),
+  );
 
-  if (cached) {
-    try {
-      const parsed = JSON.parse(cached);
-      const isValidShape =
-        parsed &&
-        typeof parsed.hasCommit === "boolean" &&
-        typeof parsed.ts === "number";
-      if (isValidShape) {
-        const fromCache = Promise.resolve(parsed);
-        _repoOwnerMainMasterCommitCache.set(key, fromCache);
-        return fromCache;
-      }
-    } catch (e) {
-      // ignore invalid cache and refetch
-    }
-  }
-
-  const commitPromise = Promise.all([
-    fetchLatestOwnerCommitOnBranch(owner, repoName, author, "main"),
-    fetchLatestOwnerCommitOnBranch(owner, repoName, author, "master"),
-  ])
-    .then(([mainCommit, masterCommit]) => {
-      const candidates = [mainCommit, masterCommit].filter(Boolean);
+  const commitPromise = Promise.all(
+    branches.map((branch) =>
+      fetchLatestOwnerCommitOnBranch(owner, repoName, author, branch),
+    ),
+  )
+    .then((branchCommits) => {
+      const candidates = branchCommits.filter(Boolean);
       if (!candidates.length) {
         return { hasCommit: false, iso: "", ts: 0 };
       }
@@ -732,21 +827,7 @@ function fetchLatestOwnerMainMasterCommit(owner, repoName, author) {
         ts: latest.ts,
       };
     })
-    .catch(() => ({ hasCommit: false, iso: "", ts: 0 }))
-    .then((result) => {
-      try {
-        // Persist positive matches to avoid stale false negatives that can
-        // distort ordering when API calls temporarily fail or are rate-limited.
-        if (result && result.hasCommit) {
-          localStorage.setItem(key, JSON.stringify(result));
-        } else {
-          localStorage.removeItem(key);
-        }
-      } catch (e) {
-        // ignore storage issues
-      }
-      return result;
-    });
+    .catch(() => ({ hasCommit: false, iso: "", ts: 0 }));
 
   _repoOwnerMainMasterCommitCache.set(key, commitPromise);
   return commitPromise;
@@ -779,25 +860,35 @@ function loadProjectsData(source, owner) {
       return _projectsDataCache.get(cacheKey);
     }
 
-    // load the list of repos and convert them into card objects.
-    const ghPromise = fetchGitHubRepos(owner).then((repos) => {
-      // ignore a few special repositories that aren't really projects
-      const filtered = repos.filter((repo) => {
-        const name = repo.name.toLowerCase();
-        const repoOwner = (
-          repo.owner && repo.owner.login ? repo.owner.login : ""
-        ).toLowerCase();
-        return (
-          // exclude the user's own profile repo(s)
-          name !== owner.toLowerCase() &&
-          // also ignore any repo whose name equals its owner's login (GitHub Pages
-          // style repositories) regardless of whether the owner is the supplied
-          // account or a collaborator.
-          name !== repoOwner &&
-          name !== "portfolio" &&
-          name !== `${owner.toLowerCase()}.github.io`
+    // Load repositories and keep only projects owned by the requested user
+    // (both original repos and forks created by that same user).
+    const ghPromise = fetchGitHubRepos(owner).then((githubResult) => {
+      const repos = Array.isArray(githubResult && githubResult.repos)
+        ? githubResult.repos
+        : [];
+      const githubFetchStatus = {
+        failed: Boolean(githubResult && githubResult.failed),
+      };
+      const uniqueRepos = [];
+      const seenRepoKeys = new Set();
+      repos.forEach((repo) => {
+        const key = String(
+          (repo &&
+            (repo.id ||
+              repo.node_id ||
+              repo.full_name ||
+              repo.html_url ||
+              repo.name)) ||
+            "",
         );
+        if (!key || seenRepoKeys.has(key)) return;
+        seenRepoKeys.add(key);
+        uniqueRepos.push(repo);
       });
+
+      const filtered = uniqueRepos
+        .filter((repo) => isEligibleGitHubProjectRepo(repo, owner))
+        .filter((repo) => normalizeGitHubLogin(repo.name) !== "portfolio");
 
       const maxLangCalls = 59; // keep us safely under the rate limit
       const cardsPromises = filtered.map((repo, idx) => {
@@ -821,6 +912,11 @@ function loadProjectsData(source, owner) {
             .filter((t) => t !== null);
 
           const repoOwnerName = (repo.owner && repo.owner.login) || owner;
+          const repoPushedAtIso = repo.pushed_at || "";
+          const ownerLatestIso =
+            (ownerCommitInfo && ownerCommitInfo.iso) || repoPushedAtIso;
+          const ownerLatestTs = parseDateToTimestamp(ownerLatestIso);
+          const hasOwnerLatestUpdate = Boolean(ownerLatestTs);
 
           const card = {
             id: slugifyCardId(repo.name),
@@ -830,18 +926,15 @@ function loadProjectsData(source, owner) {
             dateInit: makeDate(repo.created_at),
             dateEnd: makeDate(repo.pushed_at),
             repoCreatedAtIso: repo.created_at || "",
-            hasOwnerMainMasterCommit: Boolean(
-              ownerCommitInfo && ownerCommitInfo.hasCommit,
-            ),
-            latestOwnerMainMasterCommitAt:
-              (ownerCommitInfo && ownerCommitInfo.iso) || "",
+            hasOwnerMainMasterCommit: hasOwnerLatestUpdate,
+            latestOwnerMainMasterCommitAt: ownerLatestIso,
             hasMainMasterActivity: Boolean(
               (mainMasterActivityInfo && mainMasterActivityInfo.hasActivity) ||
-              (ownerCommitInfo && ownerCommitInfo.hasCommit),
+              hasOwnerLatestUpdate,
             ),
             latestMainMasterActivityAt:
               (mainMasterActivityInfo && mainMasterActivityInfo.iso) ||
-              (ownerCommitInfo && ownerCommitInfo.iso) ||
+              ownerLatestIso ||
               "",
             iconTechnologies: techObjects,
             githubFallbackTranslations: {
@@ -902,6 +995,7 @@ function loadProjectsData(source, owner) {
           repoOwnerName,
           repo.name,
           owner,
+          repo.default_branch,
         );
         const mainMasterActivityPromise = fetchLatestMainMasterActivity(
           repoOwnerName,
@@ -919,10 +1013,16 @@ function loadProjectsData(source, owner) {
         });
       });
 
-      return Promise.all(cardsPromises).then((cards) => cards);
+      return Promise.all(cardsPromises).then((cards) => ({
+        cards,
+        githubFetchStatus,
+      }));
     });
 
-    const resultPromise = ghPromise.then((ghCards) => ({ cards: ghCards }));
+    const resultPromise = ghPromise.then((result) => ({
+      cards: result.cards,
+      githubFetchStatus: result.githubFetchStatus,
+    }));
 
     _projectsDataCache.set(cacheKey, resultPromise);
     resultPromise.catch(() => {

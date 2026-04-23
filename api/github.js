@@ -21,7 +21,6 @@ export default async function handler(req, res) {
   async function fetchReposWithHeaders(headers) {
     const urls = [
       `https://api.github.com/users/${encodeURIComponent(owner)}/repos?per_page=100&sort=updated&direction=desc&type=owner&t=${now}`,
-      `https://api.github.com/users/${encodeURIComponent(owner)}/repos?per_page=100&sort=updated&direction=desc&type=member&t=${now}`,
     ];
 
     const responses = await Promise.all(urls.map((u) => fetch(u, { headers })));
@@ -57,8 +56,8 @@ export default async function handler(req, res) {
       responses.map((r) => (r.ok ? r.json() : [])),
     );
 
-    // Une os arrays de repositórios
-    const combined = [...data[0], ...data[1]];
+    // Owner-only list: projects created by the user and forks created by the user.
+    const combined = [...data[0]];
 
     // Retorna para o seu site
     res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate"); // Cache na rede da Vercel por 1h
