@@ -530,11 +530,20 @@ function setupProjects(source, language, owner, loadId) {
   main.appendChild(section);
 }
 
+function canUseDirectGitHubFallback() {
+  return (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.protocol === "file:"
+  );
+}
+
 function fetchGitHubRepos(owner) {
   // Prefer backend API route (supports token). If unavailable (e.g. Live Server),
   // fall back to direct GitHub API, then finally to local JSON fallback.
   const apiUrl = `/api/github?owner=${encodeURIComponent(owner)}`;
   const directUrl = `https://api.github.com/users/${encodeURIComponent(owner)}/repos?per_page=100&sort=updated&direction=desc&type=owner`;
+  const canFallbackDirect = canUseDirectGitHubFallback();
 
   function fetchDirectRepos() {
     return fetch(directUrl).then((fallbackRes) => {
@@ -547,11 +556,12 @@ function fetchGitHubRepos(owner) {
     .then((res) => {
       if (!res.ok) {
         if (
-          res.status === 401 ||
-          res.status === 403 ||
-          res.status === 404 ||
-          res.status === 429 ||
-          res.status === 500
+          canFallbackDirect &&
+          (res.status === 401 ||
+            res.status === 403 ||
+            res.status === 404 ||
+            res.status === 429 ||
+            res.status === 500)
         ) {
           // Silent fallback to direct GitHub API
           return fetchDirectRepos().then((repos) => ({
@@ -564,6 +574,10 @@ function fetchGitHubRepos(owner) {
       return res.json().then((repos) => ({ repos, failed: false }));
     })
     .catch((err) => {
+      if (!canFallbackDirect) {
+        console.error("[projects] API route request failed", err);
+        return { repos: [], failed: true };
+      }
       console.error(
         "[projects] Failed to fetch from API route, trying direct GitHub API",
         err,
@@ -606,18 +620,14 @@ function fetchRepoLanguages(owner, repoName) {
       console.warn("Bad cached languages for", repoName, e);
     }
   }
-  const isLocalhost =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-  const languagesUrl = isLocalhost
-    ? `/api/github-languages?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repoName)}`
-    : `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/languages`;
+  const canFallbackDirect = canUseDirectGitHubFallback();
+  const languagesUrl = `/api/github-languages?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repoName)}`;
   const directLanguagesUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/languages`;
 
   return fetch(languagesUrl)
     .then((res) => {
       if (res.ok) return res.json();
-      if (isLocalhost && (res.status === 404 || res.status === 500)) {
+      if (canFallbackDirect && (res.status === 404 || res.status === 500)) {
         console.info(
           `[projects] /api/github-languages unavailable for ${repoName}, using direct GitHub API fallback.`,
         );
@@ -642,12 +652,24 @@ function fetchRepoLanguages(owner, repoName) {
 }
 
 function fetchLatestOwnerCommitOnBranch(owner, repoName, author, branch) {
-  const commitUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?sha=${encodeURIComponent(branch)}&per_page=30`;
+  const commitPath = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?sha=${encodeURIComponent(branch)}&per_page=30`;
+  const commitUrl = `/api/github-proxy?path=${encodeURIComponent(commitPath)}`;
+  const directCommitUrl = `https://api.github.com${commitPath}`;
   const normalizedAuthor = normalizeGitHubLogin(author);
 
   return fetch(commitUrl)
     .then((res) => {
-      if (!res.ok) return null;
+      if (!res.ok) {
+        if (
+          canUseDirectGitHubFallback() &&
+          (res.status === 404 || res.status === 500)
+        ) {
+          return fetch(directCommitUrl).then((fallbackRes) =>
+            fallbackRes.ok ? fallbackRes.json() : null,
+          );
+        }
+        return null;
+      }
       return res.json();
     })
     .then((commits) => {
@@ -685,11 +707,23 @@ function fetchLatestOwnerCommitOnBranch(owner, repoName, author, branch) {
 }
 
 function fetchLatestBranchCommitOnBranch(owner, repoName, branch) {
-  const commitUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?sha=${encodeURIComponent(branch)}&per_page=1`;
+  const commitPath = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?sha=${encodeURIComponent(branch)}&per_page=1`;
+  const commitUrl = `/api/github-proxy?path=${encodeURIComponent(commitPath)}`;
+  const directCommitUrl = `https://api.github.com${commitPath}`;
 
   return fetch(commitUrl)
     .then((res) => {
-      if (!res.ok) return null;
+      if (!res.ok) {
+        if (
+          canUseDirectGitHubFallback() &&
+          (res.status === 404 || res.status === 500)
+        ) {
+          return fetch(directCommitUrl).then((fallbackRes) =>
+            fallbackRes.ok ? fallbackRes.json() : null,
+          );
+        }
+        return null;
+      }
       return res.json();
     })
     .then((commits) => {
@@ -720,11 +754,23 @@ function extractPullRequestActivityTimestamp(pr) {
 }
 
 function fetchLatestPullRequestActivityOnBase(owner, repoName, baseBranch) {
-  const pullsUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/pulls?state=all&base=${encodeURIComponent(baseBranch)}&sort=updated&direction=desc&per_page=20`;
+  const pullsPath = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/pulls?state=all&base=${encodeURIComponent(baseBranch)}&sort=updated&direction=desc&per_page=20`;
+  const pullsUrl = `/api/github-proxy?path=${encodeURIComponent(pullsPath)}`;
+  const directPullsUrl = `https://api.github.com${pullsPath}`;
 
   return fetch(pullsUrl)
     .then((res) => {
-      if (!res.ok) return null;
+      if (!res.ok) {
+        if (
+          canUseDirectGitHubFallback() &&
+          (res.status === 404 || res.status === 500)
+        ) {
+          return fetch(directPullsUrl).then((fallbackRes) =>
+            fallbackRes.ok ? fallbackRes.json() : null,
+          );
+        }
+        return null;
+      }
       return res.json();
     })
     .then((pulls) => {

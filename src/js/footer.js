@@ -2,20 +2,48 @@ const FOOTER_DEFAULT_OWNER = "JLBBARCO";
 const FOOTER_DEFAULT_REPO = "portfolio";
 const FOOTER_DYNAMIC_WRAPPER_ID = "footerContent";
 
-function fetchRepositoryMetadata(owner, repo) {
-  const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
-  return fetch(url)
-    .then((res) => (res.ok ? res.json() : null))
+function canUseDirectGitHubFallback() {
+  return (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.protocol === "file:"
+  );
+}
+
+function fetchFromGitHubProxy(path, fallbackValue) {
+  const proxyUrl = `/api/github-proxy?path=${encodeURIComponent(path)}`;
+
+  return fetch(proxyUrl)
+    .then((res) => {
+      if (res.ok) return res.json();
+      if (res.status === 404) return fallbackValue;
+      throw new Error(`GitHub proxy error: ${res.status}`);
+    })
     .catch((err) => {
-      console.warn("[footer] Failed to fetch repository metadata:", err);
-      return null;
+      console.warn("[footer] Proxy request failed:", err);
+      return fallbackValue;
     });
 }
 
+function fetchRepositoryMetadata(owner, repo) {
+  const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
+
+  return fetchFromGitHubProxy(path, null).then((data) => {
+    if (data || !canUseDirectGitHubFallback()) return data;
+
+    const url = `https://api.github.com${path}`;
+    return fetch(url)
+      .then((res) => (res.ok ? res.json() : null))
+      .catch((err) => {
+        console.warn("[footer] Failed to fetch repository metadata:", err);
+        return null;
+      });
+  });
+}
+
 function fetchMainBranchLastUpdate(owner, repo) {
-  const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/commits?sha=main&per_page=1`;
-  return fetch(url)
-    .then((res) => (res.ok ? res.json() : []))
+  const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/commits?sha=main&per_page=1`;
+  return fetchFromGitHubProxy(path, [])
     .then((commits) => {
       const first = Array.isArray(commits) ? commits[0] : null;
       return (
@@ -37,13 +65,21 @@ function fetchRepositoryLanguages(owner, repo) {
     return fetchRepoLanguages(owner, repo);
   }
 
-  const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/languages`;
-  return fetch(url)
-    .then((res) => (res.ok ? res.json() : {}))
-    .catch((err) => {
-      console.warn("[footer] Failed to fetch repository languages:", err);
-      return {};
-    });
+  const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/languages`;
+
+  return fetchFromGitHubProxy(path, {}).then((data) => {
+    if (Object.keys(data || {}).length || !canUseDirectGitHubFallback()) {
+      return data;
+    }
+
+    const url = `https://api.github.com${path}`;
+    return fetch(url)
+      .then((res) => (res.ok ? res.json() : {}))
+      .catch((err) => {
+        console.warn("[footer] Failed to fetch repository languages:", err);
+        return {};
+      });
+  });
 }
 
 function buildIconsFromRepositoryData(repoData, languagesData) {
