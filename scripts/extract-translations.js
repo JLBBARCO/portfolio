@@ -18,11 +18,14 @@
  *   npm run i18n:translate-missing # Translate only new keys (safer)
  */
 
-const fs = require("fs");
-const path = require("path");
-const glob = require("glob");
-const https = require("https");
+import fs from "node:fs";
+import path from "node:path";
+import https from "node:https";
+import { fileURLToPath } from "node:url";
+import { globSync } from "glob";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const rootDir = path.join(__dirname, "..");
 const combinedPath = path.join(
   rootDir,
@@ -144,7 +147,7 @@ function scanFiles() {
   const allKeys = new Set();
 
   // Scan HTML files
-  const htmlFiles = glob.sync("**/*.html", {
+  const htmlFiles = globSync("**/*.html", {
     cwd: rootDir,
     ignore: "node_modules/**",
   });
@@ -155,7 +158,7 @@ function scanFiles() {
   });
 
   // Scan JS files
-  const jsFiles = glob.sync("src/js/**/*.js", { cwd: rootDir });
+  const jsFiles = globSync("src/js/**/*.js", { cwd: rootDir });
   jsFiles.forEach((file) => {
     const content = fs.readFileSync(path.join(rootDir, file), "utf8");
     const keys = extractKeysFromContent(content);
