@@ -168,6 +168,61 @@ function resolveIconSpec(iconData, fallbackName = "") {
   return { style: style || "fa-solid", icon, iconName };
 }
 
+function isFontAwesomeRuntimeReady() {
+  if (window.FontAwesome && typeof window.FontAwesome.icon === "function") {
+    return true;
+  }
+
+  // CSS/webfont mode (non-kit or kit configured to inject stylesheet)
+  try {
+    return Array.from(document.styleSheets || []).some((sheet) => {
+      const href = String((sheet && sheet.href) || "").toLowerCase();
+      return href.includes("font-awesome") || href.includes("fontawesome");
+    });
+  } catch (_e) {
+    return false;
+  }
+}
+
+function tryFindKitIcon(candidate) {
+  if (!candidate || !window.FontAwesome) return null;
+  const api = window.FontAwesome;
+  if (typeof api.icon !== "function") return null;
+
+  const candidates = [
+    { style: "fa-brands", prefix: "fab" },
+    { style: "fa-solid", prefix: "fas" },
+    { style: "fa-regular", prefix: "far" },
+  ];
+
+  for (const entry of candidates) {
+    try {
+      const rendered = api.icon({ prefix: entry.prefix, iconName: candidate });
+      if (rendered && Array.isArray(rendered.html) && rendered.html.length) {
+        return { style: entry.style, icon: `fa-${candidate}` };
+      }
+    } catch (_e) {
+      // ignore lookup errors and continue trying other prefixes
+    }
+  }
+
+  return null;
+}
+
+function refreshFontAwesomeKit(node) {
+  const domApi =
+    window.FontAwesome && window.FontAwesome.dom
+      ? window.FontAwesome.dom
+      : null;
+  if (!domApi || typeof domApi.i2svg !== "function") return;
+
+  try {
+    domApi.i2svg({ node: node || document.body });
+  } catch (_e) {
+    // keep UI functional even if kit reprocessing fails
+  }
+}
+
 function guessFaIcon(name) {
   if (!name) return null;
   const key = name.toLowerCase().trim();
@@ -189,6 +244,12 @@ function guessFaIcon(name) {
     return null;
   }
 
+  const fromKit = tryFindKitIcon(candidate);
+  if (fromKit) {
+    _faGuessCache[key] = fromKit;
+    return fromKit;
+  }
+
   const styles = ["fa-brands", "fa-solid", "fa-regular"];
   let found = null;
   for (const style of styles) {
@@ -208,12 +269,18 @@ function guessFaIcon(name) {
       break;
     }
   }
-  _faGuessCache[key] = found;
+
   if (!found && _faAliasMap[key]) {
     // recursive call with alias (will hit cache if we've tried it before)
     found = guessFaIcon(_faAliasMap[key]);
+  }
+
+  // If FA has not finished loading yet (common with JS kit), avoid caching
+  // negative results so a later render can still resolve the icon.
+  if (found || isFontAwesomeRuntimeReady()) {
     _faGuessCache[key] = found;
   }
+
   return found;
 }
 
@@ -503,6 +570,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setupCarouselButtons();
         addNewIcons("src/assets/icons/svg.json");
+        refreshFontAwesomeKit(document.body);
         initializeProfileImage();
         semiHiddenCards();
         updateBackToTopVisibility();
@@ -679,6 +747,51 @@ function toggleShowAllButtonVisibility(sectionId, isAllFilterActive) {
 }
 
 function addNewIcons(linkFile) {
+  function isFaUtilityClass(className) {
+    return /^fa-(2xs|xs|sm|lg|xl|2xl|[1-9]x|10x|spin|spin-pulse|spin-reverse|beat|beat-fade|bounce|fade|flip|shake|fw|border|inverse|pull-left|pull-right|rotate-\d+)$/.test(
+      className,
+    );
+  }
+
+  function buildWrapperClassName(el, iconClass) {
+    const styleClasses = new Set([
+      "fa-solid",
+      "fa-regular",
+      "fa-brands",
+      "fa-light",
+      "fa-thin",
+      "fa-duotone",
+    ]);
+
+    const classes = Array.from(el.classList || [])
+      .filter(Boolean)
+      .filter((className) => {
+        if (className === iconClass) return false;
+        if (className === "svg-inline--fa") return false;
+        if (styleClasses.has(className)) return false;
+        if (className.startsWith("fa-sharp")) return false;
+        if (className.startsWith("fa-")) return isFaUtilityClass(className);
+        return true;
+      });
+
+    if (!classes.includes("icon")) classes.push("icon");
+    return classes.join(" ").trim();
+  }
+
+  function getTargetsForIcon(iconClass) {
+    const token = normalizeIconToken(iconClass);
+    const selectors = [`i.${iconClass}`, `svg.${iconClass}`];
+    if (token) selectors.push(`svg[data-icon="${token}"]`);
+
+    const targets = Array.from(document.querySelectorAll(selectors.join(", ")));
+    const seen = new Set();
+    return targets.filter((el) => {
+      if (!el || seen.has(el)) return false;
+      seen.add(el);
+      return true;
+    });
+  }
+
   function uniquifySvgIds(svgElement, seed) {
     if (!svgElement) return;
     const idMap = new Map();
@@ -764,64 +877,60 @@ function addNewIcons(linkFile) {
           .replace(/stroke=['"]#[^'"]*['"]/g, "");
         if (!svg) return;
 
-        Array.from(document.querySelectorAll(`i.${icon.class}`)).forEach(
-          (el) => {
-            if (el.dataset.svgReplaced === "true") return;
+        getTargetsForIcon(icon.class).forEach((el) => {
+          if (el.dataset && el.dataset.svgReplaced === "true") return;
 
-            const wrapper = document.createElement("span");
-            wrapper.className = el.className
-              .split(/\s+/)
-              .filter((c) => c && !c.startsWith("fa-"))
-              .join(" ");
-            if (!wrapper.className.includes("icon")) {
-              wrapper.className = `${wrapper.className} icon`.trim();
+          const wrapper = document.createElement("span");
+          wrapper.className = buildWrapperClassName(el, icon.class);
+
+          const title =
+            el.getAttribute("title") ||
+            el.getAttribute("aria-label") ||
+            (el.parentElement && el.parentElement.getAttribute("title"));
+          if (title) {
+            wrapper.setAttribute("title", title);
+          }
+
+          wrapper.innerHTML = svg;
+          const s = wrapper.querySelector("svg");
+          if (s) {
+            uniquifySvgIds(
+              s,
+              `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            );
+
+            s.classList.add("svg-icon");
+            s.setAttribute("aria-hidden", "true");
+            s.setAttribute("focusable", "false");
+            s.removeAttribute("width");
+            s.removeAttribute("height");
+            if (!s.getAttribute("viewBox")) {
+              s.setAttribute("viewBox", "0 0 24 24");
             }
-            if (el.getAttribute("title")) {
-              wrapper.setAttribute("title", el.getAttribute("title"));
-            }
-
-            wrapper.innerHTML = svg;
-            const s = wrapper.querySelector("svg");
-            if (s) {
-              uniquifySvgIds(
-                s,
-                `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-              );
-
-              s.classList.add("svg-icon");
-              s.setAttribute("aria-hidden", "true");
-              s.setAttribute("focusable", "false");
-              s.removeAttribute("width");
-              s.removeAttribute("height");
-              if (!s.getAttribute("viewBox")) {
-                s.setAttribute("viewBox", "0 0 24 24");
+            Array.from(
+              s.querySelectorAll("path, circle, rect, line, polygon, ellipse"),
+            ).forEach((shape) => {
+              const style = shape.getAttribute("style");
+              if (style) {
+                const nextStyle = style
+                  .replace(/fill\s*:\s*[^;]+/gi, "fill:currentColor")
+                  .replace(/stroke\s*:\s*[^;]+/gi, "stroke:currentColor");
+                shape.setAttribute("style", nextStyle);
               }
-              Array.from(
-                s.querySelectorAll(
-                  "path, circle, rect, line, polygon, ellipse",
-                ),
-              ).forEach((shape) => {
-                const style = shape.getAttribute("style");
-                if (style) {
-                  const nextStyle = style
-                    .replace(/fill\s*:\s*[^;]+/gi, "fill:currentColor")
-                    .replace(/stroke\s*:\s*[^;]+/gi, "stroke:currentColor");
-                  shape.setAttribute("style", nextStyle);
-                }
 
-                if (shape.getAttribute("fill") !== "none") {
-                  shape.setAttribute("fill", "currentColor");
-                }
-                if (shape.getAttribute("stroke")) {
-                  shape.setAttribute("stroke", "currentColor");
-                }
-              });
-            }
+              if (shape.getAttribute("fill") !== "none") {
+                shape.setAttribute("fill", "currentColor");
+              }
+              if (shape.getAttribute("stroke")) {
+                shape.setAttribute("stroke", "currentColor");
+              }
+            });
+          }
 
-            wrapper.dataset.svgReplaced = "true";
-            el.replaceWith(wrapper);
-          },
-        );
+          wrapper.dataset.svgReplaced = "true";
+          wrapper.dataset.svgIconClass = icon.class;
+          el.replaceWith(wrapper);
+        });
       });
     })
     .catch((err) => console.error("Erro ao carregar SVGs:", err));

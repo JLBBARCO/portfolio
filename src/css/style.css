@@ -41,6 +41,7 @@
   --shadow: 0 0 15px var(--hover-accent);
   --icon-size: 1.5rem;
   --navbar-height: 5rem;
+  --fa-display: inline-block;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -624,6 +625,17 @@ a.external::after {
   width: 1em;
   height: 1em;
   display: block;
+  flex-shrink: 0;
+}
+
+svg.icon.svg-inline--fa,
+.icon.svg-inline--fa {
+  width: 1em;
+  height: 1em;
+  min-width: 1em;
+  min-height: 1em;
+  display: inline-block;
+  vertical-align: middle;
   flex-shrink: 0;
 }
 

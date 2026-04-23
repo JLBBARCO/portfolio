@@ -9,11 +9,8 @@
   <link rel="stylesheet" href="src/css/tablet.css" media="(min-width: 724px)" />
   <link rel="stylesheet" href="src/css/pc.css" media="(min-width: 990px)" />
   <link rel="stylesheet" href="src/css/tv.css" media="(min-width: 1920px)" />
-  <!-- use CDN stylesheet so all free brand icons are available immediately -->
-  <!-- updated to latest FontAwesome and removed integrity check to avoid
-       accidental mismatches when the CDN updates the file. -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous" />
+  <!-- Font Awesome Kit (JS/SVG mode) -->
+  <script src="https://kit.fontawesome.com/4a1e49a1ca.js" crossorigin="anonymous"></script>
   <!-- Inicialmente use o ícone dark para reduzir flash enquanto o script ajusta conforme preferência -->
   <link rel="shortcut icon" href="src/assets/favicon/code-light.svg" type="image/x-icon" id="favicon">
   <script src="src/js/script.js" defer></script>
@@ -59,7 +56,7 @@
     </article>
     <article id="forTop">
       <button type="button" id="back-to-top" data-i18n="aria_back_to_top" data-i18n-attr="aria-label"
-        aria-label="Voltar ao topo" title="Voltar ao topo" aria-hidden="true">
+        aria-label="Voltar ao topo" aria-hidden="true">
         <i class="fa-solid fa-arrow-up icon"></i>
       </button>
     </article>
