@@ -98,10 +98,10 @@
         "pt-BR": "Sistema que instala e desinstala programas automaticamente, no qual o usuário tem total controle do gerenciamento de programas"
       }
     },
-    "Orbity": {
+    "orbit-games-archive": {
       "title": {
         "en-US": "Orbit Games Archive",
-        "pt-BR": "Orbit Games Archive"
+        "pt-BR": "Arquivo de Jogos Orbit"
       },
       "description": {
         "en-US": "Website that stores games, synopses, gameplay, community comments, and more.",
@@ -132,6 +132,5 @@
         "pt-BR": "Site para o Auto Programs, sistema que instala e desinstala programas automaticamente, no qual o usuário pode ver os programas que foram instalados, desinstalados, atualizados, os que deram erro, entre outras informações"
       }
     }
-
   }
 }
