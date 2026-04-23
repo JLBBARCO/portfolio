@@ -966,17 +966,18 @@ function semiHiddenCards() {
     const existingBtn = section.querySelector(".show-all-button");
     if (existingBtn) existingBtn.remove();
 
-    let currentLang = "en";
+    let currentLang = "en-us";
     try {
-      currentLang = localStorage.getItem("language") || "en";
+      currentLang = localStorage.getItem("language") || "en-us";
     } catch (e) {
-      currentLang = "en";
+      currentLang = "en-us";
     }
 
     const showAllButton = document.createElement("button");
     showAllButton.className = "filter-button show-all-button";
-    showAllButton.textContent =
-      currentLang === "pt" ? "Mostrar todos" : "Show all";
+    showAllButton.textContent = currentLang.startsWith("pt")
+      ? "Mostrar todos"
+      : "Show all";
     showAllButton.dataset.filter = "show-all";
     showAllButton.addEventListener("click", () => {
       hiddenCards.forEach((card) => {

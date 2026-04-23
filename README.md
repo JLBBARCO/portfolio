@@ -74,16 +74,22 @@ npm run i18n:translate-missing   # Auto-translate new keys only (recommended)
 npm run i18n:translate           # Force translate all empty keys
 ```
 
-### Legacy Information
+Legacy Information
 
-To make localization easier you no longer have to edit two separate JSON
-files (`en-us.json` and `pt-br.json`). All strings are now stored in
+To make localization easier you now keep all supported locales in
 `src/json/translate/strings.json`, which has the structure:
 
 ```json
 {
-  "en": { "key": "English text" },
-  "pt": { "key": "Texto em português" }
+  "defaultLanguage": "pt-br",
+  "languages": {
+    "pt-br": { "code": "PT", "locale": "pt-BR" },
+    "en-us": { "code": "EN", "locale": "en-US" }
+  },
+  "translations": {
+    "pt-br": { "key": "Texto em português" },
+    "en-us": { "key": "English text" }
+  }
 }
 ```
 

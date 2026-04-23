@@ -16,7 +16,8 @@ const _repoMainMasterActivityCache = new Map();
 // Each entry can define title/description/institution/descriptionImage.
 // If a field is missing, the renderer falls back to the card payload.
 function normalizeLocale(language) {
-  return language === "pt" || language === "pt-BR" ? "pt-BR" : "en-US";
+  const normalized = String(language || "").toLowerCase();
+  return normalized.startsWith("pt") ? "pt-BR" : "en-US";
 }
 
 function slugifyCardId(value) {

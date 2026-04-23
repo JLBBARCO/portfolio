@@ -32,10 +32,6 @@ const combinedPath = path.join(
   "strings.json",
 );
 
-// Legacy files - kept for backward compatibility but not actively used
-const ptPath = path.join(rootDir, "src", "json", "translate", "pt-br.json");
-const enPath = path.join(rootDir, "src", "json", "translate", "en-us.json");
-
 // CLI arguments
 const args = process.argv.slice(2);
 const AUTO_TRANSLATE = args.includes("--auto-translate");
@@ -304,7 +300,7 @@ async function autoTranslateMissing(
     current++;
 
     // Skip if only translating new keys and this key already has a translation
-    if (onlyNew && (result.en[key] || result.pt[key])) {
+    if (onlyNew && (result["en-us"][key] || result["pt-br"][key])) {
       skipped++;
       continue;
     }
@@ -327,7 +323,7 @@ async function autoTranslateMissing(
 
         // Rate limiting: be nice to the free API (500ms delay)
         await new Promise((resolve) => setTimeout(resolve, 500));
-      } else if (!langs.pt) {
+      } else if (!langs["pt-br"]) {
         console.log(`✅`);
       }
     } catch (error) {
@@ -348,11 +344,6 @@ async function main() {
   // Load existing translations
   const existing = readJSON(combinedPath);
   const result = normalizeTranslationStore(existing);
-  const languageCodes = Object.keys(result.languages || DEFAULT_LANGUAGES);
-
-  // Load legacy files for migration
-  const legacyPt = readJSON(ptPath);
-  const legacyEn = readJSON(enPath);
 
   let newKeysCount = 0;
   let missingTranslations = [];
@@ -362,7 +353,7 @@ async function main() {
     validateKeyNaming(key);
 
     if (!(key in result.translations["en-us"])) {
-      result.translations["en-us"][key] = legacyEn[key] || "";
+      result.translations["en-us"][key] = "";
       newKeysCount++;
       if (!result.translations["en-us"][key]) {
         missingTranslations.push({ key, lang: "en-us" });
@@ -370,7 +361,7 @@ async function main() {
     }
 
     if (!(key in result.translations["pt-br"])) {
-      result.translations["pt-br"][key] = legacyPt[key] || "";
+      result.translations["pt-br"][key] = "";
       if (!result.translations["pt-br"][key]) {
         missingTranslations.push({ key, lang: "pt-br" });
       }
