@@ -310,10 +310,8 @@ document.addEventListener("DOMContentLoaded", () => {
       menuButton.dataset.boundToggle = "true";
     }
 
-    const languageBtn = document.getElementById("languageBtn");
-    if (languageBtn && !languageBtn.dataset.boundLanguage) {
-      languageBtn.addEventListener("click", changeLanguage);
-      languageBtn.dataset.boundLanguage = "true";
+    if (typeof bindLanguageDropdown === "function") {
+      bindLanguageDropdown();
     }
   }
 
@@ -440,9 +438,12 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn("localStorage unavailable when reading language:", e);
       storedLang = null;
     }
-    const currentLang =
-      storedLang || (navigator.language.startsWith("pt") ? "pt" : "en");
-    const locale = currentLang === "pt" ? "pt-BR" : "en-US";
+    const currentLang = (
+      storedLang ||
+      navigator.language ||
+      "pt-BR"
+    ).toLowerCase();
+    const locale = currentLang.startsWith("pt") ? "pt-BR" : "en-US";
 
     const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
     // Always try GitHub API first; setupProjects will fallback to local JSON if API fails

@@ -85,15 +85,74 @@ function header() {
   header.appendChild(navMenu);
 
   const navLanguage = document.createElement("nav");
+  navLanguage.className = "nav-language";
+
+  const docLangForButton = (document.documentElement.lang || "pt-BR")
+    .toLowerCase()
+    .startsWith("pt")
+    ? "pt"
+    : "en";
+  const currentLanguageCode = docLangForButton === "pt" ? "PT" : "EN";
+  const currentLanguageCountry = docLangForButton === "pt" ? "BR" : "US";
+  const currentLanguageCountryName =
+    docLangForButton === "pt" ? "Brasil" : "United States";
+
+  function handleFlagFallback(flagImage, fallbackText) {
+    if (!flagImage || !fallbackText) return;
+
+    flagImage.addEventListener("error", () => {
+      flagImage.classList.add("is-hidden");
+      fallbackText.classList.add("is-visible");
+    });
+  }
 
   const languageButton = document.createElement("button");
   languageButton.id = "languageBtn";
   languageButton.className = "language";
-  languageButton.ariaLabel = "pt-br";
-  const languageIcon = document.createElement("i");
-  languageIcon.className = "fa-solid fa-globe icon";
-  languageButton.append(languageIcon);
-  navLanguage.appendChild(languageButton);
+  languageButton.type = "button";
+  languageButton.setAttribute("aria-haspopup", "menu");
+  languageButton.setAttribute("aria-expanded", "false");
+  languageButton.setAttribute("aria-controls", "languageDropdown");
+  languageButton.setAttribute("aria-label", currentLanguageCode);
+
+  const languageCurrentText = document.createElement("span");
+  languageCurrentText.id = "languageCurrentText";
+  languageCurrentText.className = "language-current-text";
+  languageCurrentText.textContent = currentLanguageCode;
+
+  const languageCurrentFlag = document.createElement("img");
+  languageCurrentFlag.id = "languageCurrentFlag";
+  languageCurrentFlag.className = "language-flag";
+  languageCurrentFlag.src = `https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.21/3x2/${currentLanguageCountry}.svg`;
+  languageCurrentFlag.alt = currentLanguageCountry;
+  languageCurrentFlag.width = 24;
+  languageCurrentFlag.height = 16;
+
+  const languageCurrentFallback = document.createElement("span");
+  languageCurrentFallback.id = "languageCurrentFallback";
+  languageCurrentFallback.className = "language-flag-fallback";
+  languageCurrentFallback.textContent = currentLanguageCountryName;
+
+  handleFlagFallback(languageCurrentFlag, languageCurrentFallback);
+
+  const languageCaret = document.createElement("i");
+  languageCaret.className = "fa-solid fa-chevron-down language-caret";
+  languageCaret.setAttribute("aria-hidden", "true");
+
+  languageButton.append(
+    languageCurrentText,
+    languageCurrentFlag,
+    languageCurrentFallback,
+    languageCaret,
+  );
+
+  const languageDropdown = document.createElement("div");
+  languageDropdown.id = "languageDropdown";
+  languageDropdown.className = "language-dropdown";
+  languageDropdown.setAttribute("role", "menu");
+  languageDropdown.setAttribute("aria-label", "Language options");
+
+  navLanguage.append(languageButton, languageDropdown);
 
   header.appendChild(navLanguage);
 

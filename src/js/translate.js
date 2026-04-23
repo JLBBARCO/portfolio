@@ -1,8 +1,99 @@
 // Sistema de tradução simples usando JSON
-let currentLanguage = "pt";
+let currentLanguage = "pt-br";
 let translations = {};
+let supportedLanguages = {};
+let supportedLanguageCodes = [];
+let defaultLanguage = "pt-br";
 // cache nodeLists for efficiency
 let _i18nElements = null;
+const FLAG_ICON_BASE_URL =
+  "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.21/3x2";
+
+function normalizeLanguageCode(language) {
+  const fallbackLanguage =
+    window.__deviceLanguagePreference ||
+    defaultLanguage ||
+    supportedLanguageCodes[0] ||
+    "pt-br";
+  if (!language) return fallbackLanguage;
+
+  const normalized = String(language).toLowerCase();
+  if (supportedLanguages[normalized]) return normalized;
+
+  const base = normalized.split("-")[0];
+  const matched = supportedLanguageCodes.find(
+    (code) => code.split("-")[0] === base,
+  );
+  return matched || fallbackLanguage;
+}
+
+function getLanguageMeta(language) {
+  const normalized = normalizeLanguageCode(language);
+  return (
+    supportedLanguages[normalized] || {
+      code: normalized.split("-")[0].toUpperCase(),
+      locale: normalized,
+      country: normalized.startsWith("pt") ? "BR" : "US",
+      countryName: normalized.startsWith("pt") ? "Brasil" : "United States",
+      displayName: normalized.startsWith("pt") ? "Português" : "English",
+    }
+  );
+}
+
+function getLanguageBase(language) {
+  return normalizeLanguageCode(language).split("-")[0];
+}
+
+function isPortugueseLanguage(language) {
+  return getLanguageBase(language) === "pt";
+}
+
+function normalizeTranslationPayload(combined) {
+  if (combined && combined.languages && combined.translations) {
+    return {
+      defaultLanguage:
+        combined.defaultLanguage ||
+        Object.keys(combined.languages)[0] ||
+        "pt-br",
+      languages: combined.languages,
+      translations: combined.translations,
+    };
+  }
+
+  if (combined && (combined.en || combined.pt)) {
+    return {
+      defaultLanguage: "pt-br",
+      languages: {
+        "pt-br": {
+          code: "PT",
+          locale: "pt-BR",
+          country: "BR",
+          countryName: "Brasil",
+          displayName: "Português (Brasil)",
+        },
+        "en-us": {
+          code: "EN",
+          locale: "en-US",
+          country: "US",
+          countryName: "United States",
+          displayName: "English (United States)",
+        },
+      },
+      translations: {
+        "pt-br": combined.pt || {},
+        "en-us": combined.en || {},
+      },
+    };
+  }
+
+  return null;
+}
+
+function getDeviceLanguageRaw() {
+  return String(
+    navigator.language || navigator.userLanguage || "",
+  ).toLowerCase();
+}
 
 // previously there were helper functions to read/write cookies; the
 // language preference is now stored in localStorage instead, so those are
@@ -40,32 +131,98 @@ function sanitizeTranslationHTML(html) {
 function loadTranslations() {
   return fetchJsonWithFallback("src/json/translate/strings.json")
     .then((combined) => {
-      if (!combined || !combined.en || !combined.pt) {
+      const normalized = normalizeTranslationPayload(combined);
+      if (!normalized) {
         throw new Error(
-          "Invalid translation file format. Expected { en: {...}, pt: {...} }",
+          "Invalid translation file format. Expected { languages: {...}, translations: {...} }",
         );
       }
 
-      translations.en = combined.en;
-      translations.pt = combined.pt;
+      const deviceLanguagePreference = normalizeLanguageCode(
+        getDeviceLanguageRaw() || normalized.defaultLanguage || "pt-br",
+      );
+      defaultLanguage = deviceLanguagePreference;
+      supportedLanguages = {};
+      supportedLanguageCodes = [];
+      Object.entries(normalized.languages || {}).forEach(([code, meta]) => {
+        const normalizedCode = String(code).toLowerCase();
+        const resolvedMeta = meta || {};
+        supportedLanguages[normalizedCode] = {
+          code: resolvedMeta.code || normalizedCode.split("-")[0].toUpperCase(),
+          locale: resolvedMeta.locale || normalizedCode,
+          country:
+            resolvedMeta.country ||
+            (normalizedCode.startsWith("pt") ? "BR" : "US"),
+          countryName:
+            resolvedMeta.countryName ||
+            resolvedMeta.displayName ||
+            (normalizedCode.startsWith("pt") ? "Brasil" : "United States"),
+          displayName:
+            resolvedMeta.displayName ||
+            resolvedMeta.countryName ||
+            normalizedCode,
+        };
+        supportedLanguageCodes.push(normalizedCode);
+      });
+
+      translations = {};
+      Object.entries(normalized.translations || {}).forEach(([code, value]) => {
+        translations[String(code).toLowerCase()] = value || {};
+      });
+
+      if (!supportedLanguageCodes.length) {
+        throw new Error("No supported languages found in translation file.");
+      }
+
+      supportedLanguageCodes.forEach((languageCode) => {
+        if (!translations[languageCode]) translations[languageCode] = {};
+      });
 
       // sincroniza chaves (preenchendo com a outra língua quando faltar)
-      const allKeys = new Set([
-        ...Object.keys(translations.en || {}),
-        ...Object.keys(translations.pt || {}),
-      ]);
-      allKeys.forEach((k) => {
-        if (!(k in translations.en))
-          translations.en[k] = translations.pt[k] || "";
-        if (!(k in translations.pt))
-          translations.pt[k] = translations.en[k] || "";
+      const allKeys = new Set();
+      supportedLanguageCodes.forEach((languageCode) => {
+        Object.keys(translations[languageCode] || {}).forEach((key) =>
+          allKeys.add(key),
+        );
+      });
+
+      allKeys.forEach((key) => {
+        let fallbackValue = "";
+        for (const languageCode of supportedLanguageCodes) {
+          if (translations[languageCode] && key in translations[languageCode]) {
+            const value = translations[languageCode][key];
+            if (typeof value === "string" && value) {
+              fallbackValue = value;
+              break;
+            }
+          }
+        }
+        supportedLanguageCodes.forEach((languageCode) => {
+          if (!(key in translations[languageCode])) {
+            translations[languageCode][key] = fallbackValue || "";
+          }
+        });
       });
 
       // Preserve templates with placeholders for dynamic replacement.
-      window.__translationTemplates = {
-        en: translations.en.meta_last_update || "Last Update: {{date}}",
-        pt: translations.pt.meta_last_update || "Última atualização: {{date}}",
-      };
+      window.__translationTemplates = {};
+      supportedLanguageCodes.forEach((languageCode) => {
+        const meta = getLanguageMeta(languageCode);
+        window.__translationTemplates[languageCode] =
+          translations[languageCode].meta_last_update ||
+          (getLanguageBase(languageCode) === "pt"
+            ? "Última atualização: {{date}}"
+            : "Last Update: {{date}}");
+        if (!meta.locale) {
+          supportedLanguages[languageCode].locale =
+            getLanguageBase(languageCode) === "pt" ? "pt-BR" : "en-US";
+        }
+      });
+
+      window.__supportedLanguages = supportedLanguages;
+      window.__supportedLanguageCodes = supportedLanguageCodes;
+      window.__defaultLanguage = deviceLanguagePreference;
+      window.__deviceLanguagePreference = deviceLanguagePreference;
 
       let savedLanguage;
       try {
@@ -74,20 +231,13 @@ function loadTranslations() {
         console.warn("localStorage unavailable when reading language:", err);
         savedLanguage = null;
       }
-      if (savedLanguage === "pt" || savedLanguage === "en") {
-        currentLanguage = savedLanguage;
-      } else {
-        const navLang = (navigator.language || "").toLowerCase();
-        currentLanguage = navLang.startsWith("pt") ? "pt" : "en";
-      }
-
-      const languageBtn = document.getElementById("languageBtn");
-      if (languageBtn) {
-        const newAria = currentLanguage === "pt" ? "pt-br" : "en-us";
-        languageBtn.setAttribute("aria-label", newAria);
-      }
+      currentLanguage = normalizeLanguageCode(
+        savedLanguage || deviceLanguagePreference,
+      );
 
       applyTranslations(currentLanguage, { emitLanguageChanged: false });
+      renderLanguageDropdown();
+      bindLanguageDropdown();
       updateLanguageSelector();
       setCVLink(currentLanguage);
 
@@ -100,7 +250,11 @@ function loadTranslations() {
       window.dumpTranslations = function () {
         console.log(
           "Translation template:\n",
-          JSON.stringify({ en: translations.en, pt: translations.pt }, null, 2),
+          JSON.stringify(
+            { languages: supportedLanguages, translations },
+            null,
+            2,
+          ),
         );
       };
     })
@@ -122,39 +276,34 @@ window.setTranslationDate = function (rawDate) {
     return;
   }
 
-  const formatted = {
-    en: date.toLocaleDateString("en-US", {
+  const formattedByLanguage = {};
+  supportedLanguageCodes.forEach((languageCode) => {
+    const meta = getLanguageMeta(languageCode);
+    const locale =
+      meta.locale ||
+      (getLanguageBase(languageCode) === "pt" ? "pt-BR" : "en-US");
+    formattedByLanguage[languageCode] = date.toLocaleDateString(locale, {
       year: "numeric",
       month: "long",
       day: "numeric",
-    }),
-    pt: date.toLocaleDateString("pt-BR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }),
-  };
+    });
+  });
 
-  const templateEn =
-    (window.__translationTemplates && window.__translationTemplates.en) ||
-    (translations.en && translations.en.meta_last_update) ||
-    "Last Update: {{date}}";
-  const templatePt =
-    (window.__translationTemplates && window.__translationTemplates.pt) ||
-    (translations.pt && translations.pt.meta_last_update) ||
-    "Última atualização: {{date}}";
+  supportedLanguageCodes.forEach((languageCode) => {
+    if (!translations[languageCode]) translations[languageCode] = {};
+    const template =
+      (window.__translationTemplates &&
+        window.__translationTemplates[languageCode]) ||
+      translations[languageCode].meta_last_update ||
+      (getLanguageBase(languageCode) === "pt"
+        ? "Última atualização: {{date}}"
+        : "Last Update: {{date}}");
 
-  if (!translations.en) translations.en = {};
-  if (!translations.pt) translations.pt = {};
-
-  translations.en.meta_last_update = templateEn.replace(
-    /\{\{date\}\}/g,
-    formatted.en,
-  );
-  translations.pt.meta_last_update = templatePt.replace(
-    /\{\{date\}\}/g,
-    formatted.pt,
-  );
+    translations[languageCode].meta_last_update = template.replace(
+      /\{\{date\}\}/g,
+      formattedByLanguage[languageCode],
+    );
+  });
 
   const el = document.getElementById("lastUpdate");
   if (el) {
@@ -165,7 +314,9 @@ window.setTranslationDate = function (rawDate) {
   }
 
   const currentFormatted =
-    currentLanguage === "pt" ? formatted.pt : formatted.en;
+    formattedByLanguage[currentLanguage] ||
+    formattedByLanguage[defaultLanguage] ||
+    "";
   const walker = document.createTreeWalker(
     document.body,
     NodeFilter.SHOW_TEXT,
@@ -187,6 +338,9 @@ window.setTranslationDate = function (rawDate) {
 function t(key) {
   if (translations[currentLanguage] && key in translations[currentLanguage]) {
     return translations[currentLanguage][key];
+  }
+  if (translations[defaultLanguage] && key in translations[defaultLanguage]) {
+    return translations[defaultLanguage][key];
   }
   return key;
 }
@@ -244,8 +398,9 @@ function applyTranslations(language, options) {
   const emitLanguageChanged = !(
     options && options.emitLanguageChanged === false
   );
-  currentLanguage = language.startsWith("pt") ? "pt" : "en";
-  document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en-US";
+  currentLanguage = normalizeLanguageCode(language);
+  const currentMeta = getLanguageMeta(currentLanguage);
+  document.documentElement.lang = currentMeta.locale || currentLanguage;
   try {
     try {
       localStorage.setItem("language", currentLanguage);
@@ -315,16 +470,69 @@ function applyTranslations(language, options) {
 }
 
 function updateLanguageSelector() {
-  const languageMenu = document.getElementById("language-menu");
-  if (!languageMenu) return;
-  languageMenu.value = currentLanguage === "pt" ? "pt-BR" : "en-US";
+  const option = getLanguageMeta(currentLanguage);
+  const languageBtn = document.getElementById("languageBtn");
+  const currentText = document.getElementById("languageCurrentText");
+  const currentFlag = document.getElementById("languageCurrentFlag");
+  const languageDropdown = document.getElementById("languageDropdown");
+
+  if (languageBtn) {
+    languageBtn.setAttribute(
+      "aria-label",
+      option.displayName || option.locale || currentLanguage,
+    );
+  }
+
+  if (currentText) {
+    currentText.textContent = option.code;
+  }
+
+  if (currentFlag) {
+    currentFlag.src = `${FLAG_ICON_BASE_URL}/${option.country}.svg`;
+    currentFlag.alt = option.country;
+    currentFlag.classList.remove("is-hidden");
+  }
+
+  const currentFallback = document.getElementById("languageCurrentFallback");
+  if (currentFallback) {
+    currentFallback.textContent =
+      option.countryName || option.displayName || option.locale;
+    currentFallback.classList.remove("is-visible");
+  }
+
+  const menuOptions = document.querySelectorAll(
+    ".language-option[data-language]",
+  );
+  menuOptions.forEach((menuOption) => {
+    const isSelected =
+      normalizeLanguageCode(menuOption.dataset.language) === currentLanguage;
+    menuOption.classList.toggle("is-active", isSelected);
+    menuOption.setAttribute("aria-checked", isSelected ? "true" : "false");
+
+    const optionFlag = menuOption.querySelector(".language-flag");
+    const optionFallback = menuOption.querySelector(".language-flag-fallback");
+    if (optionFlag) {
+      optionFlag.classList.remove("is-hidden");
+    }
+    if (optionFallback) {
+      optionFallback.classList.remove("is-visible");
+    }
+  });
+
+  if (languageDropdown) {
+    languageDropdown.classList.remove("is-open");
+  }
+
+  if (languageBtn) {
+    languageBtn.setAttribute("aria-expanded", "false");
+  }
 }
 
 function setCVLink(language) {
   const downloadCV = document.getElementById("linkDownloadCV");
   if (!downloadCV) return;
   const linkToCV =
-    language === "pt"
+    getLanguageBase(language) === "pt"
       ? "https://docs.google.com/document/d/155TwYXH4HsTpv7LjGJDIkfX_zpsXXFUc/export?format=pdf"
       : "https://docs.google.com/document/d/1cCq1NBFGyd4UfvSOWplguJuYAvBQHdt5/export?format=pdf";
   // update aria-label in case language changed outside of applyTranslations
@@ -346,32 +554,150 @@ function setCVLink(language) {
     });
 }
 
-// 🔧 CORREÇÃO: Função changeLanguage totalmente reescrita
-function changeLanguage() {
-  const languageBtn = document.getElementById("languageBtn");
-  if (!languageBtn) return;
+function renderLanguageDropdown() {
+  const languageDropdown = document.getElementById("languageDropdown");
+  if (!languageDropdown || !supportedLanguageCodes.length) return;
 
-  // Alternar entre pt e en baseado no idioma atual
-  const newLanguage = currentLanguage === "pt" ? "en" : "pt";
-  const newAriaLabel = newLanguage === "pt" ? "pt-br" : "en-us";
+  languageDropdown.innerHTML = "";
+  languageDropdown.dataset.renderedLanguages = supportedLanguageCodes.join(",");
 
-  // Atualizar o atributo aria-label do botão
-  languageBtn.setAttribute("aria-label", newAriaLabel);
+  supportedLanguageCodes.forEach((languageCode) => {
+    const meta = getLanguageMeta(languageCode);
+    const option = document.createElement("button");
+    option.type = "button";
+    option.className = "language-option";
+    option.setAttribute("role", "menuitemradio");
+    option.dataset.language = languageCode;
+    option.setAttribute(
+      "aria-checked",
+      normalizeLanguageCode(languageCode) === currentLanguage
+        ? "true"
+        : "false",
+    );
+    option.setAttribute(
+      "aria-label",
+      meta.displayName || meta.locale || languageCode,
+    );
 
-  // Aplicar as novas traduções
-  applyTranslations(newLanguage);
+    const optionText = document.createElement("span");
+    optionText.className = "language-option-text";
+    optionText.textContent = `${(meta.code || languageCode.split("-")[0]).toUpperCase()} -`;
 
-  // Atualizar o link do CV
-  setCVLink(newLanguage);
+    const optionFlag = document.createElement("img");
+    optionFlag.className = "language-flag";
+    optionFlag.src = `${FLAG_ICON_BASE_URL}/${meta.country || "US"}.svg`;
+    optionFlag.alt = meta.country || languageCode;
+    optionFlag.width = 24;
+    optionFlag.height = 16;
 
-  // Se a data foi carregada, atualizar a data também
+    const optionFallback = document.createElement("span");
+    optionFallback.className = "language-flag-fallback";
+    optionFallback.textContent =
+      meta.countryName || meta.displayName || languageCode;
+
+    optionFlag.addEventListener("error", () => {
+      optionFlag.classList.add("is-hidden");
+      optionFallback.classList.add("is-visible");
+    });
+
+    option.append(optionText, optionFlag, optionFallback);
+    languageDropdown.appendChild(option);
+  });
+}
+
+function bindLanguageDropdown() {
+  const languageButton = document.getElementById("languageBtn");
+  const languageDropdown = document.getElementById("languageDropdown");
+  if (!languageButton || !languageDropdown) {
+    return;
+  }
+
+  if (
+    supportedLanguageCodes.length &&
+    languageDropdown.dataset.renderedLanguages !==
+      supportedLanguageCodes.join(",")
+  ) {
+    renderLanguageDropdown();
+  }
+
+  const languageOptions = document.querySelectorAll(
+    ".language-option[data-language]",
+  );
+
+  if (!languageButton || !languageDropdown || languageOptions.length === 0) {
+    return;
+  }
+
+  if (!languageButton.dataset.boundDropdown) {
+    languageButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const isOpen = languageDropdown.classList.toggle("is-open");
+      languageButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+    languageButton.dataset.boundDropdown = "true";
+  }
+
+  languageOptions.forEach((option) => {
+    if (option.dataset.boundLanguageOption) return;
+    option.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const selectedLanguage = option.dataset.language;
+      if (selectedLanguage) {
+        changeLanguage(selectedLanguage);
+      }
+      languageDropdown.classList.remove("is-open");
+      languageButton.setAttribute("aria-expanded", "false");
+    });
+    option.dataset.boundLanguageOption = "true";
+  });
+
+  if (!document.body.dataset.boundLanguageOutsideClick) {
+    document.addEventListener("click", (event) => {
+      const navLanguage = document.querySelector(".nav-language");
+      if (!navLanguage || navLanguage.contains(event.target)) return;
+      const dropdown = document.getElementById("languageDropdown");
+      const button = document.getElementById("languageBtn");
+      if (dropdown) dropdown.classList.remove("is-open");
+      if (button) button.setAttribute("aria-expanded", "false");
+    });
+    document.body.dataset.boundLanguageOutsideClick = "true";
+  }
+
+  if (!document.body.dataset.boundLanguageEscape) {
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      const dropdown = document.getElementById("languageDropdown");
+      const button = document.getElementById("languageBtn");
+      if (!dropdown || !button) return;
+      dropdown.classList.remove("is-open");
+      button.setAttribute("aria-expanded", "false");
+      button.focus();
+    });
+    document.body.dataset.boundLanguageEscape = "true";
+  }
+}
+
+function changeLanguage(language) {
+  let normalizedLanguage;
+
+  if (typeof language === "string" && language) {
+    normalizedLanguage = normalizeLanguageCode(language);
+  } else if (supportedLanguageCodes.length > 1) {
+    const currentIndex = supportedLanguageCodes.indexOf(currentLanguage);
+    normalizedLanguage =
+      supportedLanguageCodes[
+        (currentIndex + 1) % supportedLanguageCodes.length
+      ] || defaultLanguage;
+  } else {
+    normalizedLanguage = defaultLanguage;
+  }
+
+  applyTranslations(normalizedLanguage);
+  setCVLink(normalizedLanguage);
+
   if (window.__lastUpdateRawDate) {
     window.setTranslationDate(window.__lastUpdateRawDate);
   }
-
-  console.log(
-    `Idioma alterado para: ${newLanguage === "pt" ? "Português" : "English"}`,
-  );
 }
 
 function fillReusableTitles() {
@@ -402,8 +728,9 @@ window.addEventListener("dynamicContentReady", () => {
 
   // Dynamic sections are created after initial page load.
   // Re-apply i18n without firing languageChanged to avoid render loops.
-  if (translations.en && translations.pt) {
+  if (supportedLanguageCodes.length && translations[currentLanguage]) {
     applyTranslations(currentLanguage, { emitLanguageChanged: false });
+    renderLanguageDropdown();
     setCVLink(currentLanguage);
     if (window.__lastUpdateRawDate) {
       window.setTranslationDate(window.__lastUpdateRawDate);
