@@ -749,6 +749,7 @@ window.addEventListener("dynamicContentReady", () => {
   if (supportedLanguageCodes.length && translations[currentLanguage]) {
     applyTranslations(currentLanguage, { emitLanguageChanged: false });
     renderLanguageDropdown();
+    bindLanguageDropdown();
     setCVLink(currentLanguage);
     if (window.__lastUpdateRawDate) {
       window.setTranslationDate(window.__lastUpdateRawDate);
