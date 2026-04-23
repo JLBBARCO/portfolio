@@ -10,7 +10,7 @@ function header() {
   const navTitle = document.createElement("nav");
   const linkNavTitle = document.createElement("a");
   linkNavTitle.href = "#Home";
-  const titleNavTitle = document.createElement("h1");
+  const titleNavTitle = document.createElement("h3");
   titleNavTitle.innerHTML = "JLBBARCO";
   linkNavTitle.append(titleNavTitle);
   navTitle.append(linkNavTitle);

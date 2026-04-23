@@ -10,7 +10,7 @@ section {
   scroll-margin-top: var(--navbar-height);
 }
 
-nav h1 {
+nav h3 {
   font-size: 1.5rem;
 }
 

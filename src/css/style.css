@@ -24,12 +24,13 @@
 /* Default Settings */
 :root {
   --primary-bg: #f0f0f0;
-  --secondary-bg: #ffffff;
-  --secondary-bg-transparent: #ffffffaa;
+  --secondary-bg: #fff;
+  --secondary-bg-transparent: #fffa;
   --text-primary: #121212;
+  --text-primary-shadow: 0 0 10px var(--text-secondary);
   --text-secondary: #4d4d4d;
   --accent: #7c4dff;
-  --accent-transparent: rgba(124, 77, 255, 0.67);
+  --accent-transparent: #7c4dffab;
   --hover-accent: #5e35b1;
   --card-bg: #e0e0e0;
   --transition: all 0.3s ease;
@@ -48,6 +49,7 @@
     --secondary-bg: #1e1e1e;
     --secondary-bg-transparent: #1e1e1eaa;
     --text-primary: #ffffff;
+    --text-primary-shadow: 0 0 10px var(--text-secondary);
     --text-secondary: #b3b3b3;
     --card-bg: #252525;
   }
@@ -106,11 +108,13 @@ h5,
 h6 {
   margin: 10px;
   text-align: center;
+  color: var(--text-primary);
 }
 
 h1 {
   font-family: var(--font1);
   font-size: 5rem;
+  text-shadow: var(--text-primary-shadow);
 }
 
 h2 {
@@ -155,7 +159,7 @@ nav {
   align-items: center;
 }
 
-nav h1 {
+nav h3 {
   margin: 10px;
   font-size: 1rem;
 }
@@ -772,7 +776,6 @@ footer {
   margin: 0;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
-  color: var(--accent);
   font-weight: 600;
 }
 

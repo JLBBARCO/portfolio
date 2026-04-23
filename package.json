@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": ">=20 <23"
+  },
   "dependencies": {
     "i18next": "^25.6.3"
   },
@@ -6,6 +9,7 @@
     "glob": "^10.3.10"
   },
   "scripts": {
+    "dev:vercel": "vercel dev",
     "extract-translations": "node scripts/extract-translations.js",
     "i18n:extract": "node scripts/extract-translations.js",
     "i18n:sync": "node scripts/extract-translations.js",
