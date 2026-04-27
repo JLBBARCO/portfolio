@@ -117,7 +117,7 @@ function resolveIconName(iconData, fallbackName = "") {
     if (normalized) return normalized;
   }
 
-  return "code";
+  return "icon-not-found";
 }
 
 function resolveIconSpec(iconData, fallbackName = "") {
@@ -162,7 +162,7 @@ function resolveIconSpec(iconData, fallbackName = "") {
 
   if (!icon) {
     style = style || "fa-solid";
-    icon = "fa-code";
+    icon = `fa-${iconName}`;
   }
 
   return { style: style || "fa-solid", icon, iconName };

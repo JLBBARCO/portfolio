@@ -131,6 +131,16 @@
         "en-US": "Website for Auto Programs, a system that automatically installs and uninstalls programs, where users can see the programs that were installed, uninstalled, updated, those that had errors, among other information",
         "pt-BR": "Site para o Auto Programs, sistema que instala e desinstala programas automaticamente, no qual o usuário pode ver os programas que foram instalados, desinstalados, atualizados, os que deram erro, entre outras informações"
       }
+    },
+    "job-openings": {
+      "title": {
+        "en-US": "Job Openings",
+        "pt-BR": "Vagas de Emprego"
+      },
+      "description": {
+        "en-US": "A website that aggregates job openings from various sources, providing users with a comprehensive platform to search and apply for job opportunities.",
+        "pt-BR": "Um site que agrega vagas de emprego de várias fontes, oferecendo aos usuários uma plataforma abrangente para pesquisar e se candidatar a oportunidades de trabalho"
+      }
     }
   }
 }
