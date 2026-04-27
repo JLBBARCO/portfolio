@@ -889,12 +889,16 @@ function loadProjectsData(source, owner) {
       tech.style = guess.style;
       tech.icon = guess.icon;
     } else {
-      // If the Font Awesome stylesheet didn't load or the specific icon
-      // isn't available, fall back to a generic code icon instead of
-      // dropping the technology entirely.  This prevents "all icons broken"
-      // situations when the CDN is unreachable.
+      const unresolvedIconClass = `fa-${
+        String(name)
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, "-")
+          .replace(/[\+\.#]/g, "")
+          .replace(/[^a-z0-9\-]/g, "") || "icon-not-found"
+      }`;
       tech.style = "fa-solid";
-      tech.icon = "fa-code";
+      tech.icon = unresolvedIconClass;
     }
     tech.stack = determineStack(name);
     return tech;

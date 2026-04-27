@@ -100,10 +100,18 @@ function buildIconsFromRepositoryData(repoData, languagesData) {
     .map((name) => {
       const guess =
         typeof guessFaIcon === "function" ? guessFaIcon(name) : null;
+      const unresolvedIconClass = `fa-${
+        String(name)
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, "-")
+          .replace(/[\+\.#]/g, "")
+          .replace(/[^a-z0-9\-]/g, "") || "icon-not-found"
+      }`;
       return {
         name,
         style: guess ? guess.style : "fa-solid",
-        class: guess ? guess.icon : "fa-code",
+        class: guess ? guess.icon : unresolvedIconClass,
       };
     });
 }
@@ -136,10 +144,18 @@ function createIconElement(style, iconClass, title) {
 function appendTechIcons(container, icons) {
   const fragment = document.createDocumentFragment();
   icons.forEach((icon) => {
+    const unresolvedIconClass = `fa-${
+      String(icon.name || "")
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, "-")
+        .replace(/[\+\.#]/g, "")
+        .replace(/[^a-z0-9\-]/g, "") || "icon-not-found"
+    }`;
     fragment.appendChild(
       createIconElement(
         icon.style || "fa-solid",
-        icon.class || "fa-code",
+        icon.class || unresolvedIconClass,
         icon.name || icon.class || "",
       ),
     );
