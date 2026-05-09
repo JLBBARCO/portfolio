@@ -8,6 +8,7 @@ function getScreenshotUrl(demoUrl) {
 // sections request the same data during one render cycle.
 const _projectsDataCache = new Map();
 const _projectCardTranslations = Object.create(null);
+const _projectCardImageOverrides = Object.create(null);
 let _projectTranslationsLoadPromise = null;
 const _repoOwnerMainMasterCommitCache = new Map();
 const _repoMainMasterActivityCache = new Map();
@@ -78,6 +79,69 @@ function ensureProjectCardId(card) {
   return id;
 }
 
+function getProjectCardImageOverride(cardId) {
+  const normalizedId = slugifyCardId(cardId);
+  if (!normalizedId) return "";
+  const url = _projectCardImageOverrides[normalizedId];
+  return typeof url === "string" ? url : "";
+}
+
+function normalizeHomepageUrl(url) {
+  const value = String(url || "").trim();
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  return `https://${value}`;
+}
+
+function resolveProjectCardImage(repo, card, repoOwnerName) {
+  const imageFromJson = getProjectCardImageOverride(repo && repo.name);
+  const rawMainThumbnailUrl = `https://raw.githubusercontent.com/${repoOwnerName}/${repo.name}/refs/heads/main/src/assets/img/thumbnail.webp`;
+  const demoUrl = normalizeHomepageUrl(repo && repo.homepage);
+  const screenshotUrl = demoUrl ? getScreenshotUrl(demoUrl) : "";
+
+  if (demoUrl) {
+    card.linkDemo = demoUrl;
+  }
+
+  const setImage = (url, type) => {
+    card.image = url;
+    card.imageMobile = url;
+    if (type) {
+      card.imageType = type;
+    } else if (card.imageType) {
+      delete card.imageType;
+    }
+  };
+
+  const checkImageExists = (url) => {
+    if (!url) return Promise.resolve(false);
+    return fetch(url, { method: "HEAD" })
+      .then((response) => response.ok)
+      .catch(() => false);
+  };
+
+  return checkImageExists(imageFromJson)
+    .then((hasJsonImage) => {
+      if (hasJsonImage) {
+        setImage(imageFromJson);
+        return true;
+      }
+      return checkImageExists(rawMainThumbnailUrl).then((hasRawImage) => {
+        if (hasRawImage) {
+          setImage(rawMainThumbnailUrl, "image/webp");
+          return true;
+        }
+        return false;
+      });
+    })
+    .then((hasRemoteImage) => {
+      if (!hasRemoteImage && screenshotUrl) {
+        setImage(screenshotUrl);
+      }
+      return card;
+    });
+}
+
 function loadProjectCardTranslations() {
   if (_projectTranslationsLoadPromise) {
     return _projectTranslationsLoadPromise;
@@ -103,6 +167,16 @@ function loadProjectCardTranslations() {
             if (normalized) entry[field] = normalized;
           },
         );
+
+        const imageOverride =
+          typeof rawCard.img === "string"
+            ? rawCard.img
+            : typeof rawCard.image === "string"
+              ? rawCard.image
+              : "";
+        if (imageOverride) {
+          _projectCardImageOverrides[cardId] = imageOverride;
+        }
       });
     })
     .catch((err) => {
@@ -996,44 +1070,17 @@ function loadProjectsData(source, owner) {
             },
           };
 
-          if (repo.homepage) {
-            let url = repo.homepage;
-            if (!url.match(/^https?:\/\//)) {
-              url = `https://${url}`;
-            }
-            card.linkDemo = url;
-            const screenshot = getScreenshotUrl(url);
-            card.image = screenshot;
-            card.imageMobile = screenshot;
-            return Promise.resolve(card);
-          }
-
-          // Try to fetch thumbnail.webp from repository
-          const thumbnailUrl = `https://raw.githubusercontent.com/${repoOwnerName}/${repo.name}/${repo.default_branch || "main"}/src/assets/img/thumbnail.webp`;
-
-          return fetch(thumbnailUrl, { method: "HEAD" })
-            .then((response) => {
-              if (response.ok) {
-                card.image = thumbnailUrl;
-                card.imageMobile = thumbnailUrl;
-                card.imageType = "image/webp";
-              }
+          return resolveProjectCardImage(repo, card, repoOwnerName).then(
+            (resolvedCard) => {
               if (repo.fork && repo.parent) {
-                card.description =
-                  (card.description ? card.description + " " : "") +
-                  `(fork of ${repo.parent.full_name})`;
+                resolvedCard.description =
+                  (resolvedCard.description
+                    ? resolvedCard.description + " "
+                    : "") + `(fork of ${repo.parent.full_name})`;
               }
-              return card;
-            })
-            .catch(() => {
-              // If thumbnail doesn't exist, continue without image
-              if (repo.fork && repo.parent) {
-                card.description =
-                  (card.description ? card.description + " " : "") +
-                  `(fork of ${repo.parent.full_name})`;
-              }
-              return card;
-            });
+              return resolvedCard;
+            },
+          );
         };
 
         const repoOwnerName = (repo.owner && repo.owner.login) || owner;
@@ -1094,6 +1141,7 @@ function loadProjectsData(source, owner) {
             if (!rawCard || typeof rawCard !== "object") return null;
             return {
               id: slugifyCardId(rawCard.id || rawId),
+              image: rawCard.image || rawCard.img || "",
               ...rawCard,
             };
           })

@@ -1,4 +1,20 @@
 function setupFormations(fileURL, language, loadId) {
+  function getCurrentYearLabel() {
+    return String(new Date().getFullYear());
+  }
+
+  function getTodayLabel(lang) {
+    const normalized = String(lang || "").toLowerCase();
+    const langKey = normalized.startsWith("pt") ? "pt-br" : "en-us";
+    if (typeof translations !== "undefined" && translations) {
+      const bucket = translations[langKey];
+      if (bucket && typeof bucket.today === "string" && bucket.today.trim()) {
+        return bucket.today;
+      }
+    }
+    return normalized.startsWith("pt") ? "Hoje" : "Today";
+  }
+
   const main = document.querySelector("main");
   const section = document.createElement("section");
   section.id = "Formations";
@@ -62,8 +78,8 @@ function setupFormations(fileURL, language, loadId) {
 
       // sort by most recent end date first (knowledge preference)
       const sortedCards = [...cards].sort((a, b) => {
-        const endA = parseDate(a.dateEnd);
-        const endB = parseDate(b.dateEnd);
+        const endA = parseDate(a.dateEnd || getCurrentYearLabel());
+        const endB = parseDate(b.dateEnd || getCurrentYearLabel());
         if (endA !== endB) {
           return endB - endA;
         }
@@ -124,10 +140,9 @@ function setupFormations(fileURL, language, loadId) {
         }
 
         if (card.dateInit) {
+          const endDateLabel = card.dateEnd || getTodayLabel(language);
           html += `<div class="period">${card.dateInit}`;
-          if (card.dateEnd) {
-            html += ` - ${card.dateEnd}`;
-          }
+          html += ` - ${endDateLabel}`;
           html += "</div>";
         }
 
