@@ -96,7 +96,8 @@
       "description": {
         "en-US": "System that automatically installs and uninstalls programs, giving the user full control over program management.",
         "pt-BR": "Sistema que instala e desinstala programas automaticamente, no qual o usuário tem total controle do gerenciamento de programas"
-      }
+      },
+      "img": "https://raw.githubusercontent.com/JLBBARCO/programs-manager/refs/heads/main/src/assets/img/thumbnail.webp"
     },
     "orbit-games-archive": {
       "title": {

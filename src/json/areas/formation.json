@@ -51,13 +51,6 @@
       "certificates": [
         {
           "name": {
-            "en-US": "Certificate of Completion - High School",
-            "pt-BR": "Certificado de Conclusão - Ensino Médio"
-          },
-          "url": ""
-        },
-        {
-          "name": {
             "en-US": "Certificate of Completion - Technical Course in System Analysis and Development",
             "pt-BR": "Certificado de Conclusão - Curso Técnico em Análise e Desenvolvimento de Sistemas"
           },
@@ -82,37 +75,7 @@
         "en-US": "Online Course",
         "pt-BR": "Curso Online"
       },
-      "dateInit": "2023",
-      "certificates": [
-        {
-          "name": {
-            "en-US": "Certificate of Completion - HTML5 & CSS3 [200 hours]",
-            "pt-BR": "Certificado de Conclusão - HTML5 & CSS3 [200 horas]"
-          },
-          "url": ""
-        },
-        {
-          "name": {
-            "en-US": "Certificate of Completion - JavaScript [40 hours]",
-            "pt-BR": "Certificado de Conclusão - JavaScript [40 horas]"
-          },
-          "url": ""
-        },
-        {
-          "name": {
-            "en-US": "Certificate of Completion - Git & GitHub [20 hours]",
-            "pt-BR": "Certificado de Conclusão - Git & GitHub [20 horas]"
-          },
-          "url": ""
-        },
-        {
-          "name": {
-            "en-US": "Certificate of Completion - Python [120 hours]",
-            "pt-BR": "Certificado de Conclusão - Python [120 horas]"
-          },
-          "url": ""
-        }
-      ]
+      "dateInit": "2023"
     },
     {
       "title": {

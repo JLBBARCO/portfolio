@@ -91,6 +91,14 @@ font {
   box-shadow: none !important;
 }
 
+img,
+picture,
+source {
+  user-select: none;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
 a {
   color: var(--text-secondary);
   text-decoration: none;
@@ -411,9 +419,7 @@ section {
   width: 100%;
   height: auto;
   border-radius: 8px 8px 0 0;
-  user-select: none;
-  pointer-events: none;
-  -webkit-user-drag: none;
+
 }
 
 .card summary {

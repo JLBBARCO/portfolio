@@ -43,7 +43,8 @@
       "section_more_title": "Mais sobre este site",
       "meta_last_update": "Última atualização: {{date}}",
       "link_skip_to_main": "Pular para o conteúdo principal",
-      "section_contact_title": "Contato"
+      "section_contact_title": "Contato",
+      "today": "Hoje"
     },
     "en-us": {
       "nav_home": "Home",
@@ -71,7 +72,8 @@
       "section_more_title": "More About This Site",
       "meta_last_update": "Last Update: {{date}}",
       "link_skip_to_main": "Skip to content",
-      "section_contact_title": "Contact"
+      "section_contact_title": "Contact",
+      "today": "Today"
     }
   }
 }
