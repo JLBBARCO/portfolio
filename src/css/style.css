@@ -275,12 +275,6 @@ button.language {
   color: var(--text-primary);
 }
 
-.language-current-text {
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
 .language-caret {
   font-size: 0.8rem;
   opacity: 0.8;
@@ -348,11 +342,6 @@ button.language {
 .language-option:focus-visible,
 .language-option.is-active {
   background: rgba(255, 255, 255, 0.08);
-}
-
-.language-option-text {
-  font-size: 0.9rem;
-  font-weight: 600;
 }
 
 /* Content */

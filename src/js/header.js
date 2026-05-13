@@ -92,7 +92,6 @@ function header() {
     .startsWith("pt")
     ? "pt"
     : "en";
-  const currentLanguageCode = docLangForButton === "pt" ? "PT" : "EN";
   const currentLanguageCountry = docLangForButton === "pt" ? "BR" : "US";
   const currentLanguageCountryName =
     docLangForButton === "pt" ? "Brasil" : "United States";
@@ -113,12 +112,6 @@ function header() {
   languageButton.setAttribute("aria-haspopup", "menu");
   languageButton.setAttribute("aria-expanded", "false");
   languageButton.setAttribute("aria-controls", "languageDropdown");
-  languageButton.setAttribute("aria-label", currentLanguageCode);
-
-  const languageCurrentText = document.createElement("span");
-  languageCurrentText.id = "languageCurrentText";
-  languageCurrentText.className = "language-current-text";
-  languageCurrentText.textContent = currentLanguageCode;
 
   const languageCurrentFlag = document.createElement("img");
   languageCurrentFlag.id = "languageCurrentFlag";
@@ -140,7 +133,6 @@ function header() {
   languageCaret.setAttribute("aria-hidden", "true");
 
   languageButton.append(
-    languageCurrentText,
     languageCurrentFlag,
     languageCurrentFallback,
     languageCaret,
