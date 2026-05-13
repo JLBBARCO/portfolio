@@ -142,6 +142,16 @@
         "en-US": "A website that aggregates job openings from various sources, providing users with a comprehensive platform to search and apply for job opportunities.",
         "pt-BR": "Um site que agrega vagas de emprego de várias fontes, oferecendo aos usuários uma plataforma abrangente para pesquisar e se candidatar a oportunidades de trabalho"
       }
+    },
+    "KampAgency": {
+      "title": {
+        "en-US": "Kamp Agency",
+        "pt-BR": "Agência Kamp"
+      },
+      "description": {
+        "en-US": "A website for a digital marketing agency, showcasing their services, portfolio, and contact information.",
+        "pt-BR": "Um site para uma agência de marketing digital, apresentando seus serviços, portfólio e informações de contato"
+      }
     }
   }
 }
