@@ -95,7 +95,6 @@ img,
 picture,
 source {
   user-select: none;
-  pointer-events: none;
   -webkit-user-drag: none;
 }
 
