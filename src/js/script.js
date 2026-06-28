@@ -569,7 +569,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         setupCarouselButtons();
-        addNewIcons("src/assets/icons/svg.json");
+        addNewIcons("src/json/svg.json");
         refreshFontAwesomeKit(document.body);
         initializeProfileImage();
         semiHiddenCards();

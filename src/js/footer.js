@@ -247,7 +247,7 @@ function loadMoreSection(state, owner, repo) {
       return;
     }
 
-    return fetchJsonWithFallback("src/assets/icons/svg.json")
+    return fetchJsonWithFallback("src/json/svg.json")
       .then((data) => {
         if (isStaleFooterState(state)) return;
         if (!data || !Array.isArray(data.icons)) return;
