@@ -44,7 +44,7 @@ function header() {
     Projects: "nav_projects",
     Technologies: "nav_technologies",
     AboutMe: "nav_about_me",
-    Formations: "nav_formations",
+    Formations: "nav_formation",
     Contact: "nav_contact",
     More: "nav_more",
   };
