@@ -593,14 +593,6 @@ function renderLanguageDropdown() {
       meta.displayName || meta.locale || languageCode,
     );
 
-    const optionText = document.createElement("span");
-    optionText.className = "language-option-text";
-    optionText.textContent = `${(meta.code || languageCode.split("-")[0]).toUpperCase()}`;
-
-    const optionDash = document.createElement("span");
-    optionDash.textContent = " - ";
-    optionDash.className = "language-option-dash";
-
     const optionFlag = document.createElement("img");
     optionFlag.className = "language-flag";
     optionFlag.src = `${FLAG_ICON_BASE_URL}/${meta.country || "US"}.svg`;
@@ -618,7 +610,7 @@ function renderLanguageDropdown() {
       optionFallback.classList.add("is-visible");
     });
 
-    option.append(optionText, optionDash, optionFlag, optionFallback);
+    option.append(optionFlag, optionFallback);
     languageDropdown.appendChild(option);
   });
 }

@@ -152,6 +152,16 @@
         "en-US": "A website for a digital marketing agency, showcasing their services, portfolio, and contact information.",
         "pt-BR": "Um site para uma agência de marketing digital, apresentando seus serviços, portfólio e informações de contato"
       }
+    },
+    "programs-manager-user-generator": {
+      "title": {
+        "en-US": "Auto Programs User Generator",
+        "pt-BR": "Gerador de Usuários do Auto Programs"
+      },
+      "description": {
+        "en-US": "A system that lists installed programs and saves them to a JSON file, allowing users to import this data into the Programs Manager and reinstall the same programs on another computer or after formatting, facilitating migration and reformatting of a device to another",
+        "pt-BR": "Um sistema que lista os programas instalados e salva em um arquivo JSON, permitindo que os usuários possam importar esses dados para o Programs Manager e reinstalarem os mesmos programas em outro computador ou no mesmo após formatação, facilitando a migração e formatação de um dispositivo para outro"
+      }
     }
   }
 }
