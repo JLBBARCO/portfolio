@@ -1,26 +1,5 @@
 @charset "UTF-8";
 
-/* Fonts */
-@font-face {
-  font-family: "Overlock";
-  src: url(../assets/fonts/Overlock/Overlock-Regular.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "Caveat";
-  src: url(../assets/fonts/Caveat/Caveat.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "MedievalSharp";
-  src: url(../assets/fonts/MedievalSharp/MedievalSharp-Regular.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "Audiowide";
-  src: url(../assets/fonts/Audiowide/Audiowide-Regular.ttf) format("truetype");
-}
-
 /* Default Settings */
 :root {
   --primary-bg: #f0f0f0;

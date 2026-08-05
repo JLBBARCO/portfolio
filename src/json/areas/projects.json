@@ -116,13 +116,6 @@
         "pt-BR": "Fork do repositório de manifestos do Windows Package Manager da comunidade Microsoft"
       }
     },
-    "homebrew-tap": {
-      "title": { "en-US": "Homebrew Tap", "pt-BR": "Homebrew Tap" },
-      "description": {
-        "en-US": "GitHub workflow for creating a compiler for macOS.",
-        "pt-BR": "Workflow do GitHub para criar um compilador para macOS"
-      }
-    },
     "programs-manager-website": {
       "title": {
         "en-US": "Auto Programs Website",
@@ -133,7 +126,7 @@
         "pt-BR": "Site para o Auto Programs, sistema que instala e desinstala programas automaticamente, no qual o usuário pode ver os programas que foram instalados, desinstalados, atualizados, os que deram erro, entre outras informações"
       }
     },
-    "job-openings": {
+    "jobs-finder": {
       "title": {
         "en-US": "Job Openings",
         "pt-BR": "Vagas de Emprego"
@@ -151,16 +144,6 @@
       "description": {
         "en-US": "A website for a digital marketing agency, showcasing their services, portfolio, and contact information.",
         "pt-BR": "Um site para uma agência de marketing digital, apresentando seus serviços, portfólio e informações de contato"
-      }
-    },
-    "programs-manager-user-generator": {
-      "title": {
-        "en-US": "Auto Programs User Generator",
-        "pt-BR": "Gerador de Usuários do Auto Programs"
-      },
-      "description": {
-        "en-US": "A system that lists installed programs and saves them to a JSON file, allowing users to import this data into the Programs Manager and reinstall the same programs on another computer or after formatting, facilitating migration and reformatting of a device to another",
-        "pt-BR": "Um sistema que lista os programas instalados e salva em um arquivo JSON, permitindo que os usuários possam importar esses dados para o Programs Manager e reinstalarem os mesmos programas em outro computador ou no mesmo após formatação, facilitando a migração e formatação de um dispositivo para outro"
       }
     }
   }

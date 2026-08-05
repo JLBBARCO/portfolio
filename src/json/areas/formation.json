@@ -18,16 +18,7 @@
         "pt-BR": "Cursos de Idiomas"
       },
       "dateInit": "2022",
-      "dateEnd": "2026",
-      "certificates": [
-        {
-          "name": {
-            "en-US": "Certificate English Fluence (in progress)",
-            "pt-BR": "Certificado de Fluência em Inglês (em andamento)"
-          },
-          "url": ""
-        }
-      ]
+      "dateEnd": "2026"
     },
     {
       "title": {
@@ -51,31 +42,12 @@
       "certificates": [
         {
           "name": {
-            "en-US": "Certificate of Completion - Technical Course in System Analysis and Development",
-            "pt-BR": "Certificado de Conclusão - Curso Técnico em Análise e Desenvolvimento de Sistemas"
+            "en-US": "Technical Course in System Analysis and Development",
+            "pt-BR": "Curso Técnico em Análise e Desenvolvimento de Sistemas"
           },
           "url": ""
         }
       ]
-    },
-    {
-      "title": {
-        "en-US": "Web Development Course",
-        "pt-BR": "Curso de Desenvolvimento Web"
-      },
-      "institution": {
-        "en-US": "Course in Video",
-        "pt-BR": "Curso em Vídeo"
-      },
-      "description": {
-        "en-US": "Course covering front-end and back-end web development technologies and best practices",
-        "pt-BR": "Curso que abrange tecnologias de desenvolvimento web (front-end e back-end) e melhores práticas"
-      },
-      "type": {
-        "en-US": "Online Course",
-        "pt-BR": "Curso Online"
-      },
-      "dateInit": "2023"
     },
     {
       "title": {
@@ -95,16 +67,7 @@
         "pt-BR": "Bacharelado"
       },
       "dateInit": "2026",
-      "dateEnd": "2029",
-      "certificates": [
-        {
-          "name": {
-            "en-US": "Certificate Bachelor's Degree in Software Engineering (in progress)",
-            "pt-BR": "Certificado de Bacharelado em Engenharia de Software (em andamento)"
-          },
-          "url": ""
-        }
-      ]
+      "dateEnd": "2029"
     }
   ],
   "buttons": [

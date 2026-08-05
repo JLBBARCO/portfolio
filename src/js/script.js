@@ -14,6 +14,14 @@ function faClass(style, icon, size) {
   return [styleClass, iconClass, sizeClass].filter(Boolean).join(" ");
 }
 
+const preconnectLinks = [
+  "https://fonts.googleapis.com",
+  "https://fonts.gstatic.com",
+];
+const insertHeader = [
+  "<link href='https://fonts.googleapis.com/css2?family=Audiowide&family=Caveat:wght@400..700&family=MedievalSharp&family=Overlock:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap' rel='stylesheet'>",
+];
+
 // try to guess a FontAwesome icon based on a technology name.  returns
 // an object { style, icon } or null if no matching icon could be found.
 // caching the result avoids repeated DOM manipulations.
@@ -382,6 +390,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  document.head.insertAdjacentHTML("beforeend", insertHeader.join("\n"));
+
+  _preconnectLinks(preconnectLinks);
+
   const faviconLink = document.getElementById("favicon");
   const prefersDark =
     typeof window.matchMedia === "function"
@@ -488,6 +500,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "Projects",
       "Technologies",
       "Formations",
+      // "Curses",
       "AboutMe",
     ]);
     Array.from(document.querySelectorAll("main > section")).forEach((el) => {
@@ -527,6 +540,7 @@ document.addEventListener("DOMContentLoaded", () => {
       locale,
       myLoadId,
     );
+    // const pCurses = curses("src/json/areas/curses.json", locale, myLoadId);
     const pAbout =
       typeof aboutMe === "function"
         ? Promise.resolve(aboutMe())
@@ -546,6 +560,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pCardProjectTranslation,
       pTechnologies,
       pFormations,
+      // pCurses,
       pAbout,
       pFooter,
     ])
@@ -1103,5 +1118,28 @@ function semiHiddenCards() {
     const isAllFilterActive =
       !activeFilterButton || activeFilterButton.dataset.filter === "all";
     toggleShowAllButtonVisibility(section.id, isAllFilterActive);
+  });
+}
+
+function _preloadLinks(list) {
+  if (!Array.isArray(list)) return;
+  list.forEach((url) => {
+    if (!url || typeof url !== "string") return;
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.href = url;
+    link.as = "image";
+    document.head.appendChild(link);
+  });
+}
+
+function _preconnectLinks(list) {
+  if (!Array.isArray(list)) return;
+  list.forEach((url) => {
+    if (!url || typeof url !== "string") return;
+    const link = document.createElement("link");
+    link.rel = "preconnect";
+    link.href = url;
+    document.head.appendChild(link);
   });
 }
