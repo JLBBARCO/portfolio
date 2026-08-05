@@ -2,7 +2,7 @@ function aboutMe() {
   const main = document.querySelector("main");
   if (!main) return;
   const section = document.createElement("section");
-  section.id = "AboutMe";
+  section.id = "About_Me";
 
   const title = document.createElement("h2");
   title.id = "aboutMeTitle";

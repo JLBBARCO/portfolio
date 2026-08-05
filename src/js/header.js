@@ -69,7 +69,7 @@ function header() {
       const link = document.createElement("a");
       link.href = `#${containerId}`;
       link.className = "links";
-      const i18nKey = navI18nKeyBySectionId[containerId];
+      const i18nKey = `nav_${containerId.toLowerCase()}`;
       if (i18nKey) {
         link.setAttribute("data-i18n", i18nKey);
         const fallback = navFallbackTextBySectionId[containerId];
