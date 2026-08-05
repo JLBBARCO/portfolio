@@ -1,31 +1,57 @@
-function setupFormations(fileURL, language, loadId) {
+function curses(fileURL, language, loadId) {
   function getCurrentYearLabel() {
     return String(new Date().getFullYear());
   }
 
-  function getTodayLabel(lang) {
-    const normalized = String(lang || "").toLowerCase();
-    const langKey = normalized.startsWith("pt") ? "pt-br" : "en-us";
-    if (typeof translations !== "undefined" && translations) {
-      const bucket = translations[langKey];
-      if (bucket && typeof bucket.today === "string" && bucket.today.trim()) {
-        return bucket.today;
-      }
-    }
-    return normalized.startsWith("pt") ? "Hoje" : "Today";
+  function getLocalizedField(value, languageKey) {
+    if (!value || typeof value !== "object") return "";
+
+    const normalizedLanguage = String(languageKey || "").toLowerCase();
+    return (
+      value[languageKey] ||
+      value[normalizedLanguage] ||
+      value["pt-BR"] ||
+      value["pt-br"] ||
+      value["en-US"] ||
+      value["en-us"] ||
+      value.pt ||
+      value.en ||
+      Object.values(value).find(
+        (entry) => typeof entry === "string" && entry.trim(),
+      ) ||
+      ""
+    );
+  }
+
+  function getCardTimestamp(date) {
+    if (!date || typeof date !== "object") return 0;
+
+    const yearValue = Number(
+      date.year ?? date["year"] ?? getCurrentYearLabel(),
+    );
+    const monthValue = Number(date.month ?? date["month"] ?? 1);
+
+    if (!Number.isFinite(yearValue)) return 0;
+
+    const safeMonth =
+      Number.isFinite(monthValue) && monthValue >= 1 && monthValue <= 12
+        ? monthValue
+        : 1;
+
+    return new Date(yearValue, safeMonth - 1).getTime();
   }
 
   const main = document.querySelector("main");
   const section = document.createElement("section");
-  section.id = "Formation";
+  section.id = "Curses";
 
   const title = document.createElement("h2");
-  title.id = "formationsTitle";
-  title.setAttribute("data-i18n", "section_formations_title");
+  title.id = "cursesTitle";
+  title.setAttribute("data-i18n", "section_curses_title");
   section.append(title);
 
   const container = document.createElement("article");
-  container.id = "formationsContainer";
+  container.id = "cursesContainer";
   container.className = "block semi-hidden";
   section.appendChild(container);
 
@@ -43,10 +69,10 @@ function setupFormations(fileURL, language, loadId) {
       const typeCount = {};
       const typeNames = {};
       cards.forEach((card) => {
-        if (card.type && card.type[language]) {
-          typeCount[card.type[language]] =
-            (typeCount[card.type[language]] || 0) + 1;
-          typeNames[card.type[language]] = getLocalized(card.type, language);
+        const typeLabel = getLocalizedField(card.type, language);
+        if (typeLabel) {
+          typeCount[typeLabel] = (typeCount[typeLabel] || 0) + 1;
+          typeNames[typeLabel] = typeLabel;
         }
       });
 
@@ -78,13 +104,13 @@ function setupFormations(fileURL, language, loadId) {
 
       // sort by most recent end date first (knowledge preference)
       const sortedCards = [...cards].sort((a, b) => {
-        const endA = parseDate(a.dateEnd || getCurrentYearLabel());
-        const endB = parseDate(b.dateEnd || getCurrentYearLabel());
+        const endA = getCardTimestamp(a.date);
+        const endB = getCardTimestamp(b.date);
         if (endA !== endB) {
           return endB - endA;
         }
-        const initA = parseDate(a.dateInit);
-        const initB = parseDate(b.dateInit);
+        const initA = Number(a.date?.month ?? a.date?.["month"] ?? 0);
+        const initB = Number(b.date?.month ?? b.date?.["month"] ?? 0);
         return initB - initA;
       });
 
@@ -96,18 +122,18 @@ function setupFormations(fileURL, language, loadId) {
         const div = document.createElement("div");
         div.className = "card card-formation";
         div.dataset.index = cardCounter; // for testing purposes
-        if (card.type && card.type[language])
-          div.dataset.type = card.type[language];
+        const typeLabel = getLocalizedField(card.type, language);
+        if (typeLabel) div.dataset.type = typeLabel;
 
         let html = "";
         if (card.title)
-          html += `<h3>${getLocalized(card.title, language)}</h3>`;
+          html += `<h3>${getLocalizedField(card.title, language)}</h3>`;
         if (card.institution)
-          html += `<p class="institution">${getLocalized(card.institution, language)}</p>`;
+          html += `<p class="institution">${getLocalizedField(card.institution, language)}</p>`;
         if (card.type)
-          html += `<p class="formation-type">${getLocalized(card.type, language)}</p>`;
+          html += `<p class="formation-type">${getLocalizedField(card.type, language)}</p>`;
         if (card.description)
-          html += `<p class="description">${getLocalized(card.description, language)}</p>`;
+          html += `<p class="description">${getLocalizedField(card.description, language)}</p>`;
 
         if (card.iconTechnologies && Array.isArray(card.iconTechnologies)) {
           const techTitle =
@@ -132,18 +158,29 @@ function setupFormations(fileURL, language, loadId) {
             html += `<li>`;
             if (cert.url)
               html += `<a href="${cert.url}" target="_blank" rel="noopener noreferrer" class="certificate-link external">`;
-            html += `${getLocalized(cert.name, language)}`;
+            html += `${getLocalizedField(cert.name, language)}`;
             if (cert.url) html += `</a>`;
             html += `</li>`;
           });
           html += `</ul></details>`;
         }
 
-        if (card.dateInit) {
-          const endDateLabel = card.dateEnd || getTodayLabel(language);
-          html += `<div class="period">${card.dateInit}`;
-          html += ` - ${endDateLabel}`;
-          html += "</div>";
+        if (card.links) {
+          html += ``;
+        }
+
+        if (card.date) {
+          html += `<div class="period">`;
+          if (card.date["month"]) {
+            html += card.date["month"];
+          }
+          if (card.date["month"] && card.date["year"]) {
+            html += ` - `;
+          }
+          if (card.date["year"]) {
+            html += card.date["year"];
+          }
+          html += `</div>`;
         }
 
         div.innerHTML = html;
@@ -154,15 +191,4 @@ function setupFormations(fileURL, language, loadId) {
       container.appendChild(fragment);
     })
     .catch((err) => console.error(`Erro ao carregar ${fileURL}:`, err));
-}
-
-function filterFormationsByType(type) {
-  Array.from(document.querySelectorAll(".card.card-formation")).forEach(
-    (card) => {
-      card.style.display =
-        type === "all" || card.dataset.type === type ? "flex" : "none";
-    },
-  );
-  updateFilterButtons(type);
-  toggleShowAllButtonVisibility("Formations", type === "all");
 }
