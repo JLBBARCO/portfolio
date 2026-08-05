@@ -480,8 +480,23 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function loadDynamicContent() {
+    // prevent concurrent runs which can cause duplicated sections when
+    // language change fires repeatedly in quick succession.
+    if (document.body.dataset.dynamicLoadRunning === "true") {
+      // queue a single delayed retry so the latest event still triggers
+      if (document.body.dataset.dynamicLoadQueued !== "true") {
+        document.body.dataset.dynamicLoadQueued = "true";
+        setTimeout(() => {
+          document.body.dataset.dynamicLoadQueued = "false";
+          loadDynamicContent();
+        }, 100);
+      }
+      return;
+    }
+
     // bump token for this run; any previous promises will become stale
     const myLoadId = ++_currentLoadId;
+    document.body.dataset.dynamicLoadRunning = "true";
 
     // Remove only dynamic sections; keep static Home section intact.
     const dynamicSectionIds = new Set([
@@ -574,6 +589,11 @@ document.addEventListener("DOMContentLoaded", () => {
         initializeProfileImage();
         semiHiddenCards();
         updateBackToTopVisibility();
+        document.body.dataset.dynamicLoadRunning = "false";
+        // ensure queued retry runs if one was requested while running
+        if (document.body.dataset.dynamicLoadQueued === "true") {
+          // the queued timeout will call loadDynamicContent; no-op here.
+        }
         window.dispatchEvent(new Event("dynamicContentReady"));
       })
       .catch((err) => console.warn("Erro no carregamento dinâmico:", err));
