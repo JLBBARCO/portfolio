@@ -1,0 +1,29 @@
+{
+  "profilePicture": {
+    "alt": "Foto de Perfil do Desenvolvedor",
+    "sources": [
+      {
+        "src": "/assets/profile-large.webp",
+        "media": "(min-width: 1024px)",
+        "width": 800,
+        "height": 800
+      },
+      {
+        "src": "/assets/profile-small.webp",
+        "media": "(max-width: 1023px)",
+        "width": 400,
+        "height": 400
+      }
+    ]
+  },
+  "logo": {
+    "alt": "Logotipo do Portfólio",
+    "sources": [
+      {
+        "src": "/assets/logo.png",
+        "width": 150,
+        "height": 50
+      }
+    ]
+  }
+}
