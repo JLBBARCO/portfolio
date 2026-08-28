@@ -2,84 +2,53 @@ const FOOTER_DEFAULT_OWNER = "JLBBARCO";
 const FOOTER_DEFAULT_REPO = "portfolio";
 const FOOTER_DYNAMIC_WRAPPER_ID = "footerContent";
 
-function canUseDirectGitHubFallback() {
-  return (
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1" ||
-    window.location.protocol === "file:"
-  );
-}
-
-function fetchFromGitHubProxy(path, fallbackValue) {
-  const proxyUrl = `/api/github-proxy?path=${encodeURIComponent(path)}`;
-
-  return fetch(proxyUrl)
-    .then((res) => {
-      if (res.ok) return res.json();
-      if (res.status === 404) return fallbackValue;
-      throw new Error(`GitHub proxy error: ${res.status}`);
+// O rodape usa exclusivamente o snapshot pronto da Vercel (/api/site-data).
+// Nao existe mais nenhuma chamada direta do navegador a API do GitHub.
+function fetchSiteRepoSnapshot(owner, repo) {
+  const siteData = window.SiteData || null;
+  if (!siteData || typeof siteData.get !== "function") {
+    return Promise.resolve(null);
+  }
+  return siteData
+    .get()
+    .then((snapshot) => {
+      if (!snapshot) return null;
+      const target = String(repo || "")
+        .trim()
+        .toLowerCase();
+      if (
+        snapshot.siteRepo &&
+        String(snapshot.siteRepo.name || "").toLowerCase() === target
+      ) {
+        return snapshot.siteRepo;
+      }
+      return (
+        (snapshot.repos || []).find(
+          (item) => String(item.name || "").toLowerCase() === target,
+        ) || null
+      );
     })
-    .catch((err) => {
-      console.warn("[footer] Proxy request failed:", err);
-      return fallbackValue;
-    });
+    .catch(() => null);
 }
 
 function fetchRepositoryMetadata(owner, repo) {
-  const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
-
-  return fetchFromGitHubProxy(path, null).then((data) => {
-    if (data || !canUseDirectGitHubFallback()) return data;
-
-    const url = `https://api.github.com${path}`;
-    return fetch(url)
-      .then((res) => (res.ok ? res.json() : null))
-      .catch((err) => {
-        console.warn("[footer] Failed to fetch repository metadata:", err);
-        return null;
-      });
-  });
+  return fetchSiteRepoSnapshot(owner, repo);
 }
 
 function fetchMainBranchLastUpdate(owner, repo) {
-  const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/commits?sha=main&per_page=1`;
-  return fetchFromGitHubProxy(path, [])
-    .then((commits) => {
-      const first = Array.isArray(commits) ? commits[0] : null;
-      return (
-        (first &&
-          first.commit &&
-          first.commit.committer &&
-          first.commit.committer.date) ||
-        null
-      );
-    })
-    .catch((err) => {
-      console.warn("[footer] Failed to fetch latest commit date:", err);
-      return null;
-    });
+  return fetchSiteRepoSnapshot(owner, repo).then((entry) =>
+    entry
+      ? entry.latestActivityAt || entry.pushed_at || entry.updated_at || null
+      : null,
+  );
 }
 
 function fetchRepositoryLanguages(owner, repo) {
-  if (typeof fetchRepoLanguages === "function") {
-    return fetchRepoLanguages(owner, repo);
-  }
-
-  const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/languages`;
-
-  return fetchFromGitHubProxy(path, {}).then((data) => {
-    if (Object.keys(data || {}).length || !canUseDirectGitHubFallback()) {
-      return data;
-    }
-
-    const url = `https://api.github.com${path}`;
-    return fetch(url)
-      .then((res) => (res.ok ? res.json() : {}))
-      .catch((err) => {
-        console.warn("[footer] Failed to fetch repository languages:", err);
-        return {};
-      });
-  });
+  return fetchSiteRepoSnapshot(owner, repo).then((entry) =>
+    entry && entry.languages && typeof entry.languages === "object"
+      ? entry.languages
+      : {},
+  );
 }
 
 function buildIconsFromRepositoryData(repoData, languagesData) {

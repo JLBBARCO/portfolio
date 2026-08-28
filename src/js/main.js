@@ -2,12 +2,17 @@
 async function loadServerComputedData() {
   try {
     const response = await fetch('/api/github-data');
+    if (!response.ok) {
+      // Rota opcional: ausente em servidores estaticos. Nao e um erro fatal.
+      console.info('[main] /api/github-data indisponivel; secao ignorada.');
+      return;
+    }
     const data = await response.json();
-    
+
     if (data.profile) renderProfile(data.profile);
     if (data.projects) renderProjects(data.projects);
   } catch (err) {
-    console.error("Erro ao carregar dados do servidor:", err);
+    console.info("[main] Nao foi possivel carregar dados do servidor:", err && err.message);
   }
 }
 

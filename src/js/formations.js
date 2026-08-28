@@ -18,6 +18,7 @@ function setupFormations(fileURL, language, loadId) {
   const main = document.querySelector("main");
   const section = document.createElement("section");
   section.id = "Formation";
+  section.dataset.dynamicSection = "true";
 
   const title = document.createElement("h2");
   title.id = "formationsTitle";

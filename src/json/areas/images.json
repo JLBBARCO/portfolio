@@ -1,29 +1,88 @@
 {
-  "profilePicture": {
-    "alt": "Foto de Perfil do Desenvolvedor",
-    "sources": [
-      {
-        "src": "/assets/profile-large.webp",
-        "media": "(min-width: 1024px)",
-        "width": 800,
-        "height": 800
+  "schema": 1,
+  "images": {
+    "profilePicture": {
+      "alt": {
+        "pt-BR": "Foto de perfil de Jose Luiz B. Barco",
+        "en-US": "Profile picture of Jose Luiz B. Barco"
       },
-      {
-        "src": "/assets/profile-small.webp",
-        "media": "(max-width: 1023px)",
-        "width": 400,
-        "height": 400
-      }
-    ]
-  },
-  "logo": {
-    "alt": "Logotipo do Portfólio",
-    "sources": [
-      {
-        "src": "/assets/logo.png",
-        "width": 150,
-        "height": 50
-      }
-    ]
+      "class": "person",
+      "loading": "lazy",
+      "decoding": "async",
+      "crossOrigin": "anonymous",
+      "dynamic": true,
+      "sources": [
+        {
+          "src": "https://avatars.githubusercontent.com/u/159829462?v=4",
+          "type": "image/png",
+          "width": 460,
+          "height": 460
+        }
+      ]
+    },
+    "faviconLight": {
+      "alt": {
+        "pt-BR": "Icone do site (tema claro)",
+        "en-US": "Site icon (light theme)"
+      },
+      "sources": [
+        {
+          "src": "src/assets/favicon/code-light.svg",
+          "type": "image/svg+xml",
+          "width": 32,
+          "height": 32
+        }
+      ]
+    },
+    "faviconDark": {
+      "alt": {
+        "pt-BR": "Icone do site (tema escuro)",
+        "en-US": "Site icon (dark theme)"
+      },
+      "sources": [
+        {
+          "src": "src/assets/favicon/code-dark.svg",
+          "type": "image/svg+xml",
+          "width": 32,
+          "height": 32
+        }
+      ]
+    },
+    "flagPtBr": {
+      "country": "BR",
+      "alt": {
+        "pt-BR": "Bandeira do Brasil",
+        "en-US": "Brazilian flag"
+      },
+      "class": "flag-icon",
+      "loading": "lazy",
+      "decoding": "async",
+      "sources": [
+        {
+          "src": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.21/3x2/BR.svg",
+          "type": "image/svg+xml",
+          "width": 24,
+          "height": 16
+        }
+      ]
+    },
+    "flagEnUs": {
+      "country": "US",
+      "alt": {
+        "pt-BR": "Bandeira dos Estados Unidos",
+        "en-US": "United States flag"
+      },
+      "class": "flag-icon",
+      "loading": "lazy",
+      "decoding": "async",
+      "sources": [
+        {
+          "src": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.21/3x2/US.svg",
+          "type": "image/svg+xml",
+          "width": 24,
+          "height": 16
+        }
+      ]
+    }
   }
 }

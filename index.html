@@ -1,67 +1,112 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="webTitle" data-i18n="page_title">JLBBARCO's Portfolio</title>
+    <link rel="stylesheet" href="src/css/style.css" media="screen" />
+    <link
+      rel="stylesheet"
+      href="src/css/tablet.css"
+      media="(min-width: 724px)"
+    />
+    <link rel="stylesheet" href="src/css/pc.css" media="(min-width: 990px)" />
+    <link rel="stylesheet" href="src/css/tv.css" media="(min-width: 1920px)" />
+    <!-- Font Awesome Kit (JS/SVG mode) -->
+    <script
+      src="https://kit.fontawesome.com/4a1e49a1ca.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Inicialmente use o ícone dark para reduzir flash enquanto o script ajusta conforme preferência -->
+    <link
+      rel="shortcut icon"
+      href="src/assets/favicon/code-light.svg"
+      type="image/x-icon"
+      id="favicon"
+    />
+    <script src="src/js/site-data.js" defer></script>
+    <script src="src/js/site-images.js" defer></script>
+    <script src="src/js/script.js" defer></script>
+    <script src="src/js/header.js" defer></script>
+    <script src="src/js/projects.js" defer></script>
+    <script src="src/js/technologies.js" defer></script>
+    <script src="src/js/about.js" defer></script>
+    <script src="src/js/formations.js" defer></script>
+    <!-- <script src="src/js/curses.js" defer></script> -->
+    <script src="src/js/footer.js" defer></script>
+    <script src="src/js/translate.js" defer></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title id="webTitle" data-i18n="page_title">JLBBARCO's Portfolio</title>
-  <link rel="stylesheet" href="src/css/style.css" media="screen" />
-  <link rel="stylesheet" href="src/css/tablet.css" media="(min-width: 724px)" />
-  <link rel="stylesheet" href="src/css/pc.css" media="(min-width: 990px)" />
-  <link rel="stylesheet" href="src/css/tv.css" media="(min-width: 1920px)" />
-  <!-- Font Awesome Kit (JS/SVG mode) -->
-  <script src="https://kit.fontawesome.com/4a1e49a1ca.js" crossorigin="anonymous"></script>
-  <!-- Inicialmente use o ícone dark para reduzir flash enquanto o script ajusta conforme preferência -->
-  <link rel="shortcut icon" href="src/assets/favicon/code-light.svg" type="image/x-icon" id="favicon">
-  <script src="src/js/script.js" defer></script>
-  <script src="src/js/header.js" defer></script>
-  <script src="src/js/projects.js" defer></script>
-  <script src="src/js/technologies.js" defer></script>
-  <script src="src/js/about.js" defer></script>
-  <script src="src/js/formations.js" defer></script>
-  <!-- <script src="src/js/curses.js" defer></script> -->
-  <script src="src/js/footer.js" defer></script>
-  <script src="src/js/translate.js" defer></script>
-</head>
-
-<body data-github-owner="JLBBARCO" data-github-repo="portfolio">
-  <a id="skip_link" class="skip-link" href="#main" data-i18n="link_skip_to_main" aria-label="Skip to main content">Pular
-    para o
-    conteúdo principal</a>
-  <main id="main">
-    <section id="Home">
-      <div>
-        <h1 id="welcome_title" data-i18n="section_home_title">Welcome to My Portfolio</h1>
-        <p id="welcome_message" data-i18n="section_home_message">I'm a developer passionate about creating innovative
-          web
-          solutions</p>
-      </div>
-    </section>
-  </main>
-  <footer>
-    <article id="accessibility">
-      <button type="button" id="accessibility-button" aria-expanded="false" aria-controls="accessibility-menu">
-        <i class="fa-solid fa-universal-access icon"></i>
-      </button>
-      <div id="accessibility-menu" aria-hidden="true">
-        <button type="button" id="increase-font" data-i18n="aria_increase_font" data-i18n-attr="aria-label">
-          <i class="fa-solid fa-plus icon"></i>
+  <body data-github-owner="JLBBARCO" data-github-repo="portfolio">
+    <a
+      id="skip_link"
+      class="skip-link"
+      href="#main"
+      data-i18n="link_skip_to_main"
+      aria-label="Skip to main content"
+      >Pular para o conteúdo principal</a
+    >
+    <main id="main">
+      <section id="Home">
+        <div>
+          <h1 id="welcome_title" data-i18n="section_home_title">
+            Welcome to My Portfolio
+          </h1>
+          <p id="welcome_message" data-i18n="section_home_message">
+            I'm a developer passionate about creating innovative web solutions
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <article id="accessibility">
+        <button
+          type="button"
+          id="accessibility-button"
+          aria-expanded="false"
+          aria-controls="accessibility-menu"
+        >
+          <i class="fa-solid fa-universal-access icon"></i>
         </button>
-        <button type="button" id="decrease-font" data-i18n="aria_decrease_font" data-i18n-attr="aria-label">
-          <i class="fa-solid fa-minus icon"></i>
+        <div id="accessibility-menu" aria-hidden="true">
+          <button
+            type="button"
+            id="increase-font"
+            data-i18n="aria_increase_font"
+            data-i18n-attr="aria-label"
+          >
+            <i class="fa-solid fa-plus icon"></i>
+          </button>
+          <button
+            type="button"
+            id="decrease-font"
+            data-i18n="aria_decrease_font"
+            data-i18n-attr="aria-label"
+          >
+            <i class="fa-solid fa-minus icon"></i>
+          </button>
+          <button
+            type="button"
+            id="reset-font"
+            data-i18n="aria_reset_font"
+            data-i18n-attr="aria-label"
+          >
+            <i class="fa-solid fa-text-slash icon"></i>
+          </button>
+        </div>
+      </article>
+      <article id="forTop">
+        <button
+          type="button"
+          id="back-to-top"
+          data-i18n="aria_back_to_top"
+          data-i18n-attr="aria-label"
+          aria-label="Voltar ao topo"
+          aria-hidden="true"
+        >
+          <i class="fa-solid fa-arrow-up icon"></i>
         </button>
-        <button type="button" id="reset-font" data-i18n="aria_reset_font" data-i18n-attr="aria-label">
-          <i class="fa-solid fa-text-slash icon"></i>
-        </button>
-      </div>
-    </article>
-    <article id="forTop">
-      <button type="button" id="back-to-top" data-i18n="aria_back_to_top" data-i18n-attr="aria-label"
-        aria-label="Voltar ao topo" aria-hidden="true">
-        <i class="fa-solid fa-arrow-up icon"></i>
-      </button>
-    </article>
-  </footer>
-</body>
-
+      </article>
+    </footer>
+  </body>
 </html>

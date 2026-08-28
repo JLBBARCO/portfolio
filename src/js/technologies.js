@@ -62,14 +62,68 @@ function setupTechnologies(container, cards, language = "pt-BR") {
   container.appendChild(fragment);
 }
 
+/**
+ * Renderiza os grupos de tecnologias JA agrupados pelo servidor
+ * (snapshot.technologies.groups). O navegador so ordena pelo idioma atual e
+ * monta os icones - nenhum calculo ou requisicao extra.
+ */
+function renderTechnologyGroups(container, groups, language = "pt-BR") {
+  if (!container || !Array.isArray(groups)) return 0;
+
+  const fragment = document.createDocumentFragment();
+  const sortedGroups = [...groups].sort((a, b) => {
+    const titleA = getLocalized(a.stack, language) || a.stack.id;
+    const titleB = getLocalized(b.stack, language) || b.stack.id;
+    return titleA.localeCompare(titleB);
+  });
+
+  let rendered = 0;
+  sortedGroups.forEach((group) => {
+    const technologies = Array.isArray(group.technologies)
+      ? group.technologies
+      : [];
+    if (!technologies.length) return;
+
+    const stackDiv = document.createElement("div");
+    stackDiv.className = "tech-stack-group";
+
+    const h3 = document.createElement("h3");
+    h3.textContent = getLocalized(group.stack, language) || group.stack.id;
+    stackDiv.appendChild(h3);
+
+    const iconsContainer = document.createElement("div");
+    iconsContainer.className = "block";
+
+    [...technologies]
+      .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+      .forEach((tech) => {
+        const div = document.createElement("div");
+        div.className = "card tech-cards";
+        const resolved = resolveIconSpec(tech, tech.name || "");
+        div.innerHTML = `<i class="${faClass(resolved.style, resolved.icon)} icon" title="${tech.name || ""}"></i>`;
+        const p = document.createElement("p");
+        p.textContent = tech.name || "";
+        div.appendChild(p);
+        iconsContainer.appendChild(div);
+        rendered += 1;
+      });
+
+    stackDiv.appendChild(iconsContainer);
+    fragment.appendChild(stackDiv);
+  });
+
+  container.appendChild(fragment);
+  return rendered;
+}
+
 function loadAllTechnologies(language = "pt-BR", loadId) {
   const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
-  // Always try GitHub API first; will fallback to local JSON if API fails
   const projectsSource = "github";
 
   const main = document.querySelector("main");
   const section = document.createElement("section");
   section.id = "Technologies";
+  section.dataset.dynamicSection = "true";
 
   const title = document.createElement("h2");
   title.id = "technologiesTitle";
@@ -85,19 +139,45 @@ function loadAllTechnologies(language = "pt-BR", loadId) {
   main.appendChild(section);
 
   if (container && loadId !== undefined) container.dataset.loadId = loadId;
-  return Promise.all([
-    // when the projects source was switched we still want the cards shape
-    loadProjectsData(projectsSource, githubOwner),
-    fetchJsonWithFallback("src/json/areas/formation.json"),
-  ])
-    .then(([projectsData, formationsData]) => {
-      const container = document.getElementById("technologiesContainer");
-      if (!container) return;
-      if (loadId !== undefined && container.dataset.loadId != loadId) return;
-      const allCards = [];
-      if (projectsData.cards) allCards.push(...projectsData.cards);
-      if (formationsData.cards) allCards.push(...formationsData.cards);
-      setupTechnologies(container, allCards, language);
+
+  // Caminho principal: grupos prontos do snapshot da Vercel.
+  const groupsPromise =
+    window.SiteData && typeof window.SiteData.technologies === "function"
+      ? window.SiteData.technologies()
+      : Promise.resolve(null);
+
+  return groupsPromise
+    .then((technologies) => {
+      const target = document.getElementById("technologiesContainer");
+      if (!target) return;
+      if (loadId !== undefined && target.dataset.loadId != loadId) return;
+
+      const groups =
+        technologies && Array.isArray(technologies.groups)
+          ? technologies.groups
+          : [];
+      if (groups.length) {
+        renderTechnologyGroups(target, groups, language);
+        return;
+      }
+
+      // Reserva: agrupa no cliente a partir dos cards (sem requisicoes novas).
+      return Promise.all([
+        loadProjectsData(projectsSource, githubOwner),
+        fetchJsonWithFallback("src/json/areas/formation.json").catch(
+          () => ({}),
+        ),
+      ]).then(([projectsData, formationsData]) => {
+        if (loadId !== undefined && target.dataset.loadId != loadId) return;
+        const allCards = [];
+        if (projectsData && projectsData.cards) {
+          allCards.push(...projectsData.cards);
+        }
+        if (formationsData && formationsData.cards) {
+          allCards.push(...formationsData.cards);
+        }
+        setupTechnologies(target, allCards, language);
+      });
     })
     .catch((err) => console.error("Erro ao carregar tecnologias:", err));
 }

@@ -6,8 +6,35 @@ let supportedLanguageCodes = [];
 let defaultLanguage = "pt-br";
 // cache nodeLists for efficiency
 let _i18nElements = null;
-const FLAG_ICON_BASE_URL =
-  "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.21/3x2";
+// Os links das bandeiras ficam em src/json/areas/images.json (SiteImages).
+function flagIconUrl(countryCode) {
+  const code = String(countryCode || "US").toUpperCase();
+  if (
+    window.SiteImages &&
+    typeof window.SiteImages.flagSrcSync === "function"
+  ) {
+    const fromCatalog = window.SiteImages.flagSrcSync(code);
+    if (fromCatalog) return fromCatalog;
+  }
+  return "";
+}
+
+function applyFlagIcon(imgElement, countryCode) {
+  if (!imgElement) return;
+  const code = String(countryCode || "US").toUpperCase();
+  const immediate = flagIconUrl(code);
+  if (immediate) {
+    imgElement.src = immediate;
+    return;
+  }
+  if (window.SiteImages && typeof window.SiteImages.flagSrc === "function") {
+    window.SiteImages.flagSrc(code)
+      .then((src) => {
+        if (src) imgElement.src = src;
+      })
+      .catch(() => {});
+  }
+}
 
 function normalizeLanguageCode(language) {
   const fallbackLanguage =
@@ -359,6 +386,34 @@ function t(key) {
   return key;
 }
 
+// Guarda os filhos originais de cada elemento traduzido, para que a troca de
+// idioma substitua o texto sem duplicar nem acumular conteudo.
+const _preservedTranslationChildren = new WeakMap();
+
+function capturePreservedChildren(element) {
+  if (!_preservedTranslationChildren.has(element)) {
+    _preservedTranslationChildren.set(
+      element,
+      Array.from(element.children || []),
+    );
+  }
+  return _preservedTranslationChildren.get(element);
+}
+
+function reattachPreservedChildren(element, preserved, translationHasEmphasis) {
+  if (!Array.isArray(preserved) || !preserved.length) return;
+  preserved.forEach((child) => {
+    if (!child) return;
+    const isEmphasis =
+      child.tagName === "SPAN" && child.classList.contains("emphasis");
+    // Se a propria traducao ja traz <span class="emphasis">, o span original
+    // nao volta (evita destaque duplicado).
+    if (isEmphasis && translationHasEmphasis) return;
+    if (child.parentNode === element) return;
+    element.appendChild(child);
+  });
+}
+
 // Aplica texto/HTML com preservação controlada de spans internos.
 // Evita duplicar <span class="emphasis"> se a tradução já tiver essa tag.
 function setTextPreserveSpans(element, text) {
@@ -368,44 +423,24 @@ function setTextPreserveSpans(element, text) {
     text = text.replace(/\{\{age\}\}/g, age).replace(/\{\{year\}\}/g, age);
   }
 
-  const childElements = Array.from(element.children || []);
-  const onlySpans =
-    childElements.length > 0 &&
-    childElements.every((c) => c.tagName.toLowerCase() === "span");
-
+  // Os filhos originais (spans decorativos etc.) sao memorizados UMA VEZ por
+  // elemento. Antes o codigo concatenava a traducao com o innerHTML atual, o
+  // que fazia o texto se acumular a cada troca de idioma. Agora o conteudo e
+  // sempre reescrito do zero e apenas os filhos originais sao reinseridos.
+  const preserved = capturePreservedChildren(element);
   const hasHTML = typeof text === "string" && /<[^>]+>/.test(text);
+  const translationHasEmphasis =
+    typeof text === "string" &&
+    /<span[^>]*class=['"]?emphasis['"]?[^>]*>/i.test(text);
 
   if (hasHTML) {
-    const safeHTML = sanitizeTranslationHTML(text);
-    const translationHasEmphasis =
-      /<span[^>]*class=['"]?emphasis['"]?[^>]*>/i.test(text);
-
-    if (onlySpans && !translationHasEmphasis) {
-      const preservedHTML = childElements.map((s) => s.outerHTML).join(" ");
-      element.innerHTML = safeHTML + (preservedHTML ? " " + preservedHTML : "");
-    } else {
-      element.innerHTML = safeHTML;
-    }
+    element.innerHTML = sanitizeTranslationHTML(text);
   } else {
-    if (onlySpans) {
-      const spans = childElements;
-      if (spans.length > 0) {
-        const spansHTML = spans.map((s) => s.outerHTML).join(" ");
-        element.innerHTML = text + (spansHTML ? " " + spansHTML : "");
-      } else {
-        element.textContent = text;
-      }
-    } else {
-      let textNode = Array.from(element.childNodes).find(
-        (n) => n.nodeType === Node.TEXT_NODE,
-      );
-      if (textNode) {
-        textNode.nodeValue = text;
-      } else {
-        element.insertBefore(document.createTextNode(text), element.firstChild);
-      }
-    }
+    element.textContent =
+      text === undefined || text === null ? "" : String(text);
   }
+
+  reattachPreservedChildren(element, preserved, translationHasEmphasis);
 }
 
 function applyTranslations(language, options) {
@@ -502,7 +537,7 @@ function updateLanguageSelector() {
   }
 
   if (currentFlag) {
-    currentFlag.src = `${FLAG_ICON_BASE_URL}/${option.country}.svg`;
+    applyFlagIcon(currentFlag, option.country);
     currentFlag.alt = option.country;
     currentFlag.classList.remove("is-hidden");
   }
@@ -595,7 +630,7 @@ function renderLanguageDropdown() {
 
     const optionFlag = document.createElement("img");
     optionFlag.className = "language-flag";
-    optionFlag.src = `${FLAG_ICON_BASE_URL}/${meta.country || "US"}.svg`;
+    applyFlagIcon(optionFlag, meta.country || "US");
     optionFlag.alt = meta.country || languageCode;
     optionFlag.width = 24;
     optionFlag.height = 16;

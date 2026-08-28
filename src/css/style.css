@@ -348,6 +348,7 @@ section {
 
 .card {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
@@ -751,8 +752,7 @@ button .icon:hover {
 }
 
 .block .card {
-  min-width: 300px;
-  max-width: 400px;
+  max-width: 350px;
 }
 
 #formationsContainer .card {

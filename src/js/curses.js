@@ -44,6 +44,7 @@ function curses(fileURL, language, loadId) {
   const main = document.querySelector("main");
   const section = document.createElement("section");
   section.id = "Curses";
+  section.dataset.dynamicSection = "true";
 
   const title = document.createElement("h2");
   title.id = "cursesTitle";

@@ -116,8 +116,14 @@ function header() {
   const languageCurrentFlag = document.createElement("img");
   languageCurrentFlag.id = "languageCurrentFlag";
   languageCurrentFlag.className = "language-flag";
-  languageCurrentFlag.src = `https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.21/3x2/${currentLanguageCountry}.svg`;
-  languageCurrentFlag.alt = currentLanguageCountry;
+  // Link e texto alternativo vem de src/json/areas/images.json.
+  if (typeof applyFlagIcon === "function") {
+    applyFlagIcon(languageCurrentFlag, currentLanguageCountry);
+  }
+  languageCurrentFlag.alt =
+    window.SiteImages && typeof window.SiteImages.flagAltSync === "function"
+      ? window.SiteImages.flagAltSync(currentLanguageCountry)
+      : currentLanguageCountry;
   languageCurrentFlag.width = 24;
   languageCurrentFlag.height = 16;
 

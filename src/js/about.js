@@ -3,6 +3,9 @@ function aboutMe() {
   if (!main) return;
   const section = document.createElement("section");
   section.id = "About_Me";
+  // Marca a secao como dinamica para que o rebuild (troca de idioma) a remova
+  // antes de recriar, em vez de acrescentar uma copia abaixo.
+  section.dataset.dynamicSection = "true";
 
   const title = document.createElement("h2");
   title.id = "aboutMeTitle";
@@ -12,16 +15,31 @@ function aboutMe() {
   const container = document.createElement("article");
   container.className = "text-with-image";
 
-  const profileImage = document.createElement("img");
-  profileImage.src = "https://avatars.githubusercontent.com/u/159829462?v=4";
-  profileImage.alt = "Profile Image";
-  profileImage.id = "profile";
-  profileImage.setAttribute("data-i18n", "aria_profile_alt");
-  profileImage.setAttribute("data-i18n-attr", "alt");
-  profileImage.crossOrigin = "anonymous";
-  profileImage.className = "person";
-  profileImage.loading = "lazy";
-  container.append(profileImage);
+  // A imagem de perfil (link + texto alternativo + dimensoes) vem de
+  // src/json/areas/images.json, entregue pronta pelo snapshot da Vercel.
+  // Um placeholder e inserido agora e substituido pelo <img>/<picture> assim
+  // que o catalogo de imagens estiver disponivel.
+  const profilePlaceholder = document.createElement("span");
+  profilePlaceholder.className = "person";
+  profilePlaceholder.dataset.imagePlaceholder = "profilePicture";
+  container.append(profilePlaceholder);
+
+  if (window.SiteImages && typeof window.SiteImages.create === "function") {
+    window.SiteImages.create("profilePicture", {
+      id: "profile",
+      className: "person",
+    })
+      .then((element) => {
+        if (!element || !profilePlaceholder.isConnected) return;
+        profilePlaceholder.replaceWith(element);
+        if (typeof initializeProfileImage === "function") {
+          initializeProfileImage();
+        }
+      })
+      .catch((error) =>
+        console.warn("[about] Falha ao montar a imagem de perfil:", error),
+      );
+  }
 
   const containerText = document.createElement("div");
   containerText.className = "text";

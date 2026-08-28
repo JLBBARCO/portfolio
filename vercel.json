@@ -1,8 +1,13 @@
 {
   "crons": [
     {
-      "path": "/api/cron/update-github",
-      "schedule": "0 0 * * *"
+      "path": "/api/cron/update-site",
+      "schedule": "0 * * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "src/json/**"
+    }
+  }
 }
