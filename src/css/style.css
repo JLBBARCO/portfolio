@@ -77,6 +77,10 @@ source {
   -webkit-user-drag: none;
 }
 
+details summary {
+  cursor: pointer;
+}
+
 a {
   color: var(--text-secondary);
   text-decoration: none;
@@ -751,8 +755,8 @@ button .icon:hover {
   padding: 1rem 0;
 }
 
-.block .card {
-  max-width: 350px;
+.block .card>* {
+  max-width: 300px;
 }
 
 #formationsContainer .card {
@@ -792,6 +796,13 @@ button .icon:hover {
   margin: 0;
   text-align: center;
   font-size: 0.95rem;
+}
+
+p.description {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 1rem 0;
+  text-align: justify;
 }
 
 /* Scrollbar styling */

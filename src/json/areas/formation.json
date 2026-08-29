@@ -38,16 +38,7 @@
         "pt-BR": "Curso focado no desenvolvimento de software, análise de sistemas e gerenciamento de projetos"
       },
       "dateInit": "2023",
-      "dateEnd": "2025",
-      "certificates": [
-        {
-          "name": {
-            "en-US": "Technical Course in System Analysis and Development",
-            "pt-BR": "Curso Técnico em Análise e Desenvolvimento de Sistemas"
-          },
-          "url": ""
-        }
-      ]
+      "dateEnd": "2025"
     },
     {
       "title": {
