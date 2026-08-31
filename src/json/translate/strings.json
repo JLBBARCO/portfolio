@@ -48,7 +48,9 @@
       "section_more_title": "Mais sobre este site",
       "meta_last_update": "Última atualização: {{date}}",
       "link_skip_to_main": "Pular para o conteúdo principal",
-      "today": "Hoje"
+      "today": "Hoje",
+      "section_projects_all_title": "Todos os projetos",
+      "section_projects_highlights_title": "Projetos em destaque"
     },
     "en-us": {
       "nav_home": "Home",
@@ -81,7 +83,9 @@
       "meta_last_update": "Last Update: {{date}}",
       "link_skip_to_main": "Skip to content",
       "section_contact_title": "Contact",
-      "today": "Today"
+      "today": "Today",
+      "section_projects_all_title": "All Projects",
+      "section_projects_highlights_title": "Highlighted Projects"
     }
   }
 }

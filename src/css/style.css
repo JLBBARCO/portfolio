@@ -333,7 +333,7 @@ main {
   margin-top: var(--navbar-height);
 }
 
-section {
+main>section {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -368,6 +368,33 @@ section {
 .card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow);
+}
+
+/* Highlights: repos com mais estrelas no GitHub (#highlightsContainer) */
+.card-highlight {
+  position: relative;
+  border: 2px solid var(--accent);
+}
+
+.highlight-stars {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+  z-index: 2;
+}
+
+.highlight-stars .icon {
+  font-size: 0.85rem;
 }
 
 /* small indicator for participative projects */

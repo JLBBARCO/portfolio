@@ -291,6 +291,151 @@ function compareProjectCardsByMaintenance(a, b) {
   return 0;
 }
 
+/**
+ * Monta o elemento DOM de um card de projeto (usado tanto pelos destaques em
+ * #highlightsContainer quanto pela listagem completa em #projectsContainer),
+ * garantindo que os dois usem exatamente o mesmo layout/estilo.
+ *
+ * options:
+ *   - cardCounter: numero usado em data-index (fins de teste)
+ *   - extraClassName: classe adicional (ex.: "card-highlight")
+ *   - starCount: se numerico, exibe um selo com a quantidade de estrelas
+ */
+function buildProjectCardElement(card, language, options) {
+  const opts = options || {};
+  const div = document.createElement("div");
+  div.className = "card card-projects";
+  if (opts.extraClassName) div.classList.add(opts.extraClassName);
+  if (opts.cardCounter !== undefined) {
+    div.dataset.index = opts.cardCounter; // for testing purposes
+  }
+  if (card.iconTechnologies) {
+    div.dataset.technologies = card.iconTechnologies
+      .map((t) => t.name)
+      .filter(Boolean)
+      .join(",");
+  }
+
+  let html = "";
+
+  if (typeof opts.starCount === "number" && Number.isFinite(opts.starCount)) {
+    html += `<div class="highlight-stars"><i class="fa-solid fa-star icon"></i><span>${opts.starCount}</span></div>`;
+  }
+
+  const translatedImageAlt =
+    getProjectCardTranslation(card, "descriptionImage", language) || "";
+  const translatedTitle =
+    getProjectCardTranslation(card, "title", language) || "";
+  const translatedInstitution =
+    getProjectCardTranslation(card, "institution", language) || "";
+  const translatedDescription =
+    getProjectCardTranslation(card, "description", language) || "";
+
+  if (card.image) {
+    html += `<picture>`;
+    if (card.imageMobile)
+      html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
+    html += `<img src="${card.image}" alt="${escapeHTML(translatedImageAlt)}" loading="lazy" onerror="var p=this.closest('picture'); if(p) p.remove();"></picture>`;
+  }
+  if (translatedTitle)
+    html += `<h3 class="title">${escapeHTML(translatedTitle)}</h3>`;
+  if (translatedInstitution)
+    html += `<p class="institution">${escapeHTML(translatedInstitution)}</p>`;
+  if (translatedDescription)
+    html += `<p class="description">${escapeHTML(translatedDescription)}</p>`;
+
+  if (card.iconTechnologies) {
+    const techTitle = language === "pt-BR" ? "Tecnologias" : "Technologies";
+    html += `<h4 class="title-technologies">${techTitle}</h4>`;
+    html += `<div class="technologies">`;
+    const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
+      (a.name || "").localeCompare(b.name || ""),
+    );
+    sortedTechs.forEach((tech) => {
+      const resolved = resolveIconSpec(tech, tech.name || "");
+      html += `<i class="${faClass(resolved.style, resolved.icon)} icon" title="${tech.name || ""}"></i>`;
+    });
+    html += `</div>`;
+  }
+
+  if (card.linkRepository || card.linkDemo) {
+    const linkTitle = language === "pt-BR" ? "Links" : "Links";
+    html += `<h4 class="title-links">${linkTitle}</h4><div class="links">`;
+    if (card.linkRepository)
+      html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer" aria-label="Repository"><i class="fa-brands fa-github icon"></i></a>`;
+    if (card.linkDemo)
+      html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer" aria-label="Demo"><i class="fa-solid fa-share-from-square icon"></i></a>`;
+    html += `</div>`;
+  }
+
+  const createdDateLabel = getProjectCreationDisplayDate(card);
+  const latestOwnerUpdateLabel = getProjectLatestOwnerUpdateDisplayDate(card);
+  if (createdDateLabel) {
+    html += `<div class="date"><p>${createdDateLabel}`;
+    if (latestOwnerUpdateLabel) {
+      html += ` - ${latestOwnerUpdateLabel}`;
+    }
+    html += "</p></div>";
+  }
+
+  div.innerHTML = html;
+  return div;
+}
+
+/**
+ * Seleciona, entre os cards de projetos ja carregados (mesma fonte usada por
+ * #projectsContainer), os `limit` repositorios do `owner` com mais estrelas
+ * no GitHub. Roda inteiramente no navegador: consome `SiteData.repos()` (o
+ * mesmo snapshot client-side que alimenta #projectsContainer) so para saber
+ * a contagem de estrelas, sem repetir nenhuma chamada a api.github.com.
+ */
+function pickTopStarredProjectCards(cards, repos, owner, limit) {
+  if (!Array.isArray(cards) || !cards.length) return [];
+  if (!Array.isArray(repos) || !repos.length) return [];
+
+  const starsByRepoName = new Map();
+  repos.forEach((repo) => {
+    if (!isEligibleGitHubProjectRepo(repo, owner)) return;
+    starsByRepoName.set(
+      normalizeGitHubLogin(repo.name),
+      Number(repo.stargazers_count) || 0,
+    );
+  });
+
+  return cards
+    .map((card) => {
+      const repoKey = normalizeGitHubLogin(card.repoName || card.id);
+      if (!starsByRepoName.has(repoKey)) return null;
+      return { card, stars: starsByRepoName.get(repoKey) };
+    })
+    .filter(Boolean)
+    .sort((a, b) => {
+      if (b.stars !== a.stars) return b.stars - a.stars;
+      return compareProjectCardsByMaintenance(a.card, b.card);
+    })
+    .slice(0, limit);
+}
+
+/**
+ * Carrega, no navegador, a lista de repositorios do owner com a contagem de
+ * estrelas (SiteData.repos()). Mesma arquitetura client-side de
+ * loadProjectsData("github", owner): consome o snapshot ja resolvido pelo
+ * SiteData, sem falar diretamente com api.github.com.
+ */
+function loadRepositoryStars(source, owner) {
+  if (source !== "github") return Promise.resolve([]);
+
+  const siteData = window.SiteData || null;
+  if (!siteData || typeof siteData.repos !== "function") {
+    return Promise.resolve([]);
+  }
+
+  return siteData.repos().catch((error) => {
+    console.warn("[projects] Falha ao ler estrelas dos repositorios:", error);
+    return [];
+  });
+}
+
 function setupProjects(source, language, owner, loadId) {
   // when we start working with a container we tag it with the load id so
   // stale async results know to bail out.  loadId is produced by
@@ -306,6 +451,44 @@ function setupProjects(source, language, owner, loadId) {
   title.setAttribute("data-i18n", "section_projects_title");
   title.innerHTML = "Projects";
   section.append(title);
+
+  const highlights = document.createElement("div");
+  highlights.id = "projectsHighlights";
+  highlights.className = "projects";
+  section.appendChild(highlights);
+
+  const highlightsTitle = document.createElement("h3");
+  highlightsTitle.id = "projectsHighlightsTitle";
+  highlightsTitle.setAttribute(
+    "data-i18n",
+    "section_projects_highlights_title",
+  );
+  highlightsTitle.innerHTML = "Highlights";
+  highlights.append(highlightsTitle);
+
+  const highlightsContainer = document.createElement("article");
+  highlightsContainer.id = "highlightsContainer";
+  highlightsContainer.className = "block semi-hidden";
+
+  if (highlightsContainer && loadId !== undefined) {
+    highlightsContainer.dataset.loadId = loadId;
+  }
+
+  highlights.appendChild(highlightsContainer);
+  // Sem destaques ainda: evita mostrar o titulo "Highlights" com uma area vazia
+  // ate sabermos se ha estrelas suficientes para preenche-la.
+  highlights.style.display = "none";
+
+  const allProjects = document.createElement("div");
+  allProjects.id = "allProjects";
+  allProjects.className = "projects";
+  section.appendChild(allProjects);
+
+  const allProjectsTitle = document.createElement("h3");
+  allProjectsTitle.id = "allProjectsTitle";
+  allProjectsTitle.setAttribute("data-i18n", "section_projects_all_title");
+  allProjectsTitle.innerHTML = "All Projects";
+  allProjects.append(allProjectsTitle);
 
   const container = document.createElement("article");
   container.id = "projectsContainer";
@@ -327,8 +510,12 @@ function setupProjects(source, language, owner, loadId) {
 
   // source may be a local path or the literal string 'github' to indicate using
   // the GitHub API for the given owner.
-  Promise.all([loadProjectCardTranslations(), loadProjectsData(source, owner)])
-    .then(([, data]) => {
+  Promise.all([
+    loadProjectCardTranslations(),
+    loadProjectsData(source, owner),
+    loadRepositoryStars(source, owner),
+  ])
+    .then(([, data, repos]) => {
       if (!container || !data.cards) return;
       if (loadId !== undefined && container.dataset.loadId != loadId) {
         // load was superseded by a newer one, nothing to do
@@ -439,79 +626,40 @@ function setupProjects(source, language, owner, loadId) {
           return;
         }
 
-        const div = document.createElement("div");
-        div.className = "card card-projects";
-        div.dataset.index = cardCounter; // for testing purposes
-        if (card.iconTechnologies) {
-          div.dataset.technologies = card.iconTechnologies
-            .map((t) => t.name)
-            .filter(Boolean)
-            .join(",");
-        }
-
-        let html = "";
-        const translatedImageAlt =
-          getProjectCardTranslation(card, "descriptionImage", language) || "";
-        const translatedTitle =
-          getProjectCardTranslation(card, "title", language) || "";
-        const translatedInstitution =
-          getProjectCardTranslation(card, "institution", language) || "";
-        const translatedDescription =
-          getProjectCardTranslation(card, "description", language) || "";
-
-        if (card.image) {
-          html += `<picture>`;
-          if (card.imageMobile)
-            html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
-          html += `<img src="${card.image}" alt="${escapeHTML(translatedImageAlt)}" loading="lazy" onerror="var p=this.closest('picture'); if(p) p.remove();"></picture>`;
-        }
-        if (translatedTitle)
-          html += `<h3 class="title">${escapeHTML(translatedTitle)}</h3>`;
-        if (translatedInstitution)
-          html += `<p class="institution">${escapeHTML(translatedInstitution)}</p>`;
-        if (translatedDescription)
-          html += `<p class="description">${escapeHTML(translatedDescription)}</p>`;
-
-        if (card.iconTechnologies) {
-          const techTitle =
-            language === "pt-BR" ? "Tecnologias" : "Technologies";
-          html += `<h4 class="title-technologies">${techTitle}</h4>`;
-          html += `<div class="technologies">`;
-          const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
-            (a.name || "").localeCompare(b.name || ""),
-          );
-          sortedTechs.forEach((tech) => {
-            const resolved = resolveIconSpec(tech, tech.name || "");
-            html += `<i class="${faClass(resolved.style, resolved.icon)} icon" title="${tech.name || ""}"></i>`;
-          });
-          html += `</div>`;
-        }
-
-        if (card.linkRepository || card.linkDemo) {
-          const linkTitle = language === "pt-BR" ? "Links" : "Links";
-          html += `<h4 class="title-links">${linkTitle}</h4><div class="links">`;
-          if (card.linkRepository)
-            html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer" aria-label="Repository"><i class="fa-brands fa-github icon"></i></a>`;
-          if (card.linkDemo)
-            html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer" aria-label="Demo"><i class="fa-solid fa-share-from-square icon"></i></a>`;
-          html += `</div>`;
-        }
-
-        const createdDateLabel = getProjectCreationDisplayDate(card);
-        const latestOwnerUpdateLabel =
-          getProjectLatestOwnerUpdateDisplayDate(card);
-        if (createdDateLabel) {
-          html += `<div class="date"><p>${createdDateLabel}`;
-          if (latestOwnerUpdateLabel) {
-            html += ` - ${latestOwnerUpdateLabel}`;
-          }
-          html += "</p></div>";
-        }
-
-        div.innerHTML = html;
+        const div = buildProjectCardElement(card, language, {
+          cardCounter,
+        });
         fragment.appendChild(div);
       });
       container.appendChild(fragment);
+
+      // Destaques: os 2 repositorios do owner com mais estrelas no GitHub,
+      // renderizados com o mesmo layout de #projectsContainer. Roda no
+      // cliente, a partir dos mesmos cards + snapshot de repositorios ja
+      // carregados acima.
+      if (
+        highlightsContainer &&
+        !(loadId !== undefined && highlightsContainer.dataset.loadId != loadId)
+      ) {
+        highlightsContainer.innerHTML = "";
+        const topStarred = pickTopStarredProjectCards(cards, repos, owner, 2);
+
+        if (topStarred.length) {
+          const highlightsFragment = document.createDocumentFragment();
+          topStarred.forEach((entry, idx) => {
+            const highlightDiv = buildProjectCardElement(entry.card, language, {
+              cardCounter: idx + 1,
+              extraClassName: "card-highlight",
+              starCount: entry.stars,
+            });
+            highlightsFragment.appendChild(highlightDiv);
+          });
+          highlightsContainer.appendChild(highlightsFragment);
+          if (highlights) highlights.style.display = "";
+        } else if (highlights) {
+          highlights.style.display = "none";
+        }
+      }
     })
     .catch((err) => {
       console.error("[projects] Failed to load projects:", err);
@@ -530,7 +678,7 @@ function setupProjects(source, language, owner, loadId) {
       );
     });
 
-  section.appendChild(container);
+  allProjects.appendChild(container);
   main.appendChild(section);
 }
 
