@@ -684,15 +684,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("languageChanged", loadDynamicContent);
 });
 
-function calcularIdade() {
-  const nascimento = new Date(2008, 8, 24);
-  const hoje = new Date();
-  let idade = hoje.getFullYear() - nascimento.getFullYear();
-  const mes = hoje.getMonth() - nascimento.getMonth();
-  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) idade--;
-  return idade;
-}
-
 function toggleMenu() {
   const navLinks = document.querySelector(".nav-links");
   const menuIcon = document.getElementById("menuIcon");

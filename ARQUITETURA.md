@@ -136,5 +136,5 @@ clicar em `#languageBtn`:
    os filhos originais voltam.
 
 Todos os textos continuam vindo de `src/json/translate/strings.json` através de
-`src/js/translate.js`, incluindo os marcadores `{{age}}` e `{{date}}`. Não
-existe nenhum outro sistema de tradução no cliente.
+`src/js/translate.js`, incluindo o marcador `{{date}}`. Não existe nenhum
+outro sistema de tradução no cliente.

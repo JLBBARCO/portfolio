@@ -155,6 +155,16 @@
         "en-US": "A system that optimizes the performance of Windows operating systems, improving speed and efficiency.",
         "pt-BR": "Um sistema que otimiza o desempenho dos sistemas operacionais Windows, melhorando a velocidade e a eficiência"
       }
+    },
+    "mossview": {
+      "title": {
+        "en-US": "Mossview",
+        "pt-BR": "Mossview"
+      },
+      "description": {
+        "en-US": "A website that provides information about the Mossview project, including its objectives, features, and updates.",
+        "pt-BR": "Um site que fornece informações sobre o projeto Mossview, incluindo seus objetivos, recursos e atualizações"
+      }
     }
   }
 }

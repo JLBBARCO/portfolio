@@ -417,12 +417,6 @@ function reattachPreservedChildren(element, preserved, translationHasEmphasis) {
 // Aplica texto/HTML com preservação controlada de spans internos.
 // Evita duplicar <span class="emphasis"> se a tradução já tiver essa tag.
 function setTextPreserveSpans(element, text) {
-  // Substitui placeholders de idade: aceita {{age}} e {{year}}
-  const age = typeof calcularIdade === "function" ? calcularIdade() : "";
-  if (typeof text === "string") {
-    text = text.replace(/\{\{age\}\}/g, age).replace(/\{\{year\}\}/g, age);
-  }
-
   // Os filhos originais (spans decorativos etc.) sao memorizados UMA VEZ por
   // elemento. Antes o codigo concatenava a traducao com o innerHTML atual, o
   // que fazia o texto se acumular a cada troca de idioma. Agora o conteudo e
