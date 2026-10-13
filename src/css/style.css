@@ -674,12 +674,15 @@ button .icon:hover {
   justify-content: center;
   width: 100%;
   max-width: 100%;
+  position: sticky;
+  top: 15%;
+  z-index: 100;
 }
 
 .filter-button {
   padding: 10px 20px;
   border: 2px solid var(--accent);
-  background-color: transparent;
+  background-color: var(--secondary-bg-transparent);
   color: var(--text-primary);
   border-radius: 20px;
   cursor: pointer;

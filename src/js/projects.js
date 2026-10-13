@@ -600,8 +600,7 @@ function setupProjects(source, language, owner, loadId) {
           btn.onclick = () => filterProjectsByTechnology(name);
           filterContainer.appendChild(btn);
         });
-        const parent = container.parentNode || section;
-        if (parent) parent.insertBefore(filterContainer, container);
+        section.insertBefore(filterContainer, highlights);
       }
 
       const fragment = document.createDocumentFragment();
