@@ -1,17 +1,9 @@
-function getScreenshotUrl(demoUrl) {
-  return `https://api.microlink.io/?url=${encodeURIComponent(
-    demoUrl,
-  )}&screenshot=true&meta=false&embed=screenshot.url`;
-}
-
 // Cache GitHub project loads to avoid duplicated network calls when multiple
 // sections request the same data during one render cycle.
 const _projectsDataCache = new Map();
 const _projectCardTranslations = Object.create(null);
 const _projectCardImageOverrides = Object.create(null);
 let _projectTranslationsLoadPromise = null;
-const _repoOwnerMainMasterCommitCache = new Map();
-const _repoMainMasterActivityCache = new Map();
 
 // Translation dictionary for project cards, keyed by card id.
 // Each entry can define title/description/institution/descriptionImage.
@@ -77,69 +69,6 @@ function ensureProjectCardId(card) {
   const id = slugifyCardId(idSource) || "project";
   if (card) card.id = id;
   return id;
-}
-
-function getProjectCardImageOverride(cardId) {
-  const normalizedId = slugifyCardId(cardId);
-  if (!normalizedId) return "";
-  const url = _projectCardImageOverrides[normalizedId];
-  return typeof url === "string" ? url : "";
-}
-
-function normalizeHomepageUrl(url) {
-  const value = String(url || "").trim();
-  if (!value) return "";
-  if (/^https?:\/\//i.test(value)) return value;
-  return `https://${value}`;
-}
-
-function resolveProjectCardImage(repo, card, repoOwnerName) {
-  const imageFromJson = getProjectCardImageOverride(repo && repo.name);
-  const rawMainThumbnailUrl = `https://raw.githubusercontent.com/${repoOwnerName}/${repo.name}/refs/heads/main/src/assets/img/thumbnail.webp`;
-  const demoUrl = normalizeHomepageUrl(repo && repo.homepage);
-  const screenshotUrl = demoUrl ? getScreenshotUrl(demoUrl) : "";
-
-  if (demoUrl) {
-    card.linkDemo = demoUrl;
-  }
-
-  const setImage = (url, type) => {
-    card.image = url;
-    card.imageMobile = url;
-    if (type) {
-      card.imageType = type;
-    } else if (card.imageType) {
-      delete card.imageType;
-    }
-  };
-
-  const checkImageExists = (url) => {
-    if (!url) return Promise.resolve(false);
-    return fetch(url, { method: "HEAD" })
-      .then((response) => response.ok)
-      .catch(() => false);
-  };
-
-  return checkImageExists(imageFromJson)
-    .then((hasJsonImage) => {
-      if (hasJsonImage) {
-        setImage(imageFromJson);
-        return true;
-      }
-      return checkImageExists(rawMainThumbnailUrl).then((hasRawImage) => {
-        if (hasRawImage) {
-          setImage(rawMainThumbnailUrl, "image/webp");
-          return true;
-        }
-        return false;
-      });
-    })
-    .then((hasRemoteImage) => {
-      if (!hasRemoteImage && screenshotUrl) {
-        setImage(screenshotUrl);
-      }
-      return card;
-    });
 }
 
 function loadProjectCardTranslations() {
@@ -362,6 +291,207 @@ function compareProjectCardsByMaintenance(a, b) {
   return 0;
 }
 
+/**
+ * Monta o elemento DOM de um card de projeto (usado tanto pelos destaques em
+ * #highlightsContainer quanto pela listagem completa em #projectsContainer),
+ * garantindo que os dois usem exatamente o mesmo layout/estilo.
+ *
+ * options:
+ *   - cardCounter: numero usado em data-index (fins de teste)
+ *   - extraClassName: classe adicional (ex.: "card-highlight")
+ *   - starCount: se numerico, exibe um selo com a quantidade de estrelas
+ */
+function buildProjectCardElement(card, language, options) {
+  const opts = options || {};
+  const div = document.createElement("div");
+  div.className = "card card-projects";
+  if (opts.extraClassName) div.classList.add(opts.extraClassName);
+  if (opts.cardCounter !== undefined) {
+    div.dataset.index = opts.cardCounter; // for testing purposes
+  }
+  if (card.iconTechnologies) {
+    div.dataset.technologies = card.iconTechnologies
+      .map((t) => t.name)
+      .filter(Boolean)
+      .join(",");
+  }
+
+  let html = "";
+
+  if (typeof opts.starCount === "number" && Number.isFinite(opts.starCount)) {
+    html += `<div class="highlight-stars"><i class="fa-solid fa-star icon"></i><span>${opts.starCount}</span></div>`;
+  }
+
+  const translatedImageAlt =
+    getProjectCardTranslation(card, "descriptionImage", language) || "";
+  const translatedTitle =
+    getProjectCardTranslation(card, "title", language) || "";
+  const translatedInstitution =
+    getProjectCardTranslation(card, "institution", language) || "";
+  const translatedDescription =
+    getProjectCardTranslation(card, "description", language) || "";
+
+  if (card.image) {
+    html += `<picture>`;
+    if (card.imageMobile)
+      html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
+    html += `<img src="${card.image}" alt="${escapeHTML(translatedImageAlt)}" loading="lazy" onerror="var p=this.closest('picture'); if(p) p.remove();"></picture>`;
+  }
+  if (translatedTitle)
+    html += `<h3 class="title">${escapeHTML(translatedTitle)}</h3>`;
+  if (translatedInstitution)
+    html += `<p class="institution">${escapeHTML(translatedInstitution)}</p>`;
+  if (translatedDescription)
+    html += `<p class="description">${escapeHTML(translatedDescription)}</p>`;
+
+  if (card.iconTechnologies) {
+    const techTitle = language === "pt-BR" ? "Tecnologias" : "Technologies";
+    html += `<h4 class="title-technologies">${techTitle}</h4>`;
+    html += `<div class="technologies">`;
+    const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
+      (a.name || "").localeCompare(b.name || ""),
+    );
+    sortedTechs.forEach((tech) => {
+      const techName = tech.name || "";
+      const safeTechName = escapeHTML(techName);
+      const resolved = resolveIconSpec(tech, tech.name || "");
+      html += `<span class="project-tech-chip"><i class="${faClass(resolved.style, resolved.icon)} icon" aria-hidden="true"></i><span>${safeTechName}</span></span>`;
+    });
+    html += `</div>`;
+  }
+
+  if (card.linkRepository || card.linkDemo) {
+    const labels =
+      language === "pt-BR"
+        ? { heading: "Acessar projeto", repository: "Repositório", demo: "Demonstração" }
+        : { heading: "Explore this project", repository: "Repository", demo: "Live demo" };
+    html += `<h4 class="title-links">${labels.heading}</h4><div class="project-links">`;
+    if (card.linkRepository)
+      html += `<a class="project-link" href="${escapeHTML(card.linkRepository)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github icon" aria-hidden="true"></i><span>${labels.repository}</span></a>`;
+    if (card.linkDemo)
+      html += `<a class="project-link" href="${escapeHTML(card.linkDemo)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square icon" aria-hidden="true"></i><span>${labels.demo}</span></a>`;
+    html += `</div>`;
+  }
+
+  const createdDateLabel = getProjectCreationDisplayDate(card);
+  const latestOwnerUpdateLabel = getProjectLatestOwnerUpdateDisplayDate(card);
+  if (createdDateLabel) {
+    html += `<div class="date"><p>${createdDateLabel}`;
+    if (latestOwnerUpdateLabel) {
+      html += ` - ${latestOwnerUpdateLabel}`;
+    }
+    html += "</p></div>";
+  }
+
+  if (translatedDescription || card.linkRepository || card.linkDemo) {
+    const isPortuguese = language === "pt-BR";
+    const labels = isPortuguese
+      ? {
+          summary: "Contexto, processo e evidências",
+          context: "Contexto",
+          process: "Desenvolvimento",
+          processBody: "Consulte o código, o README e o histórico público disponíveis no repositório para acompanhar a implementação.",
+          stars: "Estrelas no GitHub",
+          created: "Criado",
+          updated: "Atualização do autor",
+          repository: "Abrir repositório e documentação",
+          demo: "Ver demonstração",
+        }
+      : {
+          summary: "Context, process & evidence",
+          context: "Context",
+          process: "Development",
+          processBody: "Explore the code, README, and public history available in the repository to follow the implementation.",
+          stars: "GitHub stars",
+          created: "Created",
+          updated: "Owner update",
+          repository: "Open repository and documentation",
+          demo: "View live demo",
+        };
+    html += `<details class="project-details"><summary>${labels.summary}</summary><div class="project-details-content">`;
+    if (translatedDescription) {
+      html += `<div class="project-detail-block"><h4>${labels.context}</h4><p>${escapeHTML(translatedDescription)}</p></div>`;
+    }
+    html += `<div class="project-detail-block"><h4>${labels.process}</h4><p>${labels.processBody}</p></div>`;
+
+    const publicFacts = [];
+    if (typeof opts.starCount === "number" && Number.isFinite(opts.starCount)) {
+      publicFacts.push(`${labels.stars}: ${opts.starCount}`);
+    }
+    if (createdDateLabel) publicFacts.push(`${labels.created}: ${createdDateLabel}`);
+    if (latestOwnerUpdateLabel) publicFacts.push(`${labels.updated}: ${latestOwnerUpdateLabel}`);
+    if (publicFacts.length) {
+      html += `<p class="project-detail-facts">${publicFacts.map(escapeHTML).join(" · ")}</p>`;
+    }
+
+    html += `<div class="project-detail-links">`;
+    if (card.linkRepository) {
+      html += `<a href="${escapeHTML(card.linkRepository)}" target="_blank" rel="noopener noreferrer">${labels.repository}</a>`;
+    }
+    if (card.linkDemo) {
+      html += `<a href="${escapeHTML(card.linkDemo)}" target="_blank" rel="noopener noreferrer">${labels.demo}</a>`;
+    }
+    html += `</div></div></details>`;
+  }
+
+  div.innerHTML = html;
+  return div;
+}
+
+/**
+ * Seleciona, entre os cards de projetos ja carregados (mesma fonte usada por
+ * #projectsContainer), os `limit` repositorios do `owner` com mais estrelas
+ * no GitHub. Roda inteiramente no navegador: consome `SiteData.repos()` (o
+ * mesmo snapshot client-side que alimenta #projectsContainer) so para saber
+ * a contagem de estrelas, sem repetir nenhuma chamada a api.github.com.
+ */
+function pickTopStarredProjectCards(cards, repos, owner, limit) {
+  if (!Array.isArray(cards) || !cards.length) return [];
+  if (!Array.isArray(repos) || !repos.length) return [];
+
+  const starsByRepoName = new Map();
+  repos.forEach((repo) => {
+    if (!isEligibleGitHubProjectRepo(repo, owner)) return;
+    starsByRepoName.set(
+      normalizeGitHubLogin(repo.name),
+      Number(repo.stargazers_count) || 0,
+    );
+  });
+
+  return cards
+    .map((card) => {
+      const repoKey = normalizeGitHubLogin(card.repoName || card.id);
+      if (!starsByRepoName.has(repoKey)) return null;
+      return { card, stars: starsByRepoName.get(repoKey) };
+    })
+    .filter(Boolean)
+    .sort((a, b) => {
+      if (b.stars !== a.stars) return b.stars - a.stars;
+      return compareProjectCardsByMaintenance(a.card, b.card);
+    })
+    .slice(0, limit);
+}
+
+/**
+ * Carrega, no navegador, a lista de repositorios do owner com a contagem de
+ * estrelas (SiteData.repos()). Mesma arquitetura client-side de
+ * loadProjectsData("github", owner): consome o snapshot ja resolvido pelo
+ * SiteData, sem falar diretamente com api.github.com.
+ */
+function loadRepositoryStars(source, owner) {
+  if (source !== "github") return Promise.resolve([]);
+
+  const siteData = window.SiteData || null;
+  if (!siteData || typeof siteData.repos !== "function") {
+    return Promise.resolve([]);
+  }
+
+  return siteData.repos().catch((error) => {
+    console.warn("[projects] Falha ao ler estrelas dos repositorios:", error);
+    return [];
+  });
+}
+
 function setupProjects(source, language, owner, loadId) {
   // when we start working with a container we tag it with the load id so
   // stale async results know to bail out.  loadId is produced by
@@ -369,6 +499,7 @@ function setupProjects(source, language, owner, loadId) {
   const main = document.querySelector("main");
   const section = document.createElement("section");
   section.id = "Projects";
+  section.dataset.dynamicSection = "true";
   section.className = "portfolio";
 
   const title = document.createElement("h2");
@@ -376,6 +507,44 @@ function setupProjects(source, language, owner, loadId) {
   title.setAttribute("data-i18n", "section_projects_title");
   title.innerHTML = "Projects";
   section.append(title);
+
+  const highlights = document.createElement("div");
+  highlights.id = "projectsHighlights";
+  highlights.className = "projects";
+  section.appendChild(highlights);
+
+  const highlightsTitle = document.createElement("h3");
+  highlightsTitle.id = "projectsHighlightsTitle";
+  highlightsTitle.setAttribute(
+    "data-i18n",
+    "section_projects_highlights_title",
+  );
+  highlightsTitle.innerHTML = "Highlights";
+  highlights.append(highlightsTitle);
+
+  const highlightsContainer = document.createElement("article");
+  highlightsContainer.id = "highlightsContainer";
+  highlightsContainer.className = "block semi-hidden";
+
+  if (highlightsContainer && loadId !== undefined) {
+    highlightsContainer.dataset.loadId = loadId;
+  }
+
+  highlights.appendChild(highlightsContainer);
+  // Sem destaques ainda: evita mostrar o titulo "Highlights" com uma area vazia
+  // ate sabermos se ha estrelas suficientes para preenche-la.
+  highlights.style.display = "none";
+
+  const allProjects = document.createElement("div");
+  allProjects.id = "allProjects";
+  allProjects.className = "projects";
+  section.appendChild(allProjects);
+
+  const allProjectsTitle = document.createElement("h3");
+  allProjectsTitle.id = "allProjectsTitle";
+  allProjectsTitle.setAttribute("data-i18n", "section_projects_all_title");
+  allProjectsTitle.innerHTML = "All Projects";
+  allProjects.append(allProjectsTitle);
 
   const container = document.createElement("article");
   container.id = "projectsContainer";
@@ -397,8 +566,12 @@ function setupProjects(source, language, owner, loadId) {
 
   // source may be a local path or the literal string 'github' to indicate using
   // the GitHub API for the given owner.
-  Promise.all([loadProjectCardTranslations(), loadProjectsData(source, owner)])
-    .then(([, data]) => {
+  Promise.all([
+    loadProjectCardTranslations(),
+    loadProjectsData(source, owner),
+    loadRepositoryStars(source, owner),
+  ])
+    .then(([, data, repos]) => {
       if (!container || !data.cards) return;
       if (loadId !== undefined && container.dataset.loadId != loadId) {
         // load was superseded by a newer one, nothing to do
@@ -483,8 +656,7 @@ function setupProjects(source, language, owner, loadId) {
           btn.onclick = () => filterProjectsByTechnology(name);
           filterContainer.appendChild(btn);
         });
-        const parent = container.parentNode || section;
-        if (parent) parent.insertBefore(filterContainer, container);
+        section.insertBefore(filterContainer, highlights);
       }
 
       const fragment = document.createDocumentFragment();
@@ -509,79 +681,40 @@ function setupProjects(source, language, owner, loadId) {
           return;
         }
 
-        const div = document.createElement("div");
-        div.className = "card card-projects";
-        div.dataset.index = cardCounter; // for testing purposes
-        if (card.iconTechnologies) {
-          div.dataset.technologies = card.iconTechnologies
-            .map((t) => t.name)
-            .filter(Boolean)
-            .join(",");
-        }
-
-        let html = "";
-        const translatedImageAlt =
-          getProjectCardTranslation(card, "descriptionImage", language) || "";
-        const translatedTitle =
-          getProjectCardTranslation(card, "title", language) || "";
-        const translatedInstitution =
-          getProjectCardTranslation(card, "institution", language) || "";
-        const translatedDescription =
-          getProjectCardTranslation(card, "description", language) || "";
-
-        if (card.image) {
-          html += `<picture>`;
-          if (card.imageMobile)
-            html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
-          html += `<img src="${card.image}" alt="${escapeHTML(translatedImageAlt)}" loading="lazy" onerror="var p=this.closest('picture'); if(p) p.remove();"></picture>`;
-        }
-        if (translatedTitle)
-          html += `<h3 class="title">${escapeHTML(translatedTitle)}</h3>`;
-        if (translatedInstitution)
-          html += `<p class="institution">${escapeHTML(translatedInstitution)}</p>`;
-        if (translatedDescription)
-          html += `<p class="description">${escapeHTML(translatedDescription)}</p>`;
-
-        if (card.iconTechnologies) {
-          const techTitle =
-            language === "pt-BR" ? "Tecnologias" : "Technologies";
-          html += `<h4 class="title-technologies">${techTitle}</h4>`;
-          html += `<div class="technologies">`;
-          const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
-            (a.name || "").localeCompare(b.name || ""),
-          );
-          sortedTechs.forEach((tech) => {
-            const resolved = resolveIconSpec(tech, tech.name || "");
-            html += `<i class="${faClass(resolved.style, resolved.icon)} icon" title="${tech.name || ""}"></i>`;
-          });
-          html += `</div>`;
-        }
-
-        if (card.linkRepository || card.linkDemo) {
-          const linkTitle = language === "pt-BR" ? "Links" : "Links";
-          html += `<h4 class="title-links">${linkTitle}</h4><div class="links">`;
-          if (card.linkRepository)
-            html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer" aria-label="Repository"><i class="fa-brands fa-github icon"></i></a>`;
-          if (card.linkDemo)
-            html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer" aria-label="Demo"><i class="fa-solid fa-share-from-square icon"></i></a>`;
-          html += `</div>`;
-        }
-
-        const createdDateLabel = getProjectCreationDisplayDate(card);
-        const latestOwnerUpdateLabel =
-          getProjectLatestOwnerUpdateDisplayDate(card);
-        if (createdDateLabel) {
-          html += `<div class="date"><p>${createdDateLabel}`;
-          if (latestOwnerUpdateLabel) {
-            html += ` - ${latestOwnerUpdateLabel}`;
-          }
-          html += "</p></div>";
-        }
-
-        div.innerHTML = html;
+        const div = buildProjectCardElement(card, language, {
+          cardCounter,
+        });
         fragment.appendChild(div);
       });
       container.appendChild(fragment);
+
+      // Destaques: os 2 repositorios do owner com mais estrelas no GitHub,
+      // renderizados com o mesmo layout de #projectsContainer. Roda no
+      // cliente, a partir dos mesmos cards + snapshot de repositorios ja
+      // carregados acima.
+      if (
+        highlightsContainer &&
+        !(loadId !== undefined && highlightsContainer.dataset.loadId != loadId)
+      ) {
+        highlightsContainer.innerHTML = "";
+        const topStarred = pickTopStarredProjectCards(cards, repos, owner, 2);
+
+        if (topStarred.length) {
+          const highlightsFragment = document.createDocumentFragment();
+          topStarred.forEach((entry, idx) => {
+            const highlightDiv = buildProjectCardElement(entry.card, language, {
+              cardCounter: idx + 1,
+              extraClassName: "card-highlight",
+              starCount: entry.stars,
+            });
+            highlightsFragment.appendChild(highlightDiv);
+          });
+          highlightsContainer.appendChild(highlightsFragment);
+          if (highlights) highlights.style.display = "";
+        } else if (highlights) {
+          highlights.style.display = "none";
+        }
+      }
     })
     .catch((err) => {
       console.error("[projects] Failed to load projects:", err);
@@ -600,537 +733,57 @@ function setupProjects(source, language, owner, loadId) {
       );
     });
 
-  section.appendChild(container);
+  allProjects.appendChild(container);
   main.appendChild(section);
 }
 
-function canUseDirectGitHubFallback() {
-  return (
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1" ||
-    window.location.protocol === "file:"
-  );
-}
-
-function fetchGitHubRepos(owner) {
-  // Prefer backend API route (supports token). If unavailable (e.g. Live Server),
-  // fall back to direct GitHub API, then finally to local JSON fallback.
-  const apiUrl = `/api/github?owner=${encodeURIComponent(owner)}`;
-  const directUrl = `https://api.github.com/users/${encodeURIComponent(owner)}/repos?per_page=100&sort=updated&direction=desc&type=owner`;
-  const canFallbackDirect = canUseDirectGitHubFallback();
-
-  function fetchDirectRepos() {
-    return fetch(directUrl).then((fallbackRes) => {
-      if (!fallbackRes.ok) throw new Error("Erro ao obter repositórios");
-      return fallbackRes.json();
-    });
-  }
-
-  return fetch(apiUrl)
-    .then((res) => {
-      if (!res.ok) {
-        if (
-          canFallbackDirect &&
-          (res.status === 401 ||
-            res.status === 403 ||
-            res.status === 404 ||
-            res.status === 429 ||
-            res.status === 500)
-        ) {
-          // Silent fallback to direct GitHub API
-          return fetchDirectRepos().then((repos) => ({
-            repos,
-            failed: false,
-          }));
-        }
-        throw new Error("Erro ao obter repositórios");
-      }
-      return res.json().then((repos) => ({ repos, failed: false }));
-    })
-    .catch((err) => {
-      if (!canFallbackDirect) {
-        console.error("[projects] API route request failed", err);
-        return { repos: [], failed: true };
-      }
-      console.error(
-        "[projects] Failed to fetch from API route, trying direct GitHub API",
-        err,
-      );
-      return fetchDirectRepos()
-        .then((repos) => ({ repos, failed: false }))
-        .catch((fallbackErr) => {
-          console.error(
-            "[projects] Failed to fetch from direct GitHub API as well",
-            fallbackErr,
-          );
-          return { repos: [], failed: true };
-        });
-    });
-}
-
 /**
- * Generic loader for project 'data' used by setupProjects.  It currently supports
- * two modes:
- *   * fetch from a local JSON file (maintains backward compatibility)
- *   * fetch from GitHub API for a given username
- * When loading from GitHub the returned object has the same shape as the JSON
- * file ({ cards: [...] }) so the remainder of the rendering logic can stay
- * unchanged.
+ * Loader dos dados dos projetos.
+ *
+ *   * source === "github": consome os cards JA PRONTOS do snapshot gerado no
+ *     servidor (/api/site-data), atualizado de hora em hora. O navegador NAO
+ *     fala com api.github.com, nao resolve imagens e nao guarda cache proprio.
+ *   * qualquer outro valor: arquivo JSON local (compatibilidade).
  */
-// fetch per-repo language breakdown with caching to avoid excess API calls
-function fetchRepoLanguages(owner, repoName) {
-  const key = `githubLang_${owner}_${repoName}`;
-  let cached;
-  try {
-    cached = localStorage.getItem(key);
-  } catch (e) {
-    console.warn("localStorage unavailable when reading lang cache:", e);
-    cached = null;
-  }
-  if (cached) {
-    try {
-      return Promise.resolve(JSON.parse(cached));
-    } catch (e) {
-      console.warn("Bad cached languages for", repoName, e);
-    }
-  }
-  const canFallbackDirect = canUseDirectGitHubFallback();
-  const languagesUrl = `/api/github-languages?owner=${encodeURIComponent(owner)}&repo=${encodeURIComponent(repoName)}`;
-  const directLanguagesUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/languages`;
-
-  return fetch(languagesUrl)
-    .then((res) => {
-      if (res.ok) return res.json();
-      if (canFallbackDirect && (res.status === 404 || res.status === 500)) {
-        console.info(
-          `[projects] /api/github-languages unavailable for ${repoName}, using direct GitHub API fallback.`,
-        );
-        return fetch(directLanguagesUrl).then((fallbackRes) =>
-          fallbackRes.ok ? fallbackRes.json() : {},
-        );
-      }
-      return {};
-    })
-    .then((data) => {
-      try {
-        localStorage.setItem(key, JSON.stringify(data));
-      } catch (e) {
-        console.warn("Unable to cache repo languages:", e);
-      }
-      return data;
-    })
-    .catch((err) => {
-      console.warn("Error fetching languages for", repoName, err);
-      return {};
-    });
-}
-
-function fetchLatestOwnerCommitOnBranch(owner, repoName, author, branch) {
-  const commitPath = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?sha=${encodeURIComponent(branch)}&per_page=30`;
-  const commitUrl = `/api/github-proxy?path=${encodeURIComponent(commitPath)}`;
-  const directCommitUrl = `https://api.github.com${commitPath}`;
-  const normalizedAuthor = normalizeGitHubLogin(author);
-
-  return fetch(commitUrl)
-    .then((res) => {
-      if (!res.ok) {
-        if (
-          canUseDirectGitHubFallback() &&
-          (res.status === 404 || res.status === 500)
-        ) {
-          return fetch(directCommitUrl).then((fallbackRes) =>
-            fallbackRes.ok ? fallbackRes.json() : null,
-          );
-        }
-        return null;
-      }
-      return res.json();
-    })
-    .then((commits) => {
-      if (!Array.isArray(commits) || !commits.length) return null;
-
-      const latest = commits.find((commit) => {
-        const authorLogin = normalizeGitHubLogin(
-          commit && commit.author && commit.author.login,
-        );
-        const committerLogin = normalizeGitHubLogin(
-          commit && commit.committer && commit.committer.login,
-        );
-
-        return (
-          normalizedAuthor &&
-          (authorLogin === normalizedAuthor ||
-            committerLogin === normalizedAuthor)
-        );
-      });
-
-      if (!latest) return null;
-
-      const date =
-        (latest &&
-          latest.commit &&
-          latest.commit.author &&
-          latest.commit.author.date) ||
-        "";
-      if (!date) return null;
-      const ts = parseDateToTimestamp(date);
-      if (!ts) return null;
-      return { iso: date, ts };
-    })
-    .catch(() => null);
-}
-
-function fetchLatestBranchCommitOnBranch(owner, repoName, branch) {
-  const commitPath = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/commits?sha=${encodeURIComponent(branch)}&per_page=1`;
-  const commitUrl = `/api/github-proxy?path=${encodeURIComponent(commitPath)}`;
-  const directCommitUrl = `https://api.github.com${commitPath}`;
-
-  return fetch(commitUrl)
-    .then((res) => {
-      if (!res.ok) {
-        if (
-          canUseDirectGitHubFallback() &&
-          (res.status === 404 || res.status === 500)
-        ) {
-          return fetch(directCommitUrl).then((fallbackRes) =>
-            fallbackRes.ok ? fallbackRes.json() : null,
-          );
-        }
-        return null;
-      }
-      return res.json();
-    })
-    .then((commits) => {
-      if (!Array.isArray(commits) || !commits.length) return null;
-      const latest = commits[0];
-      const date =
-        (latest &&
-          latest.commit &&
-          latest.commit.author &&
-          latest.commit.author.date) ||
-        "";
-      if (!date) return null;
-      const ts = parseDateToTimestamp(date);
-      if (!ts) return null;
-      return { iso: date, ts };
-    })
-    .catch(() => null);
-}
-
-function extractPullRequestActivityTimestamp(pr) {
-  if (!pr || typeof pr !== "object") return 0;
-  const candidates = [pr.merged_at, pr.updated_at, pr.closed_at, pr.created_at]
-    .map(parseDateToTimestamp)
-    .filter((ts) => ts > 0);
-
-  if (!candidates.length) return 0;
-  return Math.max(...candidates);
-}
-
-function fetchLatestPullRequestActivityOnBase(owner, repoName, baseBranch) {
-  const pullsPath = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/pulls?state=all&base=${encodeURIComponent(baseBranch)}&sort=updated&direction=desc&per_page=20`;
-  const pullsUrl = `/api/github-proxy?path=${encodeURIComponent(pullsPath)}`;
-  const directPullsUrl = `https://api.github.com${pullsPath}`;
-
-  return fetch(pullsUrl)
-    .then((res) => {
-      if (!res.ok) {
-        if (
-          canUseDirectGitHubFallback() &&
-          (res.status === 404 || res.status === 500)
-        ) {
-          return fetch(directPullsUrl).then((fallbackRes) =>
-            fallbackRes.ok ? fallbackRes.json() : null,
-          );
-        }
-        return null;
-      }
-      return res.json();
-    })
-    .then((pulls) => {
-      if (!Array.isArray(pulls) || !pulls.length) return null;
-      let latestTs = 0;
-      pulls.forEach((pr) => {
-        const ts = extractPullRequestActivityTimestamp(pr);
-        if (ts > latestTs) latestTs = ts;
-      });
-      if (!latestTs) return null;
-      return { iso: new Date(latestTs).toISOString(), ts: latestTs };
-    })
-    .catch(() => null);
-}
-
-function fetchLatestMainMasterActivity(owner, repoName) {
-  const key = `githubMainMasterActivity_${owner}_${repoName}`;
-  if (_repoMainMasterActivityCache.has(key)) {
-    return _repoMainMasterActivityCache.get(key);
-  }
-
-  const activityPromise = Promise.all([
-    fetchLatestBranchCommitOnBranch(owner, repoName, "main"),
-    fetchLatestBranchCommitOnBranch(owner, repoName, "master"),
-    fetchLatestPullRequestActivityOnBase(owner, repoName, "main"),
-    fetchLatestPullRequestActivityOnBase(owner, repoName, "master"),
-  ])
-    .then((signals) => {
-      const candidates = signals.filter(Boolean);
-      if (!candidates.length) {
-        return { hasActivity: false, iso: "", ts: 0 };
-      }
-
-      const latest = candidates.reduce((best, current) => {
-        if (!best) return current;
-        return current.ts > best.ts ? current : best;
-      }, null);
-
-      if (!latest || !latest.ts) {
-        return { hasActivity: false, iso: "", ts: 0 };
-      }
-
-      return {
-        hasActivity: true,
-        iso: latest.iso,
-        ts: latest.ts,
-      };
-    })
-    .catch(() => ({ hasActivity: false, iso: "", ts: 0 }));
-
-  _repoMainMasterActivityCache.set(key, activityPromise);
-  return activityPromise;
-}
-
-function fetchLatestOwnerMainMasterCommit(
-  owner,
-  repoName,
-  author,
-  defaultBranch,
-) {
-  const normalizedDefaultBranch = String(defaultBranch || "")
-    .trim()
-    .toLowerCase();
-  const key = `githubOwnerMainMasterCommit_${owner}_${repoName}_${author}_${normalizedDefaultBranch || "none"}`;
-  if (_repoOwnerMainMasterCommitCache.has(key)) {
-    return _repoOwnerMainMasterCommitCache.get(key);
-  }
-
-  const branches = Array.from(
-    new Set(
-      [normalizedDefaultBranch, "main", "master"].filter(
-        (branch) => typeof branch === "string" && branch.length,
-      ),
-    ),
-  );
-
-  const commitPromise = Promise.all(
-    branches.map((branch) =>
-      fetchLatestOwnerCommitOnBranch(owner, repoName, author, branch),
-    ),
-  )
-    .then((branchCommits) => {
-      const candidates = branchCommits.filter(Boolean);
-      if (!candidates.length) {
-        return { hasCommit: false, iso: "", ts: 0 };
-      }
-
-      const latest = candidates.reduce((best, current) => {
-        if (!best) return current;
-        return current.ts > best.ts ? current : best;
-      }, null);
-
-      if (!latest) {
-        return { hasCommit: false, iso: "", ts: 0 };
-      }
-
-      return {
-        hasCommit: true,
-        iso: latest.iso,
-        ts: latest.ts,
-      };
-    })
-    .catch(() => ({ hasCommit: false, iso: "", ts: 0 }));
-
-  _repoOwnerMainMasterCommitCache.set(key, commitPromise);
-  return commitPromise;
-}
-
 function loadProjectsData(source, owner) {
-  // when building cards from github results, we convert simple strings into
-  // full technology objects; this helper does that so the logic stays clean.
-  function makeTechObject(name) {
-    const tech = { name };
-    const guess = guessFaIcon(name);
-    if (guess) {
-      tech.style = guess.style;
-      tech.icon = guess.icon;
-    } else {
-      const unresolvedIconClass = `fa-${
-        String(name)
-          .toLowerCase()
-          .trim()
-          .replace(/\s+/g, "-")
-          .replace(/[\+\.#]/g, "")
-          .replace(/[^a-z0-9\-]/g, "") || "icon-not-found"
-      }`;
-      tech.style = "fa-solid";
-      tech.icon = unresolvedIconClass;
-    }
-    tech.stack = determineStack(name);
-    return tech;
-  }
-
   if (source === "github") {
     const cacheKey = `${source}:${owner || ""}`;
     if (_projectsDataCache.has(cacheKey)) {
       return _projectsDataCache.get(cacheKey);
     }
 
-    // Load repositories and keep only projects owned by the requested user
-    // (both original repos and forks created by that same user).
-    const ghPromise = fetchGitHubRepos(owner).then((githubResult) => {
-      const repos = Array.isArray(githubResult && githubResult.repos)
-        ? githubResult.repos
-        : [];
-      const githubFetchStatus = {
-        failed: Boolean(githubResult && githubResult.failed),
-      };
-      const uniqueRepos = [];
-      const seenRepoKeys = new Set();
-      repos.forEach((repo) => {
-        const key = String(
-          (repo &&
-            (repo.id ||
-              repo.node_id ||
-              repo.full_name ||
-              repo.html_url ||
-              repo.name)) ||
-            "",
-        );
-        if (!key || seenRepoKeys.has(key)) return;
-        seenRepoKeys.add(key);
-        uniqueRepos.push(repo);
+    const siteData = window.SiteData || null;
+    if (!siteData || typeof siteData.projects !== "function") {
+      console.info(
+        "[projects] SiteData indisponivel; nenhum projeto carregado do snapshot.",
+      );
+      return Promise.resolve({
+        cards: [],
+        githubFetchStatus: { failed: true },
       });
+    }
 
-      const filtered = uniqueRepos
-        .filter((repo) => isEligibleGitHubProjectRepo(repo, owner))
-        .filter((repo) => normalizeGitHubLogin(repo.name) !== "portfolio");
-
-      const maxLangCalls = 59; // keep us safely under the rate limit
-      const cardsPromises = filtered.map((repo, idx) => {
-        const baseTechs = [];
-        if (Array.isArray(repo.topics) && repo.topics.length) {
-          baseTechs.push(...repo.topics);
-        }
-        if (repo.language) baseTechs.push(repo.language);
-
-        const makeDate = (iso) => {
-          if (!iso) return "";
-          const parts = iso.substring(0, 7).split("-");
-          if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
-          return parts[0];
+    const resultPromise = siteData
+      .projects()
+      .then((projects) => {
+        const cards = Array.isArray(projects && projects.cards)
+          ? projects.cards
+          : [];
+        const status = (projects && projects.githubFetchStatus) || {
+          failed: cards.length === 0,
         };
-
-        // makeCard returns a promise to keep the same flow for metadata lookup.
-        const makeCard = (unique, ownerCommitInfo, mainMasterActivityInfo) => {
-          const techObjects = unique
-            .map(makeTechObject)
-            .filter((t) => t !== null);
-
-          const repoOwnerName = (repo.owner && repo.owner.login) || owner;
-          const repoPushedAtIso = repo.pushed_at || "";
-          const ownerLatestIso =
-            (ownerCommitInfo && ownerCommitInfo.iso) || repoPushedAtIso;
-          const ownerLatestTs = parseDateToTimestamp(ownerLatestIso);
-          const hasOwnerLatestUpdate = Boolean(ownerLatestTs);
-
-          const card = {
-            id: slugifyCardId(repo.name),
-            title: { "pt-BR": repo.name, "en-US": repo.name },
-            description: repo.description || "",
-            linkRepository: repo.html_url,
-            dateInit: makeDate(repo.created_at),
-            dateEnd: makeDate(repo.pushed_at),
-            repoCreatedAtIso: repo.created_at || "",
-            hasOwnerMainMasterCommit: hasOwnerLatestUpdate,
-            latestOwnerMainMasterCommitAt: ownerLatestIso,
-            hasMainMasterActivity: Boolean(
-              (mainMasterActivityInfo && mainMasterActivityInfo.hasActivity) ||
-              hasOwnerLatestUpdate,
-            ),
-            latestMainMasterActivityAt:
-              (mainMasterActivityInfo && mainMasterActivityInfo.iso) ||
-              ownerLatestIso ||
-              "",
-            iconTechnologies: techObjects,
-            githubFallbackTranslations: {
-              title: { "pt-BR": repo.name, "en-US": repo.name },
-              description: {
-                "pt-BR": repo.description || "",
-                "en-US": repo.description || "",
-              },
-            },
-          };
-
-          return resolveProjectCardImage(repo, card, repoOwnerName).then(
-            (resolvedCard) => {
-              if (repo.fork && repo.parent) {
-                resolvedCard.description =
-                  (resolvedCard.description
-                    ? resolvedCard.description + " "
-                    : "") + `(fork of ${repo.parent.full_name})`;
-              }
-              return resolvedCard;
-            },
-          );
-        };
-
-        const repoOwnerName = (repo.owner && repo.owner.login) || owner;
-        const languagePromise =
-          idx < maxLangCalls
-            ? fetchRepoLanguages(owner, repo.name)
-            : Promise.resolve({});
-        const ownerCommitPromise = fetchLatestOwnerMainMasterCommit(
-          repoOwnerName,
-          repo.name,
-          owner,
-          repo.default_branch,
-        );
-        const mainMasterActivityPromise = fetchLatestMainMasterActivity(
-          repoOwnerName,
-          repo.name,
-        );
-
-        return Promise.all([
-          languagePromise,
-          ownerCommitPromise,
-          mainMasterActivityPromise,
-        ]).then(([langData, ownerCommitInfo, mainMasterActivityInfo]) => {
-          const techs = [...baseTechs, ...Object.keys(langData || {})];
-          const unique = Array.from(new Set(techs)).filter(Boolean);
-          return makeCard(unique, ownerCommitInfo, mainMasterActivityInfo);
-        });
+        return { cards, githubFetchStatus: status };
+      })
+      .catch((error) => {
+        console.warn("[projects] Falha ao ler o snapshot do site:", error);
+        return { cards: [], githubFetchStatus: { failed: true } };
       });
-
-      return Promise.all(cardsPromises).then((cards) => ({
-        cards,
-        githubFetchStatus,
-      }));
-    });
-
-    const resultPromise = ghPromise.then((result) => ({
-      cards: result.cards,
-      githubFetchStatus: result.githubFetchStatus,
-    }));
 
     _projectsDataCache.set(cacheKey, resultPromise);
-    resultPromise.catch(() => {
-      _projectsDataCache.delete(cacheKey);
-    });
-
-    return resultPromise.then((result) => {
-      return result;
-    });
+    return resultPromise;
   }
-  // default behaviour: local JSON file
+
+  // arquivo JSON local
   return fetchJsonWithFallback(source).then((data) => {
     if (!data || !data.cards) return { cards: [] };
     if (Array.isArray(data.cards)) return data;

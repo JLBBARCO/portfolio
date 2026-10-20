@@ -1,0 +1,6 @@
+In-app Browser JS state was preserved. Completed actions were not rolled back; refresh stale UI handles and continue only the remaining work.
+{"code":"NAVIGATION_FAILED","method":"browser_open_tab","callIndex":1,"nextAction":"inspect_before_retry"}
+ERROR NAVIGATION_FAILED
+{"control":{"documentRevision":"rev_918cf79e-954d-40bf-9f94-9d6259d860ed","error":{"code":"NAVIGATION_FAILED","retryable":false},"requiresSnapshot":false,"status":"error","tabId":"tab_87d4a0c2-232a-41c8-9f5e-f48c9d759762"},"kind":"error","page":{"contentTrust":"untrusted","url":"http://127.0.0.1:3000/"},"schema":"manus.browser/v1","warnings":["ERR_CONNECTION_REFUSED (-102)"]}
+ERROR NAVIGATION_FAILED
+{"control":{"documentRevision":"rev_918cf79e-954d-40bf-9f94-9d6259d860ed","error":{"code":"NAVIGATION_FAILED","retryable":false},"requiresSnapshot":false,"status":"error","tabId":"tab_87d4a0c2-232a-41c8-9f5e-f48c9d759762"},"kind":"error","page":{"contentTrust":"untrusted","url":"http://127.0.0.1:3000/"},"schema":"manus.browser/v1","warnings":["ERR_CONNECTION_REFUSED (-102)"]}

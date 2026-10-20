@@ -37,24 +37,52 @@ function header() {
   const navLinks = document.createElement("div");
   navLinks.id = "nav-links";
   navLinks.className = "nav-links";
-  const containers = document.querySelectorAll("main>section");
+  const sectionIds = Array.from(document.querySelectorAll("main>section"))
+    .map((section) => section.id)
+    .filter(Boolean);
+  if (!sectionIds.includes("Contact")) sectionIds.push("Contact");
+  const sectionOrder = [
+    "Home",
+    "Projects",
+    "Technologies",
+    "About_Me",
+    "Formation",
+    "Curses",
+    "Contact",
+  ];
+  sectionIds.sort((a, b) => {
+    const indexA = sectionOrder.indexOf(a);
+    const indexB = sectionOrder.indexOf(b);
+    return (
+      (indexA < 0 ? sectionOrder.length : indexA) -
+      (indexB < 0 ? sectionOrder.length : indexB)
+    );
+  });
 
   const navI18nKeyBySectionId = {
     Home: "nav_home",
     Projects: "nav_projects",
     Technologies: "nav_technologies",
     AboutMe: "nav_about_me",
+    About_Me: "nav_about_me",
+    Formation: "nav_formation",
     Formations: "nav_formation",
+    Curses: "nav_curses",
+    Courses: "nav_curses",
     Contact: "nav_contact",
     More: "nav_more",
   };
 
   const navFallbackTextBySectionId = {
-    Home: { pt: "Inicio", en: "Home" },
+    Home: { pt: "Início", en: "Home" },
     Projects: { pt: "Projetos", en: "Projects" },
     Technologies: { pt: "Tecnologias", en: "Technologies" },
     AboutMe: { pt: "Sobre mim", en: "About me" },
-    Formations: { pt: "Formacoes", en: "Formations" },
+    About_Me: { pt: "Sobre mim", en: "About me" },
+    Formation: { pt: "Formação", en: "Education" },
+    Formations: { pt: "Formação", en: "Education" },
+    Curses: { pt: "Cursos", en: "Courses" },
+    Courses: { pt: "Cursos", en: "Courses" },
     Contact: { pt: "Contato", en: "Contact" },
     More: { pt: "Mais", en: "More" },
   };
@@ -62,25 +90,36 @@ function header() {
   const docLang = (document.documentElement.lang || "pt-BR").toLowerCase();
   const locale = docLang.startsWith("pt") ? "pt" : "en";
 
-  containers.forEach((container) => {
-    const containerId = container.id;
-
-    if (containerId) {
-      const link = document.createElement("a");
-      link.href = `#${containerId}`;
-      link.className = "links";
-      const i18nKey = `nav_${containerId.toLowerCase()}`;
-      if (i18nKey) {
-        link.setAttribute("data-i18n", i18nKey);
-        const fallback = navFallbackTextBySectionId[containerId];
-        link.textContent = fallback ? fallback[locale] : containerId;
-      } else {
-        link.textContent = containerId;
-      }
-
-      navLinks.appendChild(link);
+  sectionIds.forEach((containerId) => {
+    const link = document.createElement("a");
+    link.href = `#${containerId}`;
+    link.className = "links";
+    const i18nKey = navI18nKeyBySectionId[containerId];
+    if (i18nKey) {
+      link.setAttribute("data-i18n", i18nKey);
+      const fallback = navFallbackTextBySectionId[containerId];
+      link.textContent = fallback ? fallback[locale] : containerId;
+    } else {
+      link.textContent = containerId;
     }
+
+    navLinks.appendChild(link);
   });
+
+  navLinks.addEventListener("click", (event) => {
+    if (
+      !event.target.closest("a") ||
+      menuButton.getAttribute("aria-expanded") !== "true"
+    ) {
+      return;
+    }
+
+    navLinks.style.display = "none";
+    menuButton.setAttribute("aria-expanded", "false");
+    menuIcon.classList.remove("fa-xmark", "fa-close", "fa-menu");
+    menuIcon.classList.add("fa-bars");
+  });
+
   navMenu.appendChild(navLinks);
   header.appendChild(navMenu);
 
@@ -116,8 +155,14 @@ function header() {
   const languageCurrentFlag = document.createElement("img");
   languageCurrentFlag.id = "languageCurrentFlag";
   languageCurrentFlag.className = "language-flag";
-  languageCurrentFlag.src = `https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.21/3x2/${currentLanguageCountry}.svg`;
-  languageCurrentFlag.alt = currentLanguageCountry;
+  // Link e texto alternativo vem de src/json/areas/images.json.
+  if (typeof applyFlagIcon === "function") {
+    applyFlagIcon(languageCurrentFlag, currentLanguageCountry);
+  }
+  languageCurrentFlag.alt =
+    window.SiteImages && typeof window.SiteImages.flagAltSync === "function"
+      ? window.SiteImages.flagAltSync(currentLanguageCountry)
+      : currentLanguageCountry;
   languageCurrentFlag.width = 24;
   languageCurrentFlag.height = 16;
 

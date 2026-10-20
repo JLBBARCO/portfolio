@@ -145,6 +145,26 @@
         "en-US": "A website for a digital marketing agency, showcasing their services, portfolio, and contact information.",
         "pt-BR": "Um site para uma agência de marketing digital, apresentando seus serviços, portfólio e informações de contato"
       }
+    },
+    "windows-optimizer": {
+      "title": {
+        "en-US": "Windows Optimizer",
+        "pt-BR": "Otimizador de Windows"
+      },
+      "description": {
+        "en-US": "A system that optimizes the performance of Windows operating systems, improving speed and efficiency.",
+        "pt-BR": "Um sistema que otimiza o desempenho dos sistemas operacionais Windows, melhorando a velocidade e a eficiência"
+      }
+    },
+    "mossview": {
+      "title": {
+        "en-US": "Mossview",
+        "pt-BR": "Mossview"
+      },
+      "description": {
+        "en-US": "A website that provides information about the Mossview project, including its objectives, features, and updates.",
+        "pt-BR": "Um site que fornece informações sobre o projeto Mossview, incluindo seus objetivos, recursos e atualizações"
+      }
     }
   }
 }

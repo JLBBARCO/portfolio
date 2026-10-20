@@ -10,6 +10,11 @@
     "glob": "^10.3.10"
   },
   "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "snapshot": "node scripts/build-site-snapshot.js",
+    "snapshot:site": "node scripts/build-site-snapshot.js",
+    "snapshot:offline": "node scripts/build-site-snapshot.js --from-github-snapshot",
+    "start": "node scripts/dev-server.js",
     "dev:vercel": "vercel dev",
     "extract-translations": "node scripts/extract-translations.js",
     "i18n:extract": "node scripts/extract-translations.js",

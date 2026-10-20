@@ -60,7 +60,11 @@ export default async function handler(req, res) {
     }
 
     if (!response.ok) {
-      return res.status(response.status).json({
+      // Devolve 200 com o erro descrito no corpo: assim o navegador nao registra
+      // requisicoes vermelhas no console e o front-end decide o fallback.
+      return res.status(200).json({
+        __githubError: true,
+        status: response.status,
         error: "Failed to fetch GitHub data",
         details:
           response.status === 401 || response.status === 403
@@ -73,7 +77,9 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", getCacheHeaderForPath(path));
     return res.status(200).json(data);
   } catch (error) {
-    return res.status(500).json({
+    return res.status(200).json({
+      __githubError: true,
+      status: 500,
       error: "Failed to fetch GitHub data",
       details: "Unexpected server error while calling GitHub API.",
     });

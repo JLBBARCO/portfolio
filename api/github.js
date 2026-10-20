@@ -43,7 +43,9 @@ export default async function handler(req, res) {
     const allFailed = responses.every((r) => !r.ok);
     if (allFailed) {
       const status = responses[0]?.status || 500;
-      return res.status(status).json({
+      return res.status(200).json({
+        __githubError: true,
+        status,
         error: "Failed to fetch GitHub data",
         details:
           status === 401 || status === 403
@@ -63,7 +65,9 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate"); // Cache na rede da Vercel por 1h
     return res.status(200).json(combined);
   } catch (error) {
-    return res.status(500).json({
+    return res.status(200).json({
+      __githubError: true,
+      status: 500,
       error: "Failed to fetch GitHub data",
       details: "Unexpected server error while calling GitHub API.",
     });

@@ -1,40 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Portfólio de José Luiz B. Barco: desenvolvedor fullstack, projetos web, tecnologias, formação e formas de contato." data-i18n="meta_description" data-i18n-attr="content" />
+  <meta name="keywords" content="José Luiz B. Barco, portfólio, desenvolvedor fullstack, software developer, JavaScript, HTML, CSS" />
+  <link rel="canonical" href="https://portfolio-jlbbarco.vercel.app/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="JLBBARCO" />
+  <meta property="og:url" content="https://portfolio-jlbbarco.vercel.app/" />
+  <meta property="og:title" content="José Luiz B. Barco | Desenvolvedor Full-stack" data-i18n="page_title" data-i18n-attr="content" />
+  <meta property="og:description" content="Portfólio de José Luiz B. Barco: desenvolvedor fullstack, projetos web, tecnologias, formação e formas de contato." data-i18n="meta_description" data-i18n-attr="content" />
+  <meta property="og:image" content="https://avatars.githubusercontent.com/u/159829462?v=4" />
+  <meta property="og:image:width" content="460" />
+  <meta property="og:image:height" content="460" />
+  <meta property="og:image:alt" content="Avatar de JLBBARCO" data-i18n="aria_profile_alt" data-i18n-attr="content" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="José Luiz B. Barco | Desenvolvedor Full-stack" data-i18n="page_title" data-i18n-attr="content" />
+  <meta name="twitter:description" content="Portfólio de José Luiz B. Barco: desenvolvedor fullstack, projetos web, tecnologias, formação e formas de contato." data-i18n="meta_description" data-i18n-attr="content" />
+  <meta name="twitter:image" content="https://avatars.githubusercontent.com/u/159829462?v=4" />
   <title id="webTitle" data-i18n="page_title">JLBBARCO's Portfolio</title>
   <link rel="stylesheet" href="src/css/style.css" media="screen" />
   <link rel="stylesheet" href="src/css/tablet.css" media="(min-width: 724px)" />
   <link rel="stylesheet" href="src/css/pc.css" media="(min-width: 990px)" />
   <link rel="stylesheet" href="src/css/tv.css" media="(min-width: 1920px)" />
+  <link rel="stylesheet" href="src/css/redesign.css" media="screen" />
   <!-- Font Awesome Kit (JS/SVG mode) -->
   <script src="https://kit.fontawesome.com/4a1e49a1ca.js" crossorigin="anonymous"></script>
   <!-- Inicialmente use o ícone dark para reduzir flash enquanto o script ajusta conforme preferência -->
-  <link rel="shortcut icon" href="src/assets/favicon/code-light.svg" type="image/x-icon" id="favicon">
+  <link rel="shortcut icon" href="src/assets/favicon/code-light.svg" type="image/x-icon" id="favicon" />
+  <script src="src/js/site-data.js" defer></script>
+  <script src="src/js/site-images.js" defer></script>
   <script src="src/js/script.js" defer></script>
   <script src="src/js/header.js" defer></script>
-  <script src="src/js/projects.js" defer></script>
   <script src="src/js/technologies.js" defer></script>
+  <script src="src/js/projects.js" defer></script>
   <script src="src/js/about.js" defer></script>
   <script src="src/js/formations.js" defer></script>
-  <!-- <script src="src/js/curses.js" defer></script> -->
+  <script src="src/js/curses.js" defer></script>
   <script src="src/js/footer.js" defer></script>
   <script src="src/js/translate.js" defer></script>
 </head>
 
 <body data-github-owner="JLBBARCO" data-github-repo="portfolio">
   <a id="skip_link" class="skip-link" href="#main" data-i18n="link_skip_to_main" aria-label="Skip to main content">Pular
-    para o
-    conteúdo principal</a>
+    para o conteúdo principal</a>
   <main id="main">
-    <section id="Home">
-      <div>
-        <h1 id="welcome_title" data-i18n="section_home_title">Welcome to My Portfolio</h1>
-        <p id="welcome_message" data-i18n="section_home_message">I'm a developer passionate about creating innovative
-          web
-          solutions</p>
+    <section id="Home" class="hero">
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <p class="hero-eyebrow" data-i18n="section_home_eyebrow">DESENVOLVEDOR FULLSTACK · PORTFÓLIO PESSOAL</p>
+          <h1 id="welcome_title" data-i18n="section_home_title">Olá, sou José Luiz Bruiani Barco.</h1>
+          <p id="welcome_message" data-i18n="section_home_message">Desenvolvedor fullstack que transforma ideias em experiências digitais claras, responsivas e funcionais.</p>
+          <div class="hero-actions">
+            <a class="hero-button hero-button-primary" href="#Projects" data-i18n="action_explore_projects">Conheça meus projetos</a>
+            <a class="hero-button hero-button-secondary" href="#About_Me" data-i18n="action_about_me">Sobre mim</a>
+            <a class="hero-button hero-button-text" href="#Contact" data-i18n="action_contact">Fale comigo</a>
+          </div>
+        </div>
+        <aside class="hero-art" aria-hidden="true">
+          <span class="hero-art-top">JLBBARCO / PORTFÓLIO</span>
+          <span class="hero-art-monogram">JLB</span>
+          <span class="hero-art-orbit"></span>
+          <span class="hero-art-bottom">BUILD · LEARN · CREATE</span>
+        </aside>
       </div>
     </section>
   </main>

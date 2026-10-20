@@ -231,10 +231,16 @@ function refreshFontAwesomeKit(node) {
   }
 }
 
-function guessFaIcon(name) {
+function guessFaIcon(name, _visitedAliases) {
   if (!name) return null;
   const key = name.toLowerCase().trim();
   if (_faGuessCache[key] !== undefined) return _faGuessCache[key];
+
+  // Protecao contra ciclos no mapa de apelidos (a -> b -> a), que causavam
+  // "Maximum call stack size exceeded" quando o FontAwesome nao estava pronto.
+  const visited = _visitedAliases || new Set();
+  if (visited.has(key)) return null;
+  visited.add(key);
 
   const custom = getCustomSvgIcon(name);
   if (custom) {
@@ -280,7 +286,7 @@ function guessFaIcon(name) {
 
   if (!found && _faAliasMap[key]) {
     // recursive call with alias (will hit cache if we've tried it before)
-    found = guessFaIcon(_faAliasMap[key]);
+    found = guessFaIcon(_faAliasMap[key], visited);
   }
 
   // If FA has not finished loading yet (common with JS kit), avoid caching
@@ -410,10 +416,22 @@ document.addEventListener("DOMContentLoaded", () => {
             ? prefersDark.matches
             : false;
     if (!faviconLink) return;
-    const newHref = isDark
-      ? "src/assets/favicon/code-dark.svg"
-      : "src/assets/favicon/code-light.svg";
-    faviconLink.href = newHref + "?v=" + Date.now();
+    // Os links dos favicones ficam em src/json/areas/images.json.
+    const imageId = isDark ? "faviconDark" : "faviconLight";
+    const applyHref = (href) => {
+      if (!href) return;
+      faviconLink.href =
+        href + (href.includes("?") ? "&" : "?") + "v=" + Date.now();
+    };
+
+    if (window.SiteImages && typeof window.SiteImages.src === "function") {
+      const immediate = window.SiteImages.srcSync(imageId);
+      if (immediate) applyHref(immediate);
+      else
+        window.SiteImages.src(imageId)
+          .then(applyHref)
+          .catch(() => {});
+    }
   }
 
   updateFavicon(prefersDark ? prefersDark.matches : false);
@@ -492,19 +510,40 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function loadDynamicContent() {
+    // prevent concurrent runs which can cause duplicated sections when
+    // language change fires repeatedly in quick succession.
+    if (document.body.dataset.dynamicLoadRunning === "true") {
+      // queue a single delayed retry so the latest event still triggers
+      if (document.body.dataset.dynamicLoadQueued !== "true") {
+        document.body.dataset.dynamicLoadQueued = "true";
+        setTimeout(() => {
+          document.body.dataset.dynamicLoadQueued = "false";
+          loadDynamicContent();
+        }, 100);
+      }
+      return;
+    }
+
     // bump token for this run; any previous promises will become stale
     const myLoadId = ++_currentLoadId;
+    document.body.dataset.dynamicLoadRunning = "true";
 
-    // Remove only dynamic sections; keep static Home section intact.
-    const dynamicSectionIds = new Set([
-      "Projects",
-      "Technologies",
-      "Formations",
-      // "Curses",
-      "AboutMe",
-    ]);
+    // Remove TODAS as secoes dinamicas antes de recriar.
+    //
+    // Antes existia uma lista fixa de ids ("Formations", "AboutMe") que estava
+    // fora de sincronia com os ids reais criados pelos modulos ("Formation",
+    // "About_Me"). Por isso, ao clicar em #languageBtn, essas secoes nao eram
+    // removidas e uma copia traduzida era acrescentada abaixo do conteudo
+    // existente. Agora as secoes dinamicas se identificam com
+    // data-dynamic-section="true" e as secoes estaticas ficam numa lista curta.
+    const staticSectionIds = new Set(["Home"]);
     Array.from(document.querySelectorAll("main > section")).forEach((el) => {
-      if (dynamicSectionIds.has(el.id)) el.remove();
+      if (
+        el.dataset.dynamicSection === "true" ||
+        !staticSectionIds.has(el.id)
+      ) {
+        el.remove();
+      }
     });
 
     Array.from(
@@ -528,13 +567,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
     // Always try GitHub API first; setupProjects will fallback to local JSON if API fails
     const projectsSource = "github";
+    const pTechnologies = loadAllTechnologies(locale, myLoadId);
     const pProjects = setupProjects(
       projectsSource,
       locale,
       githubOwner,
       myLoadId,
     );
-    const pTechnologies = loadAllTechnologies(locale, myLoadId);
     const pFormations = setupFormations(
       "src/json/areas/formation.json",
       locale,
@@ -556,9 +595,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     Promise.allSettled([
       pHeader,
+      pTechnologies,
       pProjects,
       pCardProjectTranslation,
-      pTechnologies,
       pFormations,
       // pCurses,
       pAbout,
@@ -589,6 +628,11 @@ document.addEventListener("DOMContentLoaded", () => {
         initializeProfileImage();
         semiHiddenCards();
         updateBackToTopVisibility();
+        document.body.dataset.dynamicLoadRunning = "false";
+        // ensure queued retry runs if one was requested while running
+        if (document.body.dataset.dynamicLoadQueued === "true") {
+          // the queued timeout will call loadDynamicContent; no-op here.
+        }
         window.dispatchEvent(new Event("dynamicContentReady"));
       })
       .catch((err) => console.warn("Erro no carregamento dinâmico:", err));
@@ -639,15 +683,6 @@ document.addEventListener("DOMContentLoaded", () => {
   loadDynamicContent();
   window.addEventListener("languageChanged", loadDynamicContent);
 });
-
-function calcularIdade() {
-  const nascimento = new Date(2008, 8, 24);
-  const hoje = new Date();
-  let idade = hoje.getFullYear() - nascimento.getFullYear();
-  const mes = hoje.getMonth() - nascimento.getMonth();
-  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) idade--;
-  return idade;
-}
 
 function toggleMenu() {
   const navLinks = document.querySelector(".nav-links");
@@ -1051,24 +1086,87 @@ function setCSSVariables(color) {
   );
 }
 
+/**
+ * Aplica o tema JA CALCULADO no servidor (snapshot.theme), que analisa a
+ * imagem de perfil de hora em hora. Retorna true quando conseguiu aplicar.
+ */
+function applyServerTheme() {
+  if (!window.SiteData || typeof window.SiteData.theme !== "function") {
+    return Promise.resolve(false);
+  }
+
+  return window.SiteData.theme()
+    .then((theme) => {
+      if (!theme || !theme.dark || !theme.light) return false;
+      const prefersDark =
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const variant = prefersDark ? theme.dark : theme.light;
+      const rgb = variant.rgb || variant;
+      if (
+        !Number.isFinite(Number(rgb.r)) ||
+        !Number.isFinite(Number(rgb.g)) ||
+        !Number.isFinite(Number(rgb.b))
+      ) {
+        return false;
+      }
+      setCSSVariables({
+        r: Number(rgb.r),
+        g: Number(rgb.g),
+        b: Number(rgb.b),
+      });
+      return true;
+    })
+    .catch(() => false);
+}
+
+let _serverThemeWatcherBound = false;
+
 function initializeProfileImage() {
+  // Caminho principal: cor media entregue pronta pelo servidor (sem canvas,
+  // sem CORS, sem custo no navegador).
+  const themePromise = applyServerTheme();
+
+  if (!_serverThemeWatcherBound && typeof window.matchMedia === "function") {
+    const query = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => applyServerTheme();
+    if (typeof query.addEventListener === "function") {
+      query.addEventListener("change", onChange);
+      _serverThemeWatcherBound = true;
+    } else if (typeof query.addListener === "function") {
+      query.addListener(onChange);
+      _serverThemeWatcherBound = true;
+    }
+  }
+
   const img = document.getElementById("profile");
-  if (!img) return;
+  if (!img) return themePromise;
 
-  function applyAverageColor() {
-    const avgColor = getAverageColor(img);
-    setCSSVariables(avgColor);
+  // Reserva: se o servidor nao entregou o tema, calcula no canvas como antes.
+  function applyAverageColorIfNeeded(appliedByServer) {
+    if (appliedByServer) return;
+    setCSSVariables(getAverageColor(img));
   }
 
-  if (img.complete && img.naturalHeight !== 0) {
-    applyAverageColor();
-  } else {
-    img.addEventListener("load", applyAverageColor);
-    img.addEventListener("error", () => {
-      console.warn("Erro ao carregar a imagem do perfil");
-      setCSSVariables({ r: 124, g: 77, b: 255 });
-    });
-  }
+  return themePromise.then((appliedByServer) => {
+    if (appliedByServer) return true;
+    if (img.complete && img.naturalHeight !== 0) {
+      applyAverageColorIfNeeded(false);
+    } else {
+      img.addEventListener("load", () => applyAverageColorIfNeeded(false), {
+        once: true,
+      });
+      img.addEventListener(
+        "error",
+        () => {
+          console.warn("Erro ao carregar a imagem do perfil");
+          setCSSVariables({ r: 124, g: 77, b: 255 });
+        },
+        { once: true },
+      );
+    }
+    return false;
+  });
 }
 
 function semiHiddenCards() {

@@ -77,6 +77,10 @@ source {
   -webkit-user-drag: none;
 }
 
+details summary {
+  cursor: pointer;
+}
+
 a {
   color: var(--text-secondary);
   text-decoration: none;
@@ -329,7 +333,7 @@ main {
   margin-top: var(--navbar-height);
 }
 
-section {
+main>section {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -348,6 +352,7 @@ section {
 
 .card {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
@@ -363,6 +368,33 @@ section {
 .card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow);
+}
+
+/* Highlights: repos com mais estrelas no GitHub (#highlightsContainer) */
+.card-highlight {
+  position: relative;
+  border: 2px solid var(--accent);
+}
+
+.highlight-stars {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+  z-index: 2;
+}
+
+.highlight-stars .icon {
+  font-size: 0.85rem;
 }
 
 /* small indicator for participative projects */
@@ -642,12 +674,15 @@ button .icon:hover {
   justify-content: center;
   width: 100%;
   max-width: 100%;
+  position: sticky;
+  top: 15%;
+  z-index: 100;
 }
 
 .filter-button {
   padding: 10px 20px;
   border: 2px solid var(--accent);
-  background-color: transparent;
+  background-color: var(--secondary-bg-transparent);
   color: var(--text-primary);
   border-radius: 20px;
   cursor: pointer;
@@ -750,9 +785,8 @@ button .icon:hover {
   padding: 1rem 0;
 }
 
-.block .card {
-  min-width: 300px;
-  max-width: 400px;
+.block .card>* {
+  max-width: 300px;
 }
 
 #formationsContainer .card {
@@ -792,6 +826,13 @@ button .icon:hover {
   margin: 0;
   text-align: center;
   font-size: 0.95rem;
+}
+
+p.description {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 1rem 0;
+  text-align: justify;
 }
 
 /* Scrollbar styling */
