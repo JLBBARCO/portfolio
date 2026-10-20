@@ -123,14 +123,14 @@ main {
   margin-top: 0 !important;
 }
 
-main > section {
+main>section {
   width: min(var(--site-width), calc(100% - 2 * var(--site-gutter)));
   margin-inline: auto;
   padding-block: clamp(4rem, 8vw, 6.5rem);
   scroll-margin-top: calc(var(--navbar-height) + 1rem);
 }
 
-main > section:not(#Home) > h2 {
+main>section:not(#Home)>h2 {
   position: relative;
   width: fit-content;
   margin: 0 0 2rem;
@@ -141,7 +141,7 @@ main > section:not(#Home) > h2 {
   letter-spacing: -0.035em;
 }
 
-main > section:not(#Home) > h2::after {
+main>section:not(#Home)>h2::after {
   content: "";
   display: block;
   width: 2.8rem;
@@ -616,6 +616,7 @@ main > section:not(#Home) > h2::after {
 #About_Me img.person,
 #AboutMe img.person {
   width: min(100%, 280px);
+  height: auto;
   aspect-ratio: 1;
   justify-self: center;
   border: 4px solid var(--secondary-bg);
@@ -757,7 +758,7 @@ footer .footer-credit {
     margin: 0;
   }
 
-  header > nav:first-child {
+  header>nav:first-child {
     grid-column: 1;
     margin: 0;
   }
@@ -811,7 +812,7 @@ footer .footer-credit {
 }
 
 @media (max-width: 680px) {
-  main > section {
+  main>section {
     padding-block: 3.8rem;
   }
 
@@ -867,6 +868,7 @@ footer .footer-credit {
   #About_Me img.person,
   #AboutMe img.person {
     width: min(68vw, 220px);
+    height: auto;
   }
 
   footer .footer-content-wrapper {
@@ -909,7 +911,7 @@ main {
   padding: 0;
 }
 
-main > section {
+main>section {
   min-width: 0;
 }
 
@@ -979,7 +981,7 @@ main > section {
 
 /* Tablet: colunas equilibradas e conteúdo dentro do espaço útil */
 @media (min-width: 681px) and (max-width: 989px) {
-  main > section {
+  main>section {
     width: min(var(--site-width), calc(100% - 2 * var(--site-gutter)));
     padding-block: clamp(3.5rem, 7vw, 5rem);
   }
@@ -1033,7 +1035,7 @@ main > section {
     padding-inline: clamp(1.25rem, 3vw, 2.5rem);
   }
 
-  header > nav:first-child {
+  header>nav:first-child {
     grid-column: 1;
     width: auto;
     min-width: 0;
@@ -1090,7 +1092,7 @@ main > section {
     margin: 0;
   }
 
-  main > section {
+  main>section {
     width: min(var(--site-width), calc(100% - 4rem));
   }
 
@@ -1110,7 +1112,7 @@ main > section {
     padding-inline: clamp(2rem, 4.5vw, 5rem);
   }
 
-  header > nav:first-child {
+  header>nav:first-child {
     width: auto;
     min-width: 0;
     margin: 0;
@@ -1162,7 +1164,7 @@ main > section {
     margin: 0;
   }
 
-  main > section {
+  main>section {
     width: min(var(--site-width), calc(100% - 5rem));
   }
 
