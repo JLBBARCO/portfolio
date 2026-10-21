@@ -747,6 +747,7 @@ footer .footer-credit {
   }
 
   .nav-menu {
+    position: static;
     grid-column: 2;
     margin: 0;
     padding: 0;
@@ -761,6 +762,14 @@ footer .footer-credit {
   header>nav:first-child {
     grid-column: 1;
     margin: 0;
+    min-width: 0;
+  }
+
+  header nav:first-child h3 {
+    margin: 0;
+    font-size: clamp(0.78rem, 2.2vw, 1rem);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
   }
 
   #nav-links {
@@ -1181,6 +1190,13 @@ main>section {
   #projectsContainer {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.35rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  body {
+    display: block;
+    grid-template-columns: none;
   }
 }
 

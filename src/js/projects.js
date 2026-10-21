@@ -51,8 +51,8 @@ function isEligibleGitHubProjectRepo(repo, owner) {
   if (name === requestedOwner) return false;
   if (name === `${requestedOwner}.github.io`) return false;
 
-  // Any repository owned by the requested user is valid here, including forks.
-  return true;
+  // Destaques públicos: não incluir repositórios privados ou forks.
+  return repo.private !== true && repo.fork !== true;
 }
 
 function ensureProjectCardId(card) {
@@ -449,25 +449,33 @@ function pickTopStarredProjectCards(cards, repos, owner, limit) {
   if (!Array.isArray(cards) || !cards.length) return [];
   if (!Array.isArray(repos) || !repos.length) return [];
 
-  const starsByRepoName = new Map();
+  const metricsByRepoName = new Map();
   repos.forEach((repo) => {
     if (!isEligibleGitHubProjectRepo(repo, owner)) return;
-    starsByRepoName.set(
-      normalizeGitHubLogin(repo.name),
-      Number(repo.stargazers_count) || 0,
-    );
+    const repoName = normalizeGitHubLogin(repo.name);
+    if (!repoName) return;
+    metricsByRepoName.set(repoName, {
+      stars: Math.max(0, Number(repo.stargazers_count) || 0),
+      forks: Math.max(0, Number(repo.forks_count) || 0),
+      updatedAt: Date.parse(repo.updated_at || repo.pushed_at || "") || 0,
+    });
   });
 
   return cards
     .map((card) => {
       const repoKey = normalizeGitHubLogin(card.repoName || card.id);
-      if (!starsByRepoName.has(repoKey)) return null;
-      return { card, stars: starsByRepoName.get(repoKey) };
+      const metrics = metricsByRepoName.get(repoKey);
+      if (!metrics) return null;
+      return { card, ...metrics };
     })
     .filter(Boolean)
     .sort((a, b) => {
       if (b.stars !== a.stars) return b.stars - a.stars;
-      return compareProjectCardsByMaintenance(a.card, b.card);
+      if (b.forks !== a.forks) return b.forks - a.forks;
+      if (b.updatedAt !== a.updatedAt) return b.updatedAt - a.updatedAt;
+      return String(a.card.repoName || a.card.id || "").localeCompare(
+        String(b.card.repoName || b.card.id || ""),
+      );
     })
     .slice(0, limit);
 }
@@ -688,7 +696,7 @@ function setupProjects(source, language, owner, loadId) {
       });
       container.appendChild(fragment);
 
-      // Destaques: os 2 repositorios do owner com mais estrelas no GitHub,
+      // Destaques: os 3 repositorios proprios com mais estrelas no GitHub,
       // renderizados com o mesmo layout de #projectsContainer. Roda no
       // cliente, a partir dos mesmos cards + snapshot de repositorios ja
       // carregados acima.
@@ -697,7 +705,7 @@ function setupProjects(source, language, owner, loadId) {
         !(loadId !== undefined && highlightsContainer.dataset.loadId != loadId)
       ) {
         highlightsContainer.innerHTML = "";
-        const topStarred = pickTopStarredProjectCards(cards, repos, owner, 2);
+        const topStarred = pickTopStarredProjectCards(cards, repos, owner, 3);
 
         if (topStarred.length) {
           const highlightsFragment = document.createDocumentFragment();
