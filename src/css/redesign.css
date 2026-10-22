@@ -536,11 +536,16 @@ main>section:not(#Home)>h2::after {
 
 .filter-container {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 0.55rem;
   margin: 1rem 0 1.5rem;
   padding: 0.25rem 0 0.6rem;
-  overflow-x: auto;
-  scrollbar-width: thin;
+  position: static;
+  top: auto;
+  z-index: auto;
+  overflow: visible;
 }
 
 .filter-button,
