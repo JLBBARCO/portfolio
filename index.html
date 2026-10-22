@@ -70,19 +70,28 @@
   </main>
   <footer>
     <article id="accessibility">
-      <button type="button" id="accessibility-button" aria-expanded="false" aria-controls="accessibility-menu">
-        <i class="fa-solid fa-universal-access icon"></i>
+      <button type="button" id="accessibility-button" data-i18n="accessibility_menu_title" data-i18n-attr="aria-label" aria-expanded="false" aria-controls="accessibility-menu" aria-label="Opções de acessibilidade">
+        <i class="fa-solid fa-universal-access icon" aria-hidden="true"></i>
       </button>
-      <div id="accessibility-menu" aria-hidden="true">
-        <button type="button" id="increase-font" data-i18n="aria_increase_font" data-i18n-attr="aria-label">
-          <i class="fa-solid fa-plus icon"></i>
-        </button>
-        <button type="button" id="decrease-font" data-i18n="aria_decrease_font" data-i18n-attr="aria-label">
-          <i class="fa-solid fa-minus icon"></i>
-        </button>
-        <button type="button" id="reset-font" data-i18n="aria_reset_font" data-i18n-attr="aria-label">
-          <i class="fa-solid fa-text-slash icon"></i>
-        </button>
+      <div id="accessibility-menu" role="group" aria-labelledby="accessibility-menu-title" aria-hidden="true" tabindex="-1">
+        <div class="accessibility-menu-heading">
+          <p id="accessibility-menu-title" data-i18n="accessibility_menu_title">Acessibilidade</p>
+          <p class="accessibility-menu-description" data-i18n="accessibility_menu_description">Ajuste o tamanho do texto</p>
+        </div>
+        <div class="accessibility-controls">
+          <button type="button" id="increase-font" data-i18n="aria_increase_font" data-i18n-attr="aria-label">
+            <i class="fa-solid fa-plus icon" aria-hidden="true"></i>
+            <span class="accessibility-control-label" data-i18n="aria_increase_font">Aumentar fonte</span>
+          </button>
+          <button type="button" id="decrease-font" data-i18n="aria_decrease_font" data-i18n-attr="aria-label">
+            <i class="fa-solid fa-minus icon" aria-hidden="true"></i>
+            <span class="accessibility-control-label" data-i18n="aria_decrease_font">Diminuir fonte</span>
+          </button>
+          <button type="button" id="reset-font" data-i18n="aria_reset_font" data-i18n-attr="aria-label">
+            <i class="fa-solid fa-text-slash icon" aria-hidden="true"></i>
+            <span class="accessibility-control-label" data-i18n="aria_reset_font">Redefinir fonte</span>
+          </button>
+        </div>
       </div>
     </article>
     <article id="forTop">

@@ -509,6 +509,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const menu = document.getElementById("accessibility-menu");
+    if (!menu || menu.style.display !== "flex") return;
+
+    menu.style.display = "none";
+    menu.setAttribute("aria-hidden", "true");
+    if (accessibilityButton) {
+      accessibilityButton.setAttribute("aria-expanded", "false");
+      accessibilityButton.focus();
+    }
+  });
+
   function loadDynamicContent() {
     // prevent concurrent runs which can cause duplicated sections when
     // language change fires repeatedly in quick succession.
@@ -710,7 +723,10 @@ function accessibilityToggle() {
   menu.setAttribute("aria-hidden", !isVisible);
   if (btn) {
     btn.setAttribute("aria-expanded", !isVisible);
-    if (!isVisible) menu.focus();
+    if (!isVisible) {
+      const firstAction = menu.querySelector("button");
+      (firstAction || menu).focus();
+    }
   }
 }
 
