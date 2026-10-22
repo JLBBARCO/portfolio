@@ -3,8 +3,9 @@
 ## Arquitetura de dados
 
 Perfil, projetos, tecnologias e a cor do tema (calculada a partir da imagem de
-perfil) são computados na Vercel e atualizados de hora em hora. O navegador faz
-apenas uma leitura de JSON pronto por carregamento.
+perfil) são calculados na Vercel; o cron diário atualiza o snapshot do GitHub,
+incluindo tecnologias inferidas dos arquivos dos repositórios. A CDN da Vercel
+armazena o JSON e o navegador faz apenas uma leitura pronta por carregamento.
 
 Detalhes completos: **[ARQUITETURA.md](ARQUITETURA.md)**.
 

@@ -3,7 +3,7 @@
  *
  * Todo o conteudo dinamico (perfil, tema, projetos, tecnologias e catalogo de
  * imagens) e calculado na Vercel e entregue pronto por /api/site-data, que fica
- * cacheado 1 hora na CDN. Aqui no navegador nao existe mais:
+ * cacheado 23 horas na CDN. Aqui no navegador nao existe mais:
  *
  *   - cache em localStorage/sessionStorage;
  *   - limite/orcamento de requisicoes ou "modo lite";

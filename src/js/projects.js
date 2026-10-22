@@ -51,8 +51,8 @@ function isEligibleGitHubProjectRepo(repo, owner) {
   if (name === requestedOwner) return false;
   if (name === `${requestedOwner}.github.io`) return false;
 
-  // Any repository owned by the requested user is valid here, including forks.
-  return true;
+  // Destaques públicos: não incluir repositórios privados ou forks.
+  return repo.private !== true && repo.fork !== true;
 }
 
 function ensureProjectCardId(card) {
@@ -352,19 +352,24 @@ function buildProjectCardElement(card, language, options) {
       (a.name || "").localeCompare(b.name || ""),
     );
     sortedTechs.forEach((tech) => {
+      const techName = tech.name || "";
+      const safeTechName = escapeHTML(techName);
       const resolved = resolveIconSpec(tech, tech.name || "");
-      html += `<i class="${faClass(resolved.style, resolved.icon)} icon" title="${tech.name || ""}"></i>`;
+      html += `<span class="project-tech-chip"><i class="${faClass(resolved.style, resolved.icon)} icon" aria-hidden="true"></i><span>${safeTechName}</span></span>`;
     });
     html += `</div>`;
   }
 
   if (card.linkRepository || card.linkDemo) {
-    const linkTitle = language === "pt-BR" ? "Links" : "Links";
-    html += `<h4 class="title-links">${linkTitle}</h4><div class="links">`;
+    const labels =
+      language === "pt-BR"
+        ? { heading: "Acessar projeto", repository: "Repositório", demo: "Demonstração" }
+        : { heading: "Explore this project", repository: "Repository", demo: "Live demo" };
+    html += `<h4 class="title-links">${labels.heading}</h4><div class="project-links">`;
     if (card.linkRepository)
-      html += `<a href="${card.linkRepository}" target="_blank" rel="noopener noreferrer" aria-label="Repository"><i class="fa-brands fa-github icon"></i></a>`;
+      html += `<a class="project-link" href="${escapeHTML(card.linkRepository)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github icon" aria-hidden="true"></i><span>${labels.repository}</span></a>`;
     if (card.linkDemo)
-      html += `<a href="${card.linkDemo}" target="_blank" rel="noopener noreferrer" aria-label="Demo"><i class="fa-solid fa-share-from-square icon"></i></a>`;
+      html += `<a class="project-link" href="${escapeHTML(card.linkDemo)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square icon" aria-hidden="true"></i><span>${labels.demo}</span></a>`;
     html += `</div>`;
   }
 
@@ -376,6 +381,57 @@ function buildProjectCardElement(card, language, options) {
       html += ` - ${latestOwnerUpdateLabel}`;
     }
     html += "</p></div>";
+  }
+
+  if (translatedDescription || card.linkRepository || card.linkDemo) {
+    const isPortuguese = language === "pt-BR";
+    const labels = isPortuguese
+      ? {
+          summary: "Contexto, processo e evidências",
+          context: "Contexto",
+          process: "Desenvolvimento",
+          processBody: "Consulte o código, o README e o histórico público disponíveis no repositório para acompanhar a implementação.",
+          stars: "Estrelas no GitHub",
+          created: "Criado",
+          updated: "Atualização do autor",
+          repository: "Abrir repositório e documentação",
+          demo: "Ver demonstração",
+        }
+      : {
+          summary: "Context, process & evidence",
+          context: "Context",
+          process: "Development",
+          processBody: "Explore the code, README, and public history available in the repository to follow the implementation.",
+          stars: "GitHub stars",
+          created: "Created",
+          updated: "Owner update",
+          repository: "Open repository and documentation",
+          demo: "View live demo",
+        };
+    html += `<details class="project-details"><summary>${labels.summary}</summary><div class="project-details-content">`;
+    if (translatedDescription) {
+      html += `<div class="project-detail-block"><h4>${labels.context}</h4><p>${escapeHTML(translatedDescription)}</p></div>`;
+    }
+    html += `<div class="project-detail-block"><h4>${labels.process}</h4><p>${labels.processBody}</p></div>`;
+
+    const publicFacts = [];
+    if (typeof opts.starCount === "number" && Number.isFinite(opts.starCount)) {
+      publicFacts.push(`${labels.stars}: ${opts.starCount}`);
+    }
+    if (createdDateLabel) publicFacts.push(`${labels.created}: ${createdDateLabel}`);
+    if (latestOwnerUpdateLabel) publicFacts.push(`${labels.updated}: ${latestOwnerUpdateLabel}`);
+    if (publicFacts.length) {
+      html += `<p class="project-detail-facts">${publicFacts.map(escapeHTML).join(" · ")}</p>`;
+    }
+
+    html += `<div class="project-detail-links">`;
+    if (card.linkRepository) {
+      html += `<a href="${escapeHTML(card.linkRepository)}" target="_blank" rel="noopener noreferrer">${labels.repository}</a>`;
+    }
+    if (card.linkDemo) {
+      html += `<a href="${escapeHTML(card.linkDemo)}" target="_blank" rel="noopener noreferrer">${labels.demo}</a>`;
+    }
+    html += `</div></div></details>`;
   }
 
   div.innerHTML = html;
@@ -393,25 +449,33 @@ function pickTopStarredProjectCards(cards, repos, owner, limit) {
   if (!Array.isArray(cards) || !cards.length) return [];
   if (!Array.isArray(repos) || !repos.length) return [];
 
-  const starsByRepoName = new Map();
+  const metricsByRepoName = new Map();
   repos.forEach((repo) => {
     if (!isEligibleGitHubProjectRepo(repo, owner)) return;
-    starsByRepoName.set(
-      normalizeGitHubLogin(repo.name),
-      Number(repo.stargazers_count) || 0,
-    );
+    const repoName = normalizeGitHubLogin(repo.name);
+    if (!repoName) return;
+    metricsByRepoName.set(repoName, {
+      stars: Math.max(0, Number(repo.stargazers_count) || 0),
+      forks: Math.max(0, Number(repo.forks_count) || 0),
+      updatedAt: Date.parse(repo.updated_at || repo.pushed_at || "") || 0,
+    });
   });
 
   return cards
     .map((card) => {
       const repoKey = normalizeGitHubLogin(card.repoName || card.id);
-      if (!starsByRepoName.has(repoKey)) return null;
-      return { card, stars: starsByRepoName.get(repoKey) };
+      const metrics = metricsByRepoName.get(repoKey);
+      if (!metrics) return null;
+      return { card, ...metrics };
     })
     .filter(Boolean)
     .sort((a, b) => {
       if (b.stars !== a.stars) return b.stars - a.stars;
-      return compareProjectCardsByMaintenance(a.card, b.card);
+      if (b.forks !== a.forks) return b.forks - a.forks;
+      if (b.updatedAt !== a.updatedAt) return b.updatedAt - a.updatedAt;
+      return String(a.card.repoName || a.card.id || "").localeCompare(
+        String(b.card.repoName || b.card.id || ""),
+      );
     })
     .slice(0, limit);
 }
@@ -632,7 +696,7 @@ function setupProjects(source, language, owner, loadId) {
       });
       container.appendChild(fragment);
 
-      // Destaques: os 2 repositorios do owner com mais estrelas no GitHub,
+      // Destaques: os 3 repositorios proprios com mais estrelas no GitHub,
       // renderizados com o mesmo layout de #projectsContainer. Roda no
       // cliente, a partir dos mesmos cards + snapshot de repositorios ja
       // carregados acima.
@@ -641,7 +705,7 @@ function setupProjects(source, language, owner, loadId) {
         !(loadId !== undefined && highlightsContainer.dataset.loadId != loadId)
       ) {
         highlightsContainer.innerHTML = "";
-        const topStarred = pickTopStarredProjectCards(cards, repos, owner, 2);
+        const topStarred = pickTopStarredProjectCards(cards, repos, owner, 3);
 
         if (topStarred.length) {
           const highlightsFragment = document.createDocumentFragment();

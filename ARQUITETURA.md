@@ -1,16 +1,18 @@
 # Arquitetura de dados do portfólio
 
-Tudo que é dinâmico é calculado **no servidor (Vercel)** uma vez por hora. O
-navegador só lê JSON pronto: nenhuma chamada a `api.github.com`, nenhum cache
-próprio, nenhum limite de requisições.
+Tudo que é dinâmico é calculado **no servidor (Vercel)** durante a atualização
+diária. O endpoint guarda o snapshot na CDN da Vercel; o navegador só lê o JSON
+pronto e não chama `api.github.com` nem analisa os repositórios.
 
 ## Fluxo
 
 ```
-GitHub API ──1x/hora──> lib/site-snapshot.js ──> /api/site-data (CDN, 1h)
-                              │                        │
-                              │                        └──> navegador (1 fetch por carregamento)
-                              └──> src/json/site-snapshot.json (reserva versionada)
+Vercel Cron ──diário──> /api/cron/update-site ──> /api/site-data (CDN, 23h)
+                                                        │
+GitHub API ──perfil/repos/tree──> lib/github-snapshot.js │
+raw.githubusercontent.com ─manifestos──> detector ──────┤
+                                                        ├──> navegador (1 fetch por carregamento)
+                                                        └──> src/json/site-snapshot.json (reserva versionada)
 ```
 
 ## O que o servidor calcula
@@ -21,21 +23,42 @@ GitHub API ──1x/hora──> lib/site-snapshot.js ──> /api/site-data (CDN
 | Cards de projetos       | `lib/site-snapshot.js`                     | Filtro, dedupe, stack, datas e ordenação por manutenção            |
 | Imagem de cada projeto  | `lib/site-snapshot.js`                     | `HEAD` no servidor: `images.json` → thumbnail do repo → screenshot |
 | Tecnologias agrupadas   | `buildTechnologyGroups`                    | Junta projetos + formações e agrupa por stack                      |
+| Tecnologias por projeto | `lib/technology-detector.js`               | Árvore recursiva e manifestos limitados, sem executar arquivos      |
 | Cor de destaque do tema | `lib/image-color.js`                       | Decodificador PNG puro em Node; média ponderada por alfa           |
 | Catálogo de imagens     | `src/json/areas/images.json` (normalizado) | Define `render: "img" \| "picture"` conforme o número de fontes    |
 
-## Atualização de hora em hora
+## Atualização diária
 
-- `/api/site-data` responde com `Cache-Control: public, s-maxage=3300,
-stale-while-revalidate=604800`. A CDN entrega a mesma resposta por ~55 min e
-  revalida sozinha depois disso — é isso que garante **uma** chamada ao GitHub
-  por hora, independente do número de visitantes.
-- `vercel.json` agenda `/api/cron/update-site` em `0 * * * *`. O cron apenas
-  "aquece" o cache (`cache: "no-store"`).
-- No plano Hobby da Vercel o cron roda no máximo uma vez por dia; a frequência
-  de 1 hora continua garantida pelo `s-maxage`, o cron é só um reforço.
-- Se o GitHub falhar, a rota responde **200** com os avisos no corpo e o cliente
-  usa `src/json/site-snapshot.json`.
+- `vercel.json` mantém `/api/cron/update-site` em `0 0 * * *` (meia-noite UTC).
+  O cron chama `/api/site-data` para aquecer a CDN; essa automação permanece no
+  servidor e não move a consulta do GitHub para o navegador.
+- `/api/site-data` envia `Cache-Control: public, s-maxage=82800,
+  stale-while-revalidate=604800` e `CDN-Cache-Control` com TTL de 23 horas. A
+  CDN armazena o JSON; `stale-while-revalidate` mantém a última versão pronta
+  enquanto a seguinte é regenerada.
+- O navegador continua fazendo um único `fetch` do endpoint da Vercel por
+  carregamento. O snapshot versionado em `src/json/site-snapshot.json` é a
+  reserva para preview estático e para erros na montagem do snapshot.
+- Se GitHub, a árvore de um repositório ou algum manifesto não puder ser lido,
+  o snapshot registra a cobertura parcial e os avisos sem interromper a exibição
+  dos dados que já foram obtidos.
+
+## Detecção automática de tecnologias
+
+- `lib/github-snapshot.js` consulta a árvore recursiva do branch padrão apenas
+  para os repositórios usados como projetos. Se o GitHub marca a árvore como
+  truncada, o detector informa `tree-truncated` em vez de inventar conclusões.
+- `lib/technology-detector.js` combina nomes/caminhos de arquivos com até três
+  manifestos selecionados (por exemplo, `package.json`, `pyproject.toml`,
+  `requirements.txt`, `go.mod` e `Cargo.toml`). Os manifestos são buscados como
+  texto limitado e **nunca executados**.
+- O snapshot inclui `technologyDetection.status`, a lista `technologies` e as
+  evidências usadas. `lib/site-snapshot.js` une os nomes confirmados às
+  linguagens, tópicos e tecnologias existentes; os mesmos dados chegam ao
+  cliente pelo JSON cacheado na Vercel.
+- Uma árvore truncada, limite de requisições ou falha de leitura aparece como
+  cobertura parcial. A reserva local versionada e os rótulos manuais não são
+  removidos.
 
 ## Regeneração do snapshot versionado
 

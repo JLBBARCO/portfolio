@@ -2,16 +2,13 @@
 //
 // Cron da Vercel (configurado em vercel.json).
 //
-// Funcao: "aquecer" o cache da CDN chamando /api/site-data. Como o endpoint usa
-// `s-maxage=3300` (55 min), quando o cron roda o cache ja esta expirado, entao
-// esta chamada e que consome a API do GitHub - e todos os visitantes da hora
-// leem a resposta ja pronta da CDN.
+// Funcao: "aquecer" o cache da CDN chamando /api/site-data. O TTL de 23 horas
+// deixa o cache expirado antes da agenda diaria; a Vercel regenera o snapshot e
+// os visitantes recebem o JSON pronto, sem consultar o GitHub no navegador.
 //
-// Observacao sobre planos: o plano Hobby da Vercel executa crons no maximo uma
-// vez por dia. Isso NAO impede a atualizacao horaria: o cache expira a cada 55
-// minutos e a primeira visita seguinte regenera o snapshot (com
-// stale-while-revalidate, sem espera para o visitante). O cron apenas garante
-// que o site fique atualizado mesmo sem visitas.
+// O agendamento diario existente tambem atualiza o snapshot quando nao ha
+// visitantes; stale-while-revalidate mantem a versao anterior disponivel durante
+// a regeneracao.
 export default async function handler(req, res) {
   // A Vercel envia "Authorization: Bearer $CRON_SECRET" quando a variavel existe.
   const cronSecret = process.env.CRON_SECRET;

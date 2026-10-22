@@ -11,20 +11,20 @@
 //
 // Cache na CDN da Vercel:
 //
-//   Cache-Control: public, s-maxage=3600, stale-while-revalidate=604800
+//   Cache-Control: public, s-maxage=82800, stale-while-revalidate=604800
 //
 // Consequencia pratica:
-//   - A Vercel consulta a API do GitHub no maximo 1x por hora (a primeira visita
-//     depois do cache expirar, ou o cron de aquecimento).
+//   - O cron diario aquece a CDN; o TTL de 23 horas permite a revalidacao diaria
+//     mesmo sem visitantes e impede consultas a cada carregamento da pagina.
 //   - Todos os visitantes leem a resposta pronta da CDN: requisicoes ilimitadas
 //     sem consumir o rate limit do GitHub e sem calculos no navegador.
 //   - Se o GitHub falhar, `stale-while-revalidate` mantem a ultima versao boa
 //     servindo por ate 7 dias.
 import { buildSiteSnapshot } from "../lib/site-snapshot.js";
 
-// 55 minutos: um pouco menos que 1 hora para que o cron horario sempre encontre
-// o cache expirado e dispare a revalidacao.
-const ONE_HOUR_SECONDS = 3300;
+// 23 horas: o cron Vercel roda diariamente à meia-noite UTC e encontra o cache
+// expirado mesmo com pequenas diferencas no horario de geracao do snapshot.
+const ONE_DAY_SECONDS = 23 * 60 * 60;
 const ONE_WEEK_SECONDS = 604800;
 
 export default async function handler(req, res) {
@@ -40,9 +40,9 @@ export default async function handler(req, res) {
 
     res.setHeader(
       "Cache-Control",
-      `public, s-maxage=${ONE_HOUR_SECONDS}, stale-while-revalidate=${ONE_WEEK_SECONDS}`,
+      `public, s-maxage=${ONE_DAY_SECONDS}, stale-while-revalidate=${ONE_WEEK_SECONDS}`,
     );
-    res.setHeader("CDN-Cache-Control", `public, s-maxage=${ONE_HOUR_SECONDS}`);
+    res.setHeader("CDN-Cache-Control", `public, s-maxage=${ONE_DAY_SECONDS}`);
     res.setHeader("X-Snapshot-Generated-At", snapshot.generatedAt);
 
     return res.status(200).json(snapshot);

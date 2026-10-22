@@ -178,6 +178,12 @@ function createFooterLayout(footerElement, contactContainerID, loadId) {
     "contactTitle",
     "section_contact_title",
   );
+  const contactIntro = document.createElement("p");
+  contactIntro.className = "footer-contact-intro";
+  contactIntro.setAttribute("data-i18n", "footer_contact_intro");
+  contactIntro.textContent =
+    "Vamos conversar sobre projetos, oportunidades ou tecnologia? Escolha um canal abaixo.";
+  contactSection.appendChild(contactIntro);
   const contactContainer = document.createElement("article");
   contactContainer.id = contactContainerID;
   contactContainer.className = "block";
@@ -185,6 +191,11 @@ function createFooterLayout(footerElement, contactContainerID, loadId) {
 
   footerWrapper.appendChild(moreSection);
   footerWrapper.appendChild(contactSection);
+  const footerCredit = document.createElement("p");
+  footerCredit.className = "footer-credit";
+  footerCredit.setAttribute("data-i18n", "footer_signature");
+  footerCredit.textContent = "Portfólio pessoal · JLBBARCO";
+  footerWrapper.appendChild(footerCredit);
   footerElement.appendChild(footerWrapper);
 
   return {
@@ -257,8 +268,13 @@ function loadContactSection(state, contactFileURL) {
         link.dataset.iconName = resolved.iconName || "";
         const iconNode = document.createElement("i");
         iconNode.className = `${faClass(resolved.style, resolved.icon)} icon`;
+        iconNode.setAttribute("aria-hidden", "true");
+        const labelNode = document.createElement("span");
+        labelNode.className = "link-item-label";
+        labelNode.textContent = card.name || "Contact link";
+        labelNode.setAttribute("aria-hidden", "true");
 
-        link.appendChild(iconNode);
+        link.append(iconNode, labelNode);
         fragment.appendChild(link);
       });
 
