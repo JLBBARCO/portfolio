@@ -1,8 +1,14 @@
+# IDE Files
 .vscode/
-node_modules/
-test.*
-.vercel
+
+# Secret Keys
 .env
 .env.*
 !.env.example
 .env*.local
+
+# Library files
+node_modules/
+.vercel
+.work/
+.manus/

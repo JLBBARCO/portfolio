@@ -1,4 +1,0 @@
-In-app Browser JS state was preserved. Completed actions were not rolled back; refresh stale UI handles and continue only the remaining work.
-{"code":"BROWSER_ERROR","method":"browser_screenshot","callIndex":1,"nextAction":"inspect_before_retry"}
-Invalid arguments for browser_screenshot: validating root: validating /properties/saveToFile: type: C:\Users\josel\OneDrive\Documentos\Github\portfolio\.work\baseline-preview.png has type "string", want "boolean"
-Invalid arguments for browser_screenshot: validating root: validating /properties/saveToFile: type: C:\Users\josel\OneDrive\Documentos\Github\portfolio\.work\baseline-preview.png has type "string", want "boolean"
