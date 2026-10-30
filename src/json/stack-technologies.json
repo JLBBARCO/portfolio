@@ -1,0 +1,178 @@
+{
+  "fullstack_technologies": {
+    "languages": [
+      {
+        "name": "JavaScript",
+        "category": "Frontend & Backend (Node.js)",
+        "usage_share": "Muito Alta",
+        "primary_use": "Linguagem nativa da web, indispensável para desenvolvimento frontend e scripts no backend."
+      },
+      {
+        "name": "TypeScript",
+        "category": "Frontend & Backend",
+        "usage_share": "Muito Alta",
+        "primary_use": "Superset do JavaScript que adiciona tipagem estática, amplamente adotado em aplicações enterprise e frameworks modernos."
+      },
+      {
+        "name": "Python",
+        "category": "Backend",
+        "usage_share": "Alta",
+        "primary_use": "Utilizado para APIs rápidas, automação e integração com serviços de Inteligência Artificial/Machine Learning."
+      },
+      {
+        "name": "SQL",
+        "category": "Database Query Language",
+        "usage_share": "Muito Alta",
+        "primary_use": "Linguagem padrão para manipulação e consulta em bancos de dados relacionais."
+      },
+      {
+        "name": "Java",
+        "category": "Backend",
+        "usage_share": "Média/Alta",
+        "primary_use": "Dominante no ecossistema corporativo para sistemas escaláveis e de alta performance."
+      },
+      {
+        "name": "C#",
+        "category": "Backend",
+        "usage_share": "Média/Alta",
+        "primary_use": "Muito utilizado no desenvolvimento corporativo e ecossistema Microsoft com o .NET."
+      },
+      {
+        "name": "PHP",
+        "category": "Backend",
+        "usage_share": "Média",
+        "primary_use": "Amplamente utilizado na web tradicional (WordPress) e em aplicações modernas via frameworks robustos."
+      }
+    ],
+    "frontend_frameworks_and_libraries": [
+      {
+        "name": "React",
+        "type": "Library",
+        "usage_share": "Líder de Mercado",
+        "ecosystem": ["Next.js", "Redux", "Zustand", "Tailwind CSS"]
+      },
+      {
+        "name": "Vue.js",
+        "type": "Framework",
+        "usage_share": "Alta",
+        "ecosystem": ["Nuxt.js", "Pinia", "Vuetify"]
+      },
+      {
+        "name": "Angular",
+        "type": "Framework",
+        "usage_share": "Média/Alta (Enterprise)",
+        "ecosystem": ["RxJS", "NgRx", "Angular Material"]
+      },
+      {
+        "name": "Svelte / SvelteKit",
+        "type": "Framework",
+        "usage_share": "Em Crescimento",
+        "ecosystem": ["SvelteKit"]
+      }
+    ],
+    "backend_runtimes_and_frameworks": [
+      {
+        "name": "Node.js (Express / NestJS)",
+        "language": "JavaScript / TypeScript",
+        "usage_share": "Muito Alta",
+        "primary_use": "Runtime JavaScript dominante para construção de APIs REST e GraphQL."
+      },
+      {
+        "name": "Spring Boot",
+        "language": "Java",
+        "usage_share": "Alta",
+        "primary_use": "Padrão da indústria para microsserviços corporativos."
+      },
+      {
+        "name": ".NET Core / C#",
+        "language": "C#",
+        "usage_share": "Alta",
+        "primary_use": "Desenvolvimento de APIs e aplicações enterprise no ecossistema Microsoft."
+      },
+      {
+        "name": "Django / FastAPI",
+        "language": "Python",
+        "usage_share": "Alta",
+        "primary_use": "FastAPI para APIs assíncronas de alta performance e Django para rápida prototipagem fullstack."
+      },
+      {
+        "name": "Laravel",
+        "language": "PHP",
+        "usage_share": "Média/Alta",
+        "primary_use": "Framework elegante e muito utilizado para desenvolvimento web completo e monolitos modernos."
+      }
+    ],
+    "databases": {
+      "relational_sql": [
+        {
+          "name": "PostgreSQL",
+          "usage_share": "Líder de Mercado",
+          "primary_use": "Banco relacional open-source mais popular entre desenvolvedores."
+        },
+        {
+          "name": "MySQL / MariaDB",
+          "usage_share": "Muito Alta",
+          "primary_use": "Ampla adoção em hospedações web e projetos legados/modernos."
+        },
+        {
+          "name": "Microsoft SQL Server",
+          "usage_share": "Média/Alta",
+          "primary_use": "Comum em ambientes corporativos e ecossistemas .NET."
+        }
+      ],
+      "non_relational_nosql": [
+        {
+          "name": "MongoDB",
+          "usage_share": "Alta",
+          "primary_use": "Banco de dados orientado a documentos, principal escolha para pilhas MERN/MEAN."
+        },
+        {
+          "name": "Redis",
+          "usage_share": "Muito Alta",
+          "primary_use": "Armazenamento em memória usado para caching, controle de sessão e mensageria."
+        }
+      ]
+    },
+    "devops_and_cloud": [
+      {
+        "category": "Containerization & Orchestration",
+        "tools": ["Docker", "Kubernetes"]
+      },
+      {
+        "category": "Cloud Providers",
+        "tools": ["AWS", "Google Cloud (GCP)", "Microsoft Azure"]
+      },
+      {
+        "category": "CI/CD & Hosting",
+        "tools": ["GitHub Actions", "Vercel", "Netlify"]
+      }
+    ],
+    "popular_stacks": [
+      {
+        "name": "MERN Stack",
+        "components": ["MongoDB", "Express.js", "React", "Node.js"]
+      },
+      {
+        "name": "Next.js Fullstack",
+        "components": [
+          "Next.js (React)",
+          "TypeScript",
+          "Node.js",
+          "PostgreSQL / Prisma / Drizzle"
+        ]
+      },
+      {
+        "name": "PERN Stack",
+        "components": ["PostgreSQL", "Express.js", "React", "Node.js"]
+      },
+      {
+        "name": "Enterprise Java Stack",
+        "components": ["Spring Boot", "Angular / React", "PostgreSQL / Oracle"]
+      },
+      {
+        "name": ".NET Fullstack",
+        "components": [".NET Core", "C#", "SQL Server", "React / Angular"]
+      }
+    ]
+  }
+}
