@@ -580,13 +580,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const githubOwner = document.body.dataset.githubOwner || "JLBBARCO";
     // Always try GitHub API first; setupProjects will fallback to local JSON if API fails
     const projectsSource = "github";
-    const pTechnologies = loadAllTechnologies(locale, myLoadId);
+    // Ordem das áreas: Home -> Projetos -> Tecnologias -> Formação -> Sobre mim -> Rodapé
     const pProjects = setupProjects(
       projectsSource,
       locale,
       githubOwner,
       myLoadId,
     );
+    const pTechnologies = loadAllTechnologies(locale, myLoadId);
     const pFormations = setupFormations(
       "src/json/areas/formation.json",
       locale,

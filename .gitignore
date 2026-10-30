@@ -3,6 +3,7 @@
 
 # Secret Keys
 .env
+.env*
 .env.*
 !.env.example
 .env*.local

@@ -183,15 +183,14 @@ function loadAllTechnologies(language = "pt-BR", loadId) {
 }
 
 function filterProjectsByTechnology(tech) {
-  Array.from(document.querySelectorAll(".card.card-projects")).forEach(
+  Array.from(document.querySelectorAll("#projectsContainer .card.card-projects")).forEach(
     (card) => {
-      const cardIndex = Number(card.dataset.index || 0);
       const techs = card.dataset.technologies
         ? card.dataset.technologies.split(",").map((t) => t.trim())
         : [];
 
       if (tech === "all") {
-        card.style.display = cardIndex > 6 ? "none" : "flex";
+        card.style.display = "flex";
         return;
       }
 
