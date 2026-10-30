@@ -1,15 +1,16 @@
 {
-  "schema": 2,
+  "schema": 3,
   "owner": "JLBBARCO",
-  "generatedAt": "2026-08-27T23:01:26.056Z",
-  "refreshIntervalSeconds": 3600,
+  "generatedAt": "2026-10-30T18:29:34.070Z",
+  "refreshIntervalSeconds": 82800,
   "authenticated": false,
   "requestsUsed": 11,
   "partial": true,
   "warnings": [
     "GITHUB_TOKEN invalido ou expirado (401). Continuando sem autenticacao (limite de 60 requisicoes/hora). Gere um novo token em github.com/settings/tokens.",
     "Limite de requisicoes do GitHub quase esgotado; snapshot gerado parcialmente.",
-    "Limite de requisicoes atingido (403) em /repos/JLBBARCO/JLBBARCO/commits?sha=main&per_page=30."
+    "Limite de requisicoes atingido (403) em /repos/JLBBARCO/JLBBARCO/commits?sha=main&per_page=30.",
+    "Nao foi possivel calcular a cor media: fetch failed"
   ],
   "profile": {
     "login": "JLBBARCO",
@@ -23,33 +24,33 @@
   },
   "theme": {
     "average": {
-      "r": 64,
-      "g": 61,
-      "b": 178
+      "r": 124,
+      "g": 77,
+      "b": 255
     },
     "dark": {
-      "accent": "rgb(64, 61, 178)",
-      "accentTransparent": "rgba(64, 61, 178, 0.67)",
-      "hoverAccent": "rgb(34, 31, 148)",
+      "accent": "rgb(124, 77, 255)",
+      "accentTransparent": "rgba(124, 77, 255, 0.67)",
+      "hoverAccent": "rgb(94, 47, 225)",
       "rgb": {
-        "r": 64,
-        "g": 61,
-        "b": 178
+        "r": 124,
+        "g": 77,
+        "b": 255
       }
     },
     "light": {
-      "accent": "rgb(114, 111, 228)",
-      "accentTransparent": "rgba(114, 111, 228, 0.67)",
-      "hoverAccent": "rgb(84, 81, 198)",
+      "accent": "rgb(174, 127, 255)",
+      "accentTransparent": "rgba(174, 127, 255, 0.67)",
+      "hoverAccent": "rgb(144, 97, 225)",
       "rgb": {
-        "r": 114,
-        "g": 111,
-        "b": 228
+        "r": 174,
+        "g": 127,
+        "b": 255
       }
     },
     "source": "https://avatars.githubusercontent.com/u/159829462?v=4&s=200",
-    "computed": true,
-    "warning": ""
+    "computed": false,
+    "warning": "Nao foi possivel calcular a cor media: fetch failed"
   },
   "images": {
     "schema": 1,
@@ -230,10 +231,14 @@
         "dateInit": "09/2024",
         "dateEnd": "08/2026",
         "repoCreatedAtIso": "2024-09-21T17:52:39Z",
+        "pushedAtIso": "2026-08-27T14:18:09Z",
+        "updatedAtIso": "2026-08-27T14:35:42Z",
         "hasOwnerMainMasterCommit": true,
         "latestOwnerMainMasterCommitAt": "2026-08-27T14:18:06Z",
         "hasMainMasterActivity": true,
         "latestMainMasterActivityAt": "2026-08-27T14:18:09Z",
+        "stars": 0,
+        "forks": 0,
         "iconTechnologies": [
           {
             "name": "HTML",
@@ -289,7 +294,13 @@
         "linkDemo": "http://study-jlbbarco.vercel.app/",
         "image": "https://api.microlink.io/?url=http%3A%2F%2Fstudy-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
         "imageMobile": "https://api.microlink.io/?url=http%3A%2F%2Fstudy-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot"
+        "imageSource": "screenshot",
+        "points": 3,
+        "matchedTechnologies": [
+          "Python",
+          "JavaScript",
+          "Java"
+        ]
       },
       {
         "id": "programs-manager",
@@ -303,17 +314,21 @@
         "dateInit": "02/2026",
         "dateEnd": "08/2026",
         "repoCreatedAtIso": "2026-02-22T15:18:40Z",
+        "pushedAtIso": "2026-08-26T18:36:22Z",
+        "updatedAtIso": "2026-08-06T17:39:28Z",
         "hasOwnerMainMasterCommit": true,
         "latestOwnerMainMasterCommitAt": "2026-08-26T18:36:22Z",
         "hasMainMasterActivity": true,
         "latestMainMasterActivityAt": "2026-08-26T18:36:22Z",
+        "stars": 1,
+        "forks": 0,
         "iconTechnologies": [
           {
             "name": "TypeScript",
             "stack": {
-              "id": "backEnd",
-              "en-US": "Back-end",
-              "pt-BR": "Back-end"
+              "id": "frontEnd",
+              "en-US": "Front-end",
+              "pt-BR": "Front-end"
             }
           }
         ],
@@ -328,115 +343,13 @@
           }
         },
         "linkDemo": "http://programs-manager-website-jlbbarco.vercel.app/",
-        "image": "https://raw.githubusercontent.com/JLBBARCO/programs-manager/refs/heads/main/src/assets/img/thumbnail.webp",
-        "imageMobile": "https://raw.githubusercontent.com/JLBBARCO/programs-manager/refs/heads/main/src/assets/img/thumbnail.webp",
-        "imageSource": "json"
-      },
-      {
-        "id": "desafio-site-saviom",
-        "repoName": "desafio-site-saviom",
-        "title": {
-          "pt-BR": "desafio-site-saviom",
-          "en-US": "desafio-site-saviom"
-        },
-        "description": "",
-        "linkRepository": "https://github.com/JLBBARCO/desafio-site-saviom",
-        "dateInit": "08/2026",
-        "dateEnd": "08/2026",
-        "repoCreatedAtIso": "2026-08-24T19:59:10Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-08-24T20:12:42Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-08-24T20:12:42Z",
-        "iconTechnologies": [
-          {
-            "name": "HTML",
-            "stack": {
-              "id": "frontEnd",
-              "en-US": "Front-end",
-              "pt-BR": "Front-end"
-            }
-          }
-        ],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "desafio-site-saviom",
-            "en-US": "desafio-site-saviom"
-          },
-          "description": {
-            "pt-BR": "",
-            "en-US": ""
-          }
-        }
-      },
-      {
-        "id": "windows-optimizer",
-        "repoName": "windows-optimizer",
-        "title": {
-          "pt-BR": "windows-optimizer",
-          "en-US": "windows-optimizer"
-        },
-        "description": "A program designed to optimize Windows by removing temporary files, reinstalling the system image, and running tools to fix corrupted files, among other actions.",
-        "linkRepository": "https://github.com/JLBBARCO/windows-optimizer",
-        "dateInit": "07/2026",
-        "dateEnd": "08/2026",
-        "repoCreatedAtIso": "2026-07-30T20:54:30Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-08-21T20:25:45Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-08-21T20:25:45Z",
-        "iconTechnologies": [
-          {
-            "name": "HTML",
-            "stack": {
-              "id": "frontEnd",
-              "en-US": "Front-end",
-              "pt-BR": "Front-end"
-            }
-          }
-        ],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "windows-optimizer",
-            "en-US": "windows-optimizer"
-          },
-          "description": {
-            "pt-BR": "A program designed to optimize Windows by removing temporary files, reinstalling the system image, and running tools to fix corrupted files, among other actions.",
-            "en-US": "A program designed to optimize Windows by removing temporary files, reinstalling the system image, and running tools to fix corrupted files, among other actions."
-          }
-        },
-        "linkDemo": "https://windows-optimizer.vercel.app",
-        "image": "https://api.microlink.io/?url=https%3A%2F%2Fwindows-optimizer.vercel.app&screenshot=true&meta=false&embed=screenshot.url",
-        "imageMobile": "https://api.microlink.io/?url=https%3A%2F%2Fwindows-optimizer.vercel.app&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot"
-      },
-      {
-        "id": "winget-pkgs",
-        "repoName": "winget-pkgs",
-        "title": {
-          "pt-BR": "winget-pkgs",
-          "en-US": "winget-pkgs"
-        },
-        "description": "The Microsoft community Windows Package Manager manifest repository",
-        "linkRepository": "https://github.com/JLBBARCO/winget-pkgs",
-        "dateInit": "06/2026",
-        "dateEnd": "08/2026",
-        "repoCreatedAtIso": "2026-06-08T19:45:00Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-08-19T16:35:10Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-08-19T16:35:10Z",
-        "iconTechnologies": [],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "winget-pkgs",
-            "en-US": "winget-pkgs"
-          },
-          "description": {
-            "pt-BR": "The Microsoft community Windows Package Manager manifest repository",
-            "en-US": "The Microsoft community Windows Package Manager manifest repository"
-          }
-        }
+        "image": "https://api.microlink.io/?url=http%3A%2F%2Fprograms-manager-website-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
+        "imageMobile": "https://api.microlink.io/?url=http%3A%2F%2Fprograms-manager-website-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
+        "imageSource": "screenshot",
+        "points": 1,
+        "matchedTechnologies": [
+          "TypeScript"
+        ]
       },
       {
         "id": "image-converter",
@@ -450,17 +363,21 @@
         "dateInit": "01/2026",
         "dateEnd": "07/2026",
         "repoCreatedAtIso": "2026-01-03T20:08:20Z",
+        "pushedAtIso": "2026-07-03T14:48:49Z",
+        "updatedAtIso": "2026-07-03T14:48:53Z",
         "hasOwnerMainMasterCommit": true,
         "latestOwnerMainMasterCommitAt": "2026-07-03T14:48:49Z",
         "hasMainMasterActivity": true,
         "latestMainMasterActivityAt": "2026-07-03T14:48:49Z",
+        "stars": 0,
+        "forks": 0,
         "iconTechnologies": [
           {
             "name": "TypeScript",
             "stack": {
-              "id": "backEnd",
-              "en-US": "Back-end",
-              "pt-BR": "Back-end"
+              "id": "frontEnd",
+              "en-US": "Front-end",
+              "pt-BR": "Front-end"
             }
           }
         ],
@@ -477,7 +394,11 @@
         "linkDemo": "http://image-converter-jlbbarco.vercel.app/",
         "image": "https://api.microlink.io/?url=http%3A%2F%2Fimage-converter-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
         "imageMobile": "https://api.microlink.io/?url=http%3A%2F%2Fimage-converter-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot"
+        "imageSource": "screenshot",
+        "points": 1,
+        "matchedTechnologies": [
+          "TypeScript"
+        ]
       },
       {
         "id": "jobs-finder",
@@ -491,17 +412,21 @@
         "dateInit": "04/2026",
         "dateEnd": "07/2026",
         "repoCreatedAtIso": "2026-04-25T03:04:52Z",
+        "pushedAtIso": "2026-07-03T14:47:28Z",
+        "updatedAtIso": "2026-08-27T19:02:24Z",
         "hasOwnerMainMasterCommit": true,
         "latestOwnerMainMasterCommitAt": "2026-07-03T14:47:30Z",
         "hasMainMasterActivity": true,
         "latestMainMasterActivityAt": "2026-07-03T14:47:30Z",
+        "stars": 1,
+        "forks": 0,
         "iconTechnologies": [
           {
             "name": "TypeScript",
             "stack": {
-              "id": "backEnd",
-              "en-US": "Back-end",
-              "pt-BR": "Back-end"
+              "id": "frontEnd",
+              "en-US": "Front-end",
+              "pt-BR": "Front-end"
             }
           },
           {
@@ -542,7 +467,12 @@
         "linkDemo": "http://jobs-finder-jlbbarco.vercel.app/",
         "image": "https://api.microlink.io/?url=http%3A%2F%2Fjobs-finder-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
         "imageMobile": "https://api.microlink.io/?url=http%3A%2F%2Fjobs-finder-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot"
+        "imageSource": "screenshot",
+        "points": 2,
+        "matchedTechnologies": [
+          "TypeScript",
+          "JavaScript"
+        ]
       },
       {
         "id": "passwords-manager",
@@ -556,10 +486,14 @@
         "dateInit": "07/2025",
         "dateEnd": "07/2026",
         "repoCreatedAtIso": "2025-07-14T17:42:01Z",
+        "pushedAtIso": "2026-07-03T00:05:47Z",
+        "updatedAtIso": "2026-07-03T00:05:51Z",
         "hasOwnerMainMasterCommit": true,
         "latestOwnerMainMasterCommitAt": "2026-07-03T00:05:47Z",
         "hasMainMasterActivity": true,
         "latestMainMasterActivityAt": "2026-07-03T00:05:47Z",
+        "stars": 0,
+        "forks": 0,
         "iconTechnologies": [
           {
             "name": "Python",
@@ -580,10 +514,10 @@
             "en-US": "A system to save your passwords."
           }
         },
-        "image": "https://raw.githubusercontent.com/JLBBARCO/passwords-manager/refs/heads/main/src/assets/img/thumbnail.webp",
-        "imageMobile": "https://raw.githubusercontent.com/JLBBARCO/passwords-manager/refs/heads/main/src/assets/img/thumbnail.webp",
-        "imageType": "image/webp",
-        "imageSource": "repository"
+        "points": 1,
+        "matchedTechnologies": [
+          "Python"
+        ]
       },
       {
         "id": "total-score",
@@ -597,10 +531,14 @@
         "dateInit": "11/2025",
         "dateEnd": "05/2026",
         "repoCreatedAtIso": "2025-11-12T19:26:24Z",
+        "pushedAtIso": "2026-05-21T18:02:50Z",
+        "updatedAtIso": "2026-05-21T18:01:14Z",
         "hasOwnerMainMasterCommit": true,
         "latestOwnerMainMasterCommitAt": "2026-05-21T18:02:50Z",
         "hasMainMasterActivity": true,
         "latestMainMasterActivityAt": "2026-05-21T18:02:50Z",
+        "stars": 0,
+        "forks": 0,
         "iconTechnologies": [
           {
             "name": "Python",
@@ -620,329 +558,14 @@
             "pt-BR": "Repository of summation tests to discover your test score based on your answers and the answer key. The files accept only extensions .csv and .tsv",
             "en-US": "Repository of summation tests to discover your test score based on your answers and the answer key. The files accept only extensions .csv and .tsv"
           }
-        }
-      },
-      {
-        "id": "kampagency",
-        "repoName": "KampAgency",
-        "title": {
-          "pt-BR": "KampAgency",
-          "en-US": "KampAgency"
         },
-        "description": "Website created for promotion Kamp Agency",
-        "linkRepository": "https://github.com/JLBBARCO/KampAgency",
-        "dateInit": "05/2026",
-        "dateEnd": "05/2026",
-        "repoCreatedAtIso": "2026-05-11T20:11:59Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-05-13T17:16:23Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-05-13T17:16:23Z",
-        "iconTechnologies": [
-          {
-            "name": "HTML",
-            "stack": {
-              "id": "frontEnd",
-              "en-US": "Front-end",
-              "pt-BR": "Front-end"
-            }
-          }
-        ],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "KampAgency",
-            "en-US": "KampAgency"
-          },
-          "description": {
-            "pt-BR": "Website created for promotion Kamp Agency",
-            "en-US": "Website created for promotion Kamp Agency"
-          }
-        },
-        "linkDemo": "https://kampagency.github.io/KampAgency/",
-        "image": "https://api.microlink.io/?url=https%3A%2F%2Fkampagency.github.io%2FKampAgency%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageMobile": "https://api.microlink.io/?url=https%3A%2F%2Fkampagency.github.io%2FKampAgency%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot"
-      },
-      {
-        "id": "agrinho2024",
-        "repoName": "agrinho2024",
-        "title": {
-          "pt-BR": "agrinho2024",
-          "en-US": "agrinho2024"
-        },
-        "description": "",
-        "linkRepository": "https://github.com/JLBBARCO/agrinho2024",
-        "dateInit": "07/2024",
-        "dateEnd": "05/2026",
-        "repoCreatedAtIso": "2024-07-27T16:45:38Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-05-09T20:00:00Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-05-09T20:00:00Z",
-        "iconTechnologies": [
-          {
-            "name": "HTML",
-            "stack": {
-              "id": "frontEnd",
-              "en-US": "Front-end",
-              "pt-BR": "Front-end"
-            }
-          }
-        ],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "agrinho2024",
-            "en-US": "agrinho2024"
-          },
-          "description": {
-            "pt-BR": "",
-            "en-US": ""
-          }
-        },
-        "linkDemo": "https://jlbbarco.github.io/agrinho2024/",
-        "image": "https://api.microlink.io/?url=https%3A%2F%2Fjlbbarco.github.io%2Fagrinho2024%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageMobile": "https://api.microlink.io/?url=https%3A%2F%2Fjlbbarco.github.io%2Fagrinho2024%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot"
-      },
-      {
-        "id": "colegio-adolpho",
-        "repoName": "colegio-adolpho",
-        "title": {
-          "pt-BR": "colegio-adolpho",
-          "en-US": "colegio-adolpho"
-        },
-        "description": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news",
-        "linkRepository": "https://github.com/JLBBARCO/colegio-adolpho",
-        "dateInit": "09/2025",
-        "dateEnd": "04/2026",
-        "repoCreatedAtIso": "2025-09-18T14:33:29Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-04-23T21:59:21Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-04-23T21:59:21Z",
-        "iconTechnologies": [
-          {
-            "name": "CSS",
-            "stack": {
-              "id": "frontEnd",
-              "en-US": "Front-end",
-              "pt-BR": "Front-end"
-            }
-          }
-        ],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "colegio-adolpho",
-            "en-US": "colegio-adolpho"
-          },
-          "description": {
-            "pt-BR": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news",
-            "en-US": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news"
-          }
-        },
-        "linkDemo": "http://colegio-adolpho.vercel.app/",
-        "image": "https://api.microlink.io/?url=http%3A%2F%2Fcolegio-adolpho.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageMobile": "https://api.microlink.io/?url=http%3A%2F%2Fcolegio-adolpho.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot"
-      },
-      {
-        "id": "tecnoverde",
-        "repoName": "tecnoverde",
-        "title": {
-          "pt-BR": "tecnoverde",
-          "en-US": "tecnoverde"
-        },
-        "description": "A website for teaching the cultivation of Parsley",
-        "linkRepository": "https://github.com/JLBBARCO/tecnoverde",
-        "dateInit": "06/2025",
-        "dateEnd": "04/2026",
-        "repoCreatedAtIso": "2025-06-02T12:27:48Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-04-17T00:46:21Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-04-17T00:46:21Z",
-        "iconTechnologies": [
-          {
-            "name": "HTML",
-            "stack": {
-              "id": "frontEnd",
-              "en-US": "Front-end",
-              "pt-BR": "Front-end"
-            }
-          }
-        ],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "tecnoverde",
-            "en-US": "tecnoverde"
-          },
-          "description": {
-            "pt-BR": "A website for teaching the cultivation of Parsley",
-            "en-US": "A website for teaching the cultivation of Parsley"
-          }
-        },
-        "linkDemo": "https://jlbbarco.github.io/tecnoverde/",
-        "image": "https://api.microlink.io/?url=https%3A%2F%2Fjlbbarco.github.io%2Ftecnoverde%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageMobile": "https://api.microlink.io/?url=https%3A%2F%2Fjlbbarco.github.io%2Ftecnoverde%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot"
-      },
-      {
-        "id": "orbit-games-archive",
-        "repoName": "orbit-games-archive",
-        "title": {
-          "pt-BR": "orbit-games-archive",
-          "en-US": "orbit-games-archive"
-        },
-        "description": "",
-        "linkRepository": "https://github.com/JLBBARCO/orbit-games-archive",
-        "dateInit": "07/2026",
-        "dateEnd": "03/2026",
-        "repoCreatedAtIso": "2026-07-03T17:13:23Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-03-12T04:45:24Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-03-12T04:45:24Z",
-        "iconTechnologies": [],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "orbit-games-archive",
-            "en-US": "orbit-games-archive"
-          },
-          "description": {
-            "pt-BR": "",
-            "en-US": ""
-          }
-        },
-        "linkDemo": "https://beatriz-soares-1.github.io/Orbity/",
-        "image": "https://api.microlink.io/?url=https%3A%2F%2Fbeatriz-soares-1.github.io%2FOrbity%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageMobile": "https://api.microlink.io/?url=https%3A%2F%2Fbeatriz-soares-1.github.io%2FOrbity%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot"
-      },
-      {
-        "id": "random-generator",
-        "repoName": "random-generator",
-        "title": {
-          "pt-BR": "random-generator",
-          "en-US": "random-generator"
-        },
-        "description": "System with generate random names and numbers with quantity of user",
-        "linkRepository": "https://github.com/JLBBARCO/random-generator",
-        "dateInit": "07/2025",
-        "dateEnd": "03/2026",
-        "repoCreatedAtIso": "2025-07-14T17:47:20Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-03-02T17:20:53Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-03-02T17:20:53Z",
-        "iconTechnologies": [
-          {
-            "name": "Python",
-            "stack": {
-              "id": "backEnd",
-              "en-US": "Back-end",
-              "pt-BR": "Back-end"
-            }
-          }
-        ],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "random-generator",
-            "en-US": "random-generator"
-          },
-          "description": {
-            "pt-BR": "System with generate random names and numbers with quantity of user",
-            "en-US": "System with generate random names and numbers with quantity of user"
-          }
-        },
-        "image": "https://raw.githubusercontent.com/JLBBARCO/random-generator/refs/heads/main/src/assets/img/thumbnail.webp",
-        "imageMobile": "https://raw.githubusercontent.com/JLBBARCO/random-generator/refs/heads/main/src/assets/img/thumbnail.webp",
-        "imageType": "image/webp",
-        "imageSource": "repository"
-      },
-      {
-        "id": "unit-converter",
-        "repoName": "unit-converter",
-        "title": {
-          "pt-BR": "unit-converter",
-          "en-US": "unit-converter"
-        },
-        "description": "A tool to convert between different units of measurement",
-        "linkRepository": "https://github.com/JLBBARCO/unit-converter",
-        "dateInit": "07/2025",
-        "dateEnd": "03/2026",
-        "repoCreatedAtIso": "2025-07-14T17:45:56Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-03-02T17:20:22Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-03-02T17:20:22Z",
-        "iconTechnologies": [
-          {
-            "name": "Python",
-            "stack": {
-              "id": "backEnd",
-              "en-US": "Back-end",
-              "pt-BR": "Back-end"
-            }
-          }
-        ],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "unit-converter",
-            "en-US": "unit-converter"
-          },
-          "description": {
-            "pt-BR": "A tool to convert between different units of measurement",
-            "en-US": "A tool to convert between different units of measurement"
-          }
-        },
-        "image": "https://raw.githubusercontent.com/JLBBARCO/unit-converter/refs/heads/main/src/assets/img/thumbnail.webp",
-        "imageMobile": "https://raw.githubusercontent.com/JLBBARCO/unit-converter/refs/heads/main/src/assets/img/thumbnail.webp",
-        "imageType": "image/webp",
-        "imageSource": "repository"
-      },
-      {
-        "id": "receipt-generator",
-        "repoName": "receipt-generator",
-        "title": {
-          "pt-BR": "receipt-generator",
-          "en-US": "receipt-generator"
-        },
-        "description": "System with receipt generator at the user inserts basic informations",
-        "linkRepository": "https://github.com/JLBBARCO/receipt-generator",
-        "dateInit": "07/2025",
-        "dateEnd": "01/2026",
-        "repoCreatedAtIso": "2025-07-23T14:04:20Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-01-08T18:58:56Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-01-08T18:58:56Z",
-        "iconTechnologies": [
-          {
-            "name": "CSS",
-            "stack": {
-              "id": "frontEnd",
-              "en-US": "Front-end",
-              "pt-BR": "Front-end"
-            }
-          }
-        ],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "receipt-generator",
-            "en-US": "receipt-generator"
-          },
-          "description": {
-            "pt-BR": "System with receipt generator at the user inserts basic informations",
-            "en-US": "System with receipt generator at the user inserts basic informations"
-          }
-        },
-        "linkDemo": "http://receipt-generator-tan.vercel.app/",
-        "image": "https://api.microlink.io/?url=http%3A%2F%2Freceipt-generator-tan.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageMobile": "https://api.microlink.io/?url=http%3A%2F%2Freceipt-generator-tan.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot"
+        "points": 1,
+        "matchedTechnologies": [
+          "Python"
+        ]
       }
     ],
-    "count": 17,
+    "count": 6,
     "githubFetchStatus": {
       "failed": false
     }
@@ -979,6 +602,14 @@
               "en-US": "Front-end",
               "pt-BR": "Front-end"
             }
+          },
+          {
+            "name": "TypeScript",
+            "stack": {
+              "id": "frontEnd",
+              "en-US": "Front-end",
+              "pt-BR": "Front-end"
+            }
           }
         ]
       },
@@ -999,14 +630,6 @@
           },
           {
             "name": "Python",
-            "stack": {
-              "id": "backEnd",
-              "en-US": "Back-end",
-              "pt-BR": "Back-end"
-            }
-          },
-          {
-            "name": "TypeScript",
             "stack": {
               "id": "backEnd",
               "en-US": "Back-end",
@@ -1056,38 +679,6 @@
     "latestOwnerCommitAt": "2026-08-27T13:37:15Z"
   },
   "repos": [
-    {
-      "id": 854262615,
-      "name": "JLBBARCO",
-      "full_name": "JLBBARCO/JLBBARCO",
-      "private": false,
-      "fork": false,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "README Profile",
-      "html_url": "https://github.com/JLBBARCO/JLBBARCO",
-      "homepage": "https://jlbbarco.github.io/JLBBARCO/",
-      "language": "Python",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2024-09-08T19:53:49Z",
-      "updated_at": "2026-08-27T21:39:52Z",
-      "pushed_at": "2026-08-27T22:06:29Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 1,
-      "size": 1066,
-      "license": null,
-      "parent": null,
-      "languages": {
-        "Python": 10969
-      },
-      "latestActivityAt": "2026-08-27T22:06:29Z",
-      "latestOwnerCommitAt": "2026-08-27T22:06:29Z"
-    },
     {
       "id": 1220552015,
       "name": "jobs-finder",
@@ -1200,99 +791,6 @@
       "latestOwnerCommitAt": "2026-08-27T13:37:15Z"
     },
     {
-      "id": 1345357218,
-      "name": "desafio-site-saviom",
-      "full_name": "JLBBARCO/desafio-site-saviom",
-      "private": false,
-      "fork": true,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "",
-      "html_url": "https://github.com/JLBBARCO/desafio-site-saviom",
-      "homepage": "",
-      "language": "HTML",
-      "topics": [],
-      "default_branch": "master",
-      "created_at": "2026-08-24T19:59:10Z",
-      "updated_at": "2026-08-24T20:15:57Z",
-      "pushed_at": "2026-08-24T20:12:42Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 793,
-      "license": null,
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-08-24T20:12:42Z",
-      "latestOwnerCommitAt": "2026-08-24T20:12:42Z"
-    },
-    {
-      "id": 1317675603,
-      "name": "windows-optimizer",
-      "full_name": "JLBBARCO/windows-optimizer",
-      "private": false,
-      "fork": false,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "A program designed to optimize Windows by removing temporary files, reinstalling the system image, and running tools to fix corrupted files, among other actions.",
-      "html_url": "https://github.com/JLBBARCO/windows-optimizer",
-      "homepage": "https://windows-optimizer.vercel.app",
-      "language": "HTML",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2026-07-30T20:54:30Z",
-      "updated_at": "2026-08-19T20:09:20Z",
-      "pushed_at": "2026-08-21T20:25:45Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 1,
-      "size": 30,
-      "license": null,
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-08-21T20:25:45Z",
-      "latestOwnerCommitAt": "2026-08-21T20:25:45Z"
-    },
-    {
-      "id": 1263272435,
-      "name": "winget-pkgs",
-      "full_name": "JLBBARCO/winget-pkgs",
-      "private": false,
-      "fork": true,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "The Microsoft community Windows Package Manager manifest repository",
-      "html_url": "https://github.com/JLBBARCO/winget-pkgs",
-      "homepage": "",
-      "language": "",
-      "topics": [],
-      "default_branch": "master",
-      "created_at": "2026-06-08T19:45:00Z",
-      "updated_at": "2026-08-19T16:38:39Z",
-      "pushed_at": "2026-08-19T16:35:10Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 836687,
-      "license": {
-        "name": "MIT License",
-        "spdx_id": "MIT"
-      },
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-08-19T16:35:10Z",
-      "latestOwnerCommitAt": "2026-08-19T16:35:10Z"
-    },
-    {
       "id": 1164055565,
       "name": "programs-manager",
       "full_name": "JLBBARCO/programs-manager",
@@ -1324,66 +822,6 @@
       "languages": {},
       "latestActivityAt": "2026-08-26T18:36:22Z",
       "latestOwnerCommitAt": "2026-08-26T18:36:22Z"
-    },
-    {
-      "id": 1288511804,
-      "name": "orbit-games-archive",
-      "full_name": "JLBBARCO/orbit-games-archive",
-      "private": false,
-      "fork": true,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "",
-      "html_url": "https://github.com/JLBBARCO/orbit-games-archive",
-      "homepage": "https://beatriz-soares-1.github.io/Orbity/",
-      "language": "",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2026-07-03T17:13:23Z",
-      "updated_at": "2026-08-01T20:26:46Z",
-      "pushed_at": "2026-03-12T04:45:24Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 127,
-      "license": null,
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-03-12T04:45:24Z",
-      "latestOwnerCommitAt": "2026-03-12T04:45:24Z"
-    },
-    {
-      "id": 834563677,
-      "name": "agrinho2024",
-      "full_name": "JLBBARCO/agrinho2024",
-      "private": false,
-      "fork": false,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "",
-      "html_url": "https://github.com/JLBBARCO/agrinho2024",
-      "homepage": "https://jlbbarco.github.io/agrinho2024/",
-      "language": "HTML",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2024-07-27T16:45:38Z",
-      "updated_at": "2026-08-01T17:11:37Z",
-      "pushed_at": "2026-05-09T20:00:00Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 14693,
-      "license": null,
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-05-09T20:00:00Z",
-      "latestOwnerCommitAt": "2026-05-09T20:00:00Z"
     },
     {
       "id": 1127401741,
@@ -1483,201 +921,6 @@
       "languages": {},
       "latestActivityAt": "2026-05-21T18:02:50Z",
       "latestOwnerCommitAt": "2026-05-21T18:02:50Z"
-    },
-    {
-      "id": 1024961274,
-      "name": "receipt-generator",
-      "full_name": "JLBBARCO/receipt-generator",
-      "private": false,
-      "fork": false,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "System with receipt generator at the user inserts basic informations",
-      "html_url": "https://github.com/JLBBARCO/receipt-generator",
-      "homepage": "http://receipt-generator-tan.vercel.app/",
-      "language": "CSS",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2025-07-23T14:04:20Z",
-      "updated_at": "2026-05-19T16:33:06Z",
-      "pushed_at": "2026-01-08T18:58:56Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 9,
-      "license": {
-        "name": "MIT License",
-        "spdx_id": "MIT"
-      },
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-01-08T18:58:56Z",
-      "latestOwnerCommitAt": "2026-01-08T18:58:56Z"
-    },
-    {
-      "id": 1235950292,
-      "name": "KampAgency",
-      "full_name": "JLBBARCO/KampAgency",
-      "private": false,
-      "fork": true,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "Website created for promotion Kamp Agency",
-      "html_url": "https://github.com/JLBBARCO/KampAgency",
-      "homepage": "https://kampagency.github.io/KampAgency/",
-      "language": "HTML",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2026-05-11T20:11:59Z",
-      "updated_at": "2026-05-13T17:16:28Z",
-      "pushed_at": "2026-05-13T17:16:23Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 8392,
-      "license": null,
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-05-13T17:16:23Z",
-      "latestOwnerCommitAt": "2026-05-13T17:16:23Z"
-    },
-    {
-      "id": 1059505808,
-      "name": "colegio-adolpho",
-      "full_name": "JLBBARCO/colegio-adolpho",
-      "private": false,
-      "fork": false,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news",
-      "html_url": "https://github.com/JLBBARCO/colegio-adolpho",
-      "homepage": "http://colegio-adolpho.vercel.app/",
-      "language": "CSS",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2025-09-18T14:33:29Z",
-      "updated_at": "2026-04-23T21:59:26Z",
-      "pushed_at": "2026-04-23T21:59:21Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 1618,
-      "license": {
-        "name": "MIT License",
-        "spdx_id": "MIT"
-      },
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-04-23T21:59:21Z",
-      "latestOwnerCommitAt": "2026-04-23T21:59:21Z"
-    },
-    {
-      "id": 994749867,
-      "name": "tecnoverde",
-      "full_name": "JLBBARCO/tecnoverde",
-      "private": false,
-      "fork": false,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "A website for teaching the cultivation of Parsley",
-      "html_url": "https://github.com/JLBBARCO/tecnoverde",
-      "homepage": "https://jlbbarco.github.io/tecnoverde/",
-      "language": "HTML",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2025-06-02T12:27:48Z",
-      "updated_at": "2026-04-17T00:47:06Z",
-      "pushed_at": "2026-04-17T00:46:21Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 134485,
-      "license": {
-        "name": "MIT License",
-        "spdx_id": "MIT"
-      },
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-04-17T00:46:21Z",
-      "latestOwnerCommitAt": "2026-04-17T00:46:21Z"
-    },
-    {
-      "id": 1019680884,
-      "name": "random-generator",
-      "full_name": "JLBBARCO/random-generator",
-      "private": false,
-      "fork": false,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "System with generate random names and numbers with quantity of user",
-      "html_url": "https://github.com/JLBBARCO/random-generator",
-      "homepage": "",
-      "language": "Python",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2025-07-14T17:47:20Z",
-      "updated_at": "2026-04-07T18:57:22Z",
-      "pushed_at": "2026-03-02T17:20:53Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 48386,
-      "license": {
-        "name": "MIT License",
-        "spdx_id": "MIT"
-      },
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-03-02T17:20:53Z",
-      "latestOwnerCommitAt": "2026-03-02T17:20:53Z"
-    },
-    {
-      "id": 1019680158,
-      "name": "unit-converter",
-      "full_name": "JLBBARCO/unit-converter",
-      "private": false,
-      "fork": false,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "A tool to convert between different units of measurement",
-      "html_url": "https://github.com/JLBBARCO/unit-converter",
-      "homepage": "",
-      "language": "Python",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2025-07-14T17:45:56Z",
-      "updated_at": "2026-03-02T17:20:27Z",
-      "pushed_at": "2026-03-02T17:20:22Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 31284,
-      "license": {
-        "name": "MIT License",
-        "spdx_id": "MIT"
-      },
-      "parent": null,
-      "languages": {},
-      "latestActivityAt": "2026-03-02T17:20:22Z",
-      "latestOwnerCommitAt": "2026-03-02T17:20:22Z"
     }
   ]
 }

@@ -45,8 +45,8 @@ function header() {
     "Home",
     "Projects",
     "Technologies",
-    "About_Me",
     "Formation",
+    "About_Me",
     "Curses",
     "Contact",
   ];

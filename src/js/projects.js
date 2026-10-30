@@ -274,21 +274,79 @@ function getProjectLatestOwnerUpdateDisplayDate(card) {
   return card.dateEnd || getProjectCreationDisplayDate(card) || "";
 }
 
-function compareProjectCardsByMaintenance(a, b) {
-  const aMaintenanceTimestamp = getLatestOwnerMainMasterCommitTimestamp(a);
-  const bMaintenanceTimestamp = getLatestOwnerMainMasterCommitTimestamp(b);
-
-  if (aMaintenanceTimestamp !== bMaintenanceTimestamp) {
-    return bMaintenanceTimestamp - aMaintenanceTimestamp;
+function getCardLastModifiedTimestamp(card) {
+  if (!card) return 0;
+  const iso =
+    card.latestOwnerMainMasterCommitAt ||
+    card.latestMainMasterActivityAt ||
+    card.pushedAtIso ||
+    card.updatedAtIso ||
+    "";
+  if (iso) {
+    const ts = Date.parse(iso);
+    if (Number.isFinite(ts) && ts > 0) return ts;
   }
-
-  const aCreatedAt = getRepositoryCreationTimestamp(a);
-  const bCreatedAt = getRepositoryCreationTimestamp(b);
-  if (aCreatedAt !== bCreatedAt) {
-    return bCreatedAt - aCreatedAt;
+  if (card.dateEnd) {
+    const parts = String(card.dateEnd).split("/");
+    if (parts.length === 2) {
+      const ts = Date.parse(`${parts[1]}-${parts[0]}-01`);
+      if (Number.isFinite(ts) && ts > 0) return ts;
+    }
   }
-
+  if (card.dateInit) {
+    const parts = String(card.dateInit).split("/");
+    if (parts.length === 2) {
+      const ts = Date.parse(`${parts[1]}-${parts[0]}-01`);
+      if (Number.isFinite(ts) && ts > 0) return ts;
+    }
+  }
   return 0;
+}
+
+function compareProjectCards(a, b, repoStarsMap) {
+  // 1. Data da última modificação (decrescente)
+  const modA = getCardLastModifiedTimestamp(a);
+  const modB = getCardLastModifiedTimestamp(b);
+  if (modB !== modA) {
+    return modB - modA;
+  }
+
+  // 2. Estrelas (crescente)
+  const starsA =
+    typeof a.stars === "number"
+      ? a.stars
+      : (repoStarsMap?.get(normalizeGitHubLogin(a.repoName || a.id)) ?? 0);
+  const starsB =
+    typeof b.stars === "number"
+      ? b.stars
+      : (repoStarsMap?.get(normalizeGitHubLogin(b.repoName || b.id)) ?? 0);
+  if (starsA !== starsB) {
+    return starsA - starsB;
+  }
+
+  // 3. Nome (crescente)
+  const nameA = String(
+    a.repoName ||
+      (typeof a.title === "object"
+        ? a.title["pt-BR"] || a.title["en-US"]
+        : a.title) ||
+      a.id ||
+      "",
+  ).toLowerCase();
+  const nameB = String(
+    b.repoName ||
+      (typeof b.title === "object"
+        ? b.title["pt-BR"] || b.title["en-US"]
+        : b.title) ||
+      b.id ||
+      "",
+  ).toLowerCase();
+
+  return nameA.localeCompare(nameB);
+}
+
+function compareProjectCardsByMaintenance(a, b) {
+  return compareProjectCards(a, b);
 }
 
 /**
@@ -516,44 +574,6 @@ function setupProjects(source, language, owner, loadId) {
   title.innerHTML = "Projects";
   section.append(title);
 
-  const highlights = document.createElement("div");
-  highlights.id = "projectsHighlights";
-  highlights.className = "projects";
-  section.appendChild(highlights);
-
-  const highlightsTitle = document.createElement("h3");
-  highlightsTitle.id = "projectsHighlightsTitle";
-  highlightsTitle.setAttribute(
-    "data-i18n",
-    "section_projects_highlights_title",
-  );
-  highlightsTitle.innerHTML = "Highlights";
-  highlights.append(highlightsTitle);
-
-  const highlightsContainer = document.createElement("article");
-  highlightsContainer.id = "highlightsContainer";
-  highlightsContainer.className = "block semi-hidden";
-
-  if (highlightsContainer && loadId !== undefined) {
-    highlightsContainer.dataset.loadId = loadId;
-  }
-
-  highlights.appendChild(highlightsContainer);
-  // Sem destaques ainda: evita mostrar o titulo "Highlights" com uma area vazia
-  // ate sabermos se ha estrelas suficientes para preenche-la.
-  highlights.style.display = "none";
-
-  const allProjects = document.createElement("div");
-  allProjects.id = "allProjects";
-  allProjects.className = "projects";
-  section.appendChild(allProjects);
-
-  const allProjectsTitle = document.createElement("h3");
-  allProjectsTitle.id = "allProjectsTitle";
-  allProjectsTitle.setAttribute("data-i18n", "section_projects_all_title");
-  allProjectsTitle.innerHTML = "All Projects";
-  allProjects.append(allProjectsTitle);
-
   const container = document.createElement("article");
   container.id = "projectsContainer";
   container.className = "block semi-hidden";
@@ -664,17 +684,29 @@ function setupProjects(source, language, owner, loadId) {
           btn.onclick = () => filterProjectsByTechnology(name);
           filterContainer.appendChild(btn);
         });
-        section.insertBefore(filterContainer, highlights);
+        section.insertBefore(filterContainer, container);
+      }
+
+      const repoStarsMap = new Map();
+      if (Array.isArray(repos)) {
+        repos.forEach((repo) => {
+          if (!repo || !repo.name) return;
+          repoStarsMap.set(
+            normalizeGitHubLogin(repo.name),
+            Math.max(0, Number(repo.stargazers_count) || 0),
+          );
+        });
       }
 
       const fragment = document.createDocumentFragment();
 
-      // Ordenação com ênfase em manutenção:
-      // 1) Repositórios com commit seu em main/master primeiro.
-      // 2) Entre eles, commit autoral mais recente.
-      // 3) Se não houver commit seu em main/master, usar criação do repositório.
-      // 4) Empate: criação do repositório e depois datas exibidas no card.
-      const sortedCards = [...cards].sort(compareProjectCardsByMaintenance);
+      // Ordenação dos projetos:
+      // 1. Data da última modificação (decrescente)
+      // 2. Estrelas (crescente)
+      // 3. Nome (crescente)
+      const sortedCards = [...cards].sort((a, b) =>
+        compareProjectCards(a, b, repoStarsMap),
+      );
 
       let cardCounter = 0;
 
@@ -689,40 +721,22 @@ function setupProjects(source, language, owner, loadId) {
           return;
         }
 
+        const repoKey = normalizeGitHubLogin(card.repoName || card.id);
+        const starCount =
+          typeof card.stars === "number" && Number.isFinite(card.stars)
+            ? card.stars
+            : typeof card.stargazers_count === "number" &&
+                Number.isFinite(card.stargazers_count)
+              ? card.stargazers_count
+              : (repoStarsMap.get(repoKey) ?? 0);
+
         const div = buildProjectCardElement(card, language, {
           cardCounter,
+          starCount,
         });
         fragment.appendChild(div);
       });
       container.appendChild(fragment);
-
-      // Destaques: os 3 repositorios proprios com mais estrelas no GitHub,
-      // renderizados com o mesmo layout de #projectsContainer. Roda no
-      // cliente, a partir dos mesmos cards + snapshot de repositorios ja
-      // carregados acima.
-      if (
-        highlightsContainer &&
-        !(loadId !== undefined && highlightsContainer.dataset.loadId != loadId)
-      ) {
-        highlightsContainer.innerHTML = "";
-        const topStarred = pickTopStarredProjectCards(cards, repos, owner, 3);
-
-        if (topStarred.length) {
-          const highlightsFragment = document.createDocumentFragment();
-          topStarred.forEach((entry, idx) => {
-            const highlightDiv = buildProjectCardElement(entry.card, language, {
-              cardCounter: idx + 1,
-              extraClassName: "card-highlight",
-              starCount: entry.stars,
-            });
-            highlightsFragment.appendChild(highlightDiv);
-          });
-          highlightsContainer.appendChild(highlightsFragment);
-          if (highlights) highlights.style.display = "";
-        } else if (highlights) {
-          highlights.style.display = "none";
-        }
-      }
     })
     .catch((err) => {
       console.error("[projects] Failed to load projects:", err);
@@ -741,7 +755,7 @@ function setupProjects(source, language, owner, loadId) {
       );
     });
 
-  allProjects.appendChild(container);
+  section.appendChild(container);
   main.appendChild(section);
 }
 
