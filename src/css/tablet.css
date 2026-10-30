@@ -1,0 +1,97 @@
+@charset "UTF-8";
+
+.icon {
+  font-size: 2rem;
+}
+
+main>section {
+  min-height: 75dvh;
+  padding: 50px 0;
+  scroll-margin-top: var(--navbar-height);
+}
+
+nav h3 {
+  font-size: 1.5rem;
+}
+
+.nav-links {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--secondary-bg);
+  border-top: 1px solid var(--accent);
+  text-align: center;
+  padding: 1rem;
+}
+
+main {
+  margin: 100px;
+}
+
+.tech-stack-group {
+  max-width: 40dvw;
+}
+
+.text-with-image {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+.person {
+  width: 20%;
+  margin: 25px;
+}
+
+.text {
+  width: 60%;
+  margin: 25px;
+}
+
+/* Ajustes específicos para Tablet */
+.btn.prev {
+  left: 25px;
+}
+
+.btn.next {
+  right: 25px;
+}
+
+.carrousel .card {
+  min-width: 300px;
+  max-width: 400px;
+}
+
+/* Footer layout adjustments for tablet */
+.footer-content-wrapper {
+  flex-flow: row wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.footer-section {
+  flex: 0 1 calc(50% - 1rem);
+  min-width: 220px;
+  padding: 1.5rem;
+}
+
+.footer-section h3 {
+  font-size: 1.2rem;
+}
+
+footer .link-item {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.icon-container {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+#accessibility .icon {
+  font-size: 1.75rem;
+}

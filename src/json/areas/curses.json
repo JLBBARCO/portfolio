@@ -1,0 +1,13 @@
+{
+  "cards": [
+    {
+      "img": "",
+      "title": { "pt-br": "", "en-us": "" },
+      "institution": { "pt-br": "", "en-us": "" },
+      "type": { "pt-br": "", "en-us": "" },
+      "description": { "pt-br": "", "en-us": "" },
+      "links": [],
+      "date": { "month": 8, "year": 2026 }
+    }
+  ]
+}

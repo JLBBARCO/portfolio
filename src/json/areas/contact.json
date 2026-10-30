@@ -1,0 +1,19 @@
+{
+  "cards": [
+    {
+      "iconName": "email",
+      "url": "mailto:jbruianibarco@gmail.com",
+      "name": "jbruianibarco+portfolio@gmail.com"
+    },
+    {
+      "iconName": "github",
+      "url": "https://github.com/JLBBARCO",
+      "name": "GitHub.com/JLBBARCO"
+    },
+    {
+      "iconName": "linkedin",
+      "url": "https://linkedin.com/in/joseluizbbarco",
+      "name": "LinkedIn.com/in/joseluizbbarco"
+    }
+  ]
+}
