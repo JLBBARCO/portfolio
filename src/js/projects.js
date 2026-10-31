@@ -304,14 +304,7 @@ function getCardLastModifiedTimestamp(card) {
 }
 
 function compareProjectCards(a, b, repoStarsMap) {
-  // 1. Data da última modificação (decrescente)
-  const modA = getCardLastModifiedTimestamp(a);
-  const modB = getCardLastModifiedTimestamp(b);
-  if (modB !== modA) {
-    return modB - modA;
-  }
-
-  // 2. Estrelas (crescente)
+  // 1. Stars count (descending)
   const starsA =
     typeof a.stars === "number"
       ? a.stars
@@ -320,11 +313,25 @@ function compareProjectCards(a, b, repoStarsMap) {
     typeof b.stars === "number"
       ? b.stars
       : (repoStarsMap?.get(normalizeGitHubLogin(b.repoName || b.id)) ?? 0);
-  if (starsA !== starsB) {
-    return starsA - starsB;
+  if (starsB !== starsA) {
+    return starsB - starsA; // descending
   }
 
-  // 3. Nome (crescente)
+  // 2. Last modification date (descending)
+  const modA = getCardLastModifiedTimestamp(a);
+  const modB = getCardLastModifiedTimestamp(b);
+  if (modB !== modA) {
+    return modB - modA;
+  }
+
+  // 3. Repository creation date (ascending)
+  const creationA = getRepositoryCreationTimestamp(a);
+  const creationB = getRepositoryCreationTimestamp(b);
+  if (creationA !== creationB) {
+    return creationA - creationB; // ascending
+  }
+
+  // 4. Name (ascending)
   const nameA = String(
     a.repoName ||
       (typeof a.title === "object"
