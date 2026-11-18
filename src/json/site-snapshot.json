@@ -1,7 +1,7 @@
 {
   "schema": 3,
   "owner": "JLBBARCO",
-  "generatedAt": "2026-10-30T18:29:34.070Z",
+  "generatedAt": "2026-11-18T18:49:50.664Z",
   "refreshIntervalSeconds": 82800,
   "authenticated": false,
   "requestsUsed": 11,
@@ -9,8 +9,7 @@
   "warnings": [
     "GITHUB_TOKEN invalido ou expirado (401). Continuando sem autenticacao (limite de 60 requisicoes/hora). Gere um novo token em github.com/settings/tokens.",
     "Limite de requisicoes do GitHub quase esgotado; snapshot gerado parcialmente.",
-    "Limite de requisicoes atingido (403) em /repos/JLBBARCO/JLBBARCO/commits?sha=main&per_page=30.",
-    "Nao foi possivel calcular a cor media: fetch failed"
+    "Limite de requisicoes atingido (403) em /repos/JLBBARCO/JLBBARCO/commits?sha=main&per_page=30."
   ],
   "profile": {
     "login": "JLBBARCO",
@@ -24,33 +23,33 @@
   },
   "theme": {
     "average": {
-      "r": 124,
-      "g": 77,
-      "b": 255
+      "r": 64,
+      "g": 61,
+      "b": 178
     },
     "dark": {
-      "accent": "rgb(124, 77, 255)",
-      "accentTransparent": "rgba(124, 77, 255, 0.67)",
-      "hoverAccent": "rgb(94, 47, 225)",
+      "accent": "rgb(64, 61, 178)",
+      "accentTransparent": "rgba(64, 61, 178, 0.67)",
+      "hoverAccent": "rgb(34, 31, 148)",
       "rgb": {
-        "r": 124,
-        "g": 77,
-        "b": 255
+        "r": 64,
+        "g": 61,
+        "b": 178
       }
     },
     "light": {
-      "accent": "rgb(174, 127, 255)",
-      "accentTransparent": "rgba(174, 127, 255, 0.67)",
-      "hoverAccent": "rgb(144, 97, 225)",
+      "accent": "rgb(114, 111, 228)",
+      "accentTransparent": "rgba(114, 111, 228, 0.67)",
+      "hoverAccent": "rgb(84, 81, 198)",
       "rgb": {
-        "r": 174,
-        "g": 127,
-        "b": 255
+        "r": 114,
+        "g": 111,
+        "b": 228
       }
     },
     "source": "https://avatars.githubusercontent.com/u/159829462?v=4&s=200",
-    "computed": false,
-    "warning": "Nao foi possivel calcular a cor media: fetch failed"
+    "computed": true,
+    "warning": ""
   },
   "images": {
     "schema": 1,
@@ -219,89 +218,6 @@
   },
   "projects": {
     "cards": [
-      {
-        "id": "study",
-        "repoName": "study",
-        "title": {
-          "pt-BR": "study",
-          "en-US": "study"
-        },
-        "description": "This repository contains all school work related to the study of programming.",
-        "linkRepository": "https://github.com/JLBBARCO/study",
-        "dateInit": "09/2024",
-        "dateEnd": "08/2026",
-        "repoCreatedAtIso": "2024-09-21T17:52:39Z",
-        "pushedAtIso": "2026-08-27T14:18:09Z",
-        "updatedAtIso": "2026-08-27T14:35:42Z",
-        "hasOwnerMainMasterCommit": true,
-        "latestOwnerMainMasterCommitAt": "2026-08-27T14:18:06Z",
-        "hasMainMasterActivity": true,
-        "latestMainMasterActivityAt": "2026-08-27T14:18:09Z",
-        "stars": 0,
-        "forks": 0,
-        "iconTechnologies": [
-          {
-            "name": "HTML",
-            "stack": {
-              "id": "frontEnd",
-              "en-US": "Front-end",
-              "pt-BR": "Front-end"
-            }
-          },
-          {
-            "name": "Python",
-            "stack": {
-              "id": "backEnd",
-              "en-US": "Back-end",
-              "pt-BR": "Back-end"
-            }
-          },
-          {
-            "name": "JavaScript",
-            "stack": {
-              "id": "frontEnd",
-              "en-US": "Front-end",
-              "pt-BR": "Front-end"
-            }
-          },
-          {
-            "name": "CSS",
-            "stack": {
-              "id": "frontEnd",
-              "en-US": "Front-end",
-              "pt-BR": "Front-end"
-            }
-          },
-          {
-            "name": "Java",
-            "stack": {
-              "id": "backEnd",
-              "en-US": "Back-end",
-              "pt-BR": "Back-end"
-            }
-          }
-        ],
-        "githubFallbackTranslations": {
-          "title": {
-            "pt-BR": "study",
-            "en-US": "study"
-          },
-          "description": {
-            "pt-BR": "This repository contains all school work related to the study of programming.",
-            "en-US": "This repository contains all school work related to the study of programming."
-          }
-        },
-        "linkDemo": "http://study-jlbbarco.vercel.app/",
-        "image": "https://api.microlink.io/?url=http%3A%2F%2Fstudy-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageMobile": "https://api.microlink.io/?url=http%3A%2F%2Fstudy-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
-        "imageSource": "screenshot",
-        "points": 3,
-        "matchedTechnologies": [
-          "Python",
-          "JavaScript",
-          "Java"
-        ]
-      },
       {
         "id": "programs-manager",
         "repoName": "programs-manager",
@@ -563,6 +479,55 @@
         "matchedTechnologies": [
           "Python"
         ]
+      },
+      {
+        "id": "random-generator",
+        "repoName": "random-generator",
+        "title": {
+          "pt-BR": "random-generator",
+          "en-US": "random-generator"
+        },
+        "description": "System with generate random names and numbers with quantity of user",
+        "linkRepository": "https://github.com/JLBBARCO/random-generator",
+        "dateInit": "07/2025",
+        "dateEnd": "03/2026",
+        "repoCreatedAtIso": "2025-07-14T17:47:20Z",
+        "pushedAtIso": "2026-03-02T17:20:53Z",
+        "updatedAtIso": "2026-04-07T18:57:22Z",
+        "hasOwnerMainMasterCommit": true,
+        "latestOwnerMainMasterCommitAt": "2026-03-02T17:20:53Z",
+        "hasMainMasterActivity": true,
+        "latestMainMasterActivityAt": "2026-03-02T17:20:53Z",
+        "stars": 0,
+        "forks": 0,
+        "iconTechnologies": [
+          {
+            "name": "Python",
+            "stack": {
+              "id": "backEnd",
+              "en-US": "Back-end",
+              "pt-BR": "Back-end"
+            }
+          }
+        ],
+        "githubFallbackTranslations": {
+          "title": {
+            "pt-BR": "random-generator",
+            "en-US": "random-generator"
+          },
+          "description": {
+            "pt-BR": "System with generate random names and numbers with quantity of user",
+            "en-US": "System with generate random names and numbers with quantity of user"
+          }
+        },
+        "image": "https://raw.githubusercontent.com/JLBBARCO/random-generator/refs/heads/main/src/assets/img/thumbnail.webp",
+        "imageMobile": "https://raw.githubusercontent.com/JLBBARCO/random-generator/refs/heads/main/src/assets/img/thumbnail.webp",
+        "imageType": "image/webp",
+        "imageSource": "repository",
+        "points": 1,
+        "matchedTechnologies": [
+          "Python"
+        ]
       }
     ],
     "count": 6,
@@ -621,14 +586,6 @@
         },
         "technologies": [
           {
-            "name": "Java",
-            "stack": {
-              "id": "backEnd",
-              "en-US": "Back-end",
-              "pt-BR": "Back-end"
-            }
-          },
-          {
             "name": "Python",
             "stack": {
               "id": "backEnd",
@@ -639,7 +596,7 @@
         ]
       }
     ],
-    "count": 6
+    "count": 5
   },
   "siteRepo": {
     "id": 904397776,
@@ -716,42 +673,6 @@
       },
       "latestActivityAt": "2026-07-03T14:47:30Z",
       "latestOwnerCommitAt": "2026-07-03T14:47:30Z"
-    },
-    {
-      "id": 860991902,
-      "name": "study",
-      "full_name": "JLBBARCO/study",
-      "private": false,
-      "fork": false,
-      "archived": false,
-      "owner": {
-        "login": "JLBBARCO"
-      },
-      "description": "This repository contains all school work related to the study of programming.",
-      "html_url": "https://github.com/JLBBARCO/study",
-      "homepage": "http://study-jlbbarco.vercel.app/",
-      "language": "HTML",
-      "topics": [],
-      "default_branch": "main",
-      "created_at": "2024-09-21T17:52:39Z",
-      "updated_at": "2026-08-27T14:35:42Z",
-      "pushed_at": "2026-08-27T14:18:09Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "open_issues_count": 0,
-      "watchers_count": 0,
-      "size": 171256,
-      "license": null,
-      "parent": null,
-      "languages": {
-        "HTML": 420063,
-        "Python": 123653,
-        "JavaScript": 92879,
-        "CSS": 78314,
-        "Java": 232
-      },
-      "latestActivityAt": "2026-08-27T14:18:09Z",
-      "latestOwnerCommitAt": "2026-08-27T14:18:06Z"
     },
     {
       "id": 904397776,
@@ -921,6 +842,39 @@
       "languages": {},
       "latestActivityAt": "2026-05-21T18:02:50Z",
       "latestOwnerCommitAt": "2026-05-21T18:02:50Z"
+    },
+    {
+      "id": 1019680884,
+      "name": "random-generator",
+      "full_name": "JLBBARCO/random-generator",
+      "private": false,
+      "fork": false,
+      "archived": false,
+      "owner": {
+        "login": "JLBBARCO"
+      },
+      "description": "System with generate random names and numbers with quantity of user",
+      "html_url": "https://github.com/JLBBARCO/random-generator",
+      "homepage": "",
+      "language": "Python",
+      "topics": [],
+      "default_branch": "main",
+      "created_at": "2025-07-14T17:47:20Z",
+      "updated_at": "2026-04-07T18:57:22Z",
+      "pushed_at": "2026-03-02T17:20:53Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "open_issues_count": 0,
+      "watchers_count": 0,
+      "size": 48386,
+      "license": {
+        "name": "MIT License",
+        "spdx_id": "MIT"
+      },
+      "parent": null,
+      "languages": {},
+      "latestActivityAt": "2026-03-02T17:20:53Z",
+      "latestOwnerCommitAt": "2026-03-02T17:20:53Z"
     }
   ]
 }

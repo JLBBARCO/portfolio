@@ -59,7 +59,9 @@ export default async function handler(req, res) {
     );
 
     // Owner-only list: projects created by the user and forks created by the user.
-    const combined = [...data[0]];
+    const combined = [...data[0]].filter(
+      (repo) => String(repo?.name || "").toLowerCase() !== "study",
+    );
 
     // Retorna para o seu site
     res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate"); // Cache na rede da Vercel por 1h
