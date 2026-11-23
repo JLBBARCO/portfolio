@@ -43,6 +43,9 @@ export default async function handler(req, res) {
       generatedAt: data?.generatedAt || null,
       repos: Array.isArray(data?.repos) ? data.repos.length : 0,
       projects: data?.projects?.count || 0,
+      projectImages: Array.isArray(data?.projectImages)
+        ? data.projectImages.length
+        : 0,
       technologies: data?.technologies?.count || 0,
       themeComputed: Boolean(data?.theme?.computed),
       partial: Boolean(data?.partial),

@@ -165,6 +165,16 @@
         "en-US": "A website that provides information about the Mossview project, including its objectives, features, and updates.",
         "pt-BR": "Um site que fornece informações sobre o projeto Mossview, incluindo seus objetivos, recursos e atualizações"
       }
+    },
+    "Wireless-Device-Battery-Monitor": {
+      "title": {
+        "en-US": "Wireless Device Battery Monitor",
+        "pt-BR": "Monitor de Bateria de Dispositivos Sem Fio"
+      },
+      "description": {
+        "en-US": "Show the battery level of wireless mice, headsets, keyboards and controllers on the Windows 10/11 taskbar. Lightweight tray app, no vendor software needed. Supports Logitech, Razer, SteelSeries, Corsair, HyperX, Glorious, PS4/PS5 DualSense, Xbox and Bluetooth devices.",
+        "pt-BR": "Mostra o nível de bateria de mouses, headsets, teclados e controles sem fio na barra de tarefas do Windows 10/11. Aplicativo leve na bandeja, sem necessidade de software do fabricante. Suporta dispositivos Logitech, Razer, SteelSeries, Corsair, HyperX, Glorious, PS4/PS5 DualSense, Xbox e Bluetooth."
+      }
     }
   }
 }

@@ -35,6 +35,7 @@
     theme: null,
     images: { images: {} },
     projects: { cards: [], count: 0, githubFetchStatus: { failed: true } },
+    projectImages: [],
     technologies: { groups: [], count: 0 },
     siteRepo: null,
     repos: [],
@@ -210,6 +211,11 @@
             count: 0,
             githubFetchStatus: { failed: true },
           },
+      );
+    },
+    projectImages() {
+      return load().then((snapshot) =>
+        Array.isArray(snapshot.projectImages) ? snapshot.projectImages : [],
       );
     },
 
