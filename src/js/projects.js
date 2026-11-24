@@ -616,14 +616,9 @@ function setupProjects(source, language, owner, loadId) {
       let cards = Array.isArray(data.cards) ? data.cards : [];
       cards = cards.filter(isValidProjectCard);
 
-      // ensure demo links have screenshot images when no explicit image
-      // is supplied (local JSON cards may already provide their own).
       cards.forEach((card) => {
         ensureProjectCardId(card);
         registerProjectCardTranslations(card);
-        if (card.linkDemo && !card.image) {
-          card.image = getScreenshotUrl(card.linkDemo);
-        }
       });
       const seen = new Set();
       cards = cards.filter((c) => {
