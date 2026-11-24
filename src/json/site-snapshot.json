@@ -1,7 +1,7 @@
 {
   "schema": 3,
   "owner": "JLBBARCO",
-  "generatedAt": "2026-11-18T18:49:50.664Z",
+  "generatedAt": "2026-11-24T16:24:37.167Z",
   "refreshIntervalSeconds": 82800,
   "authenticated": false,
   "requestsUsed": 11,
@@ -9,7 +9,8 @@
   "warnings": [
     "GITHUB_TOKEN invalido ou expirado (401). Continuando sem autenticacao (limite de 60 requisicoes/hora). Gere um novo token em github.com/settings/tokens.",
     "Limite de requisicoes do GitHub quase esgotado; snapshot gerado parcialmente.",
-    "Limite de requisicoes atingido (403) em /repos/JLBBARCO/JLBBARCO/commits?sha=main&per_page=30."
+    "Limite de requisicoes atingido (403) em /repos/JLBBARCO/JLBBARCO/commits?sha=main&per_page=30.",
+    "A imagem do tema nao esta em PNG; usando cor padrao no servidor."
   ],
   "profile": {
     "login": "JLBBARCO",
@@ -23,33 +24,33 @@
   },
   "theme": {
     "average": {
-      "r": 64,
-      "g": 61,
-      "b": 178
+      "r": 124,
+      "g": 77,
+      "b": 255
     },
     "dark": {
-      "accent": "rgb(64, 61, 178)",
-      "accentTransparent": "rgba(64, 61, 178, 0.67)",
-      "hoverAccent": "rgb(34, 31, 148)",
+      "accent": "rgb(124, 77, 255)",
+      "accentTransparent": "rgba(124, 77, 255, 0.67)",
+      "hoverAccent": "rgb(94, 47, 225)",
       "rgb": {
-        "r": 64,
-        "g": 61,
-        "b": 178
+        "r": 124,
+        "g": 77,
+        "b": 255
       }
     },
     "light": {
-      "accent": "rgb(114, 111, 228)",
-      "accentTransparent": "rgba(114, 111, 228, 0.67)",
-      "hoverAccent": "rgb(84, 81, 198)",
+      "accent": "rgb(174, 127, 255)",
+      "accentTransparent": "rgba(174, 127, 255, 0.67)",
+      "hoverAccent": "rgb(144, 97, 225)",
       "rgb": {
-        "r": 114,
-        "g": 111,
-        "b": 228
+        "r": 174,
+        "g": 127,
+        "b": 255
       }
     },
     "source": "https://avatars.githubusercontent.com/u/159829462?v=4&s=200",
-    "computed": true,
-    "warning": ""
+    "computed": false,
+    "warning": "A imagem do tema nao esta em PNG; usando cor padrao no servidor."
   },
   "images": {
     "schema": 1,
@@ -520,10 +521,6 @@
             "en-US": "System with generate random names and numbers with quantity of user"
           }
         },
-        "image": "https://raw.githubusercontent.com/JLBBARCO/random-generator/refs/heads/main/src/assets/img/thumbnail.webp",
-        "imageMobile": "https://raw.githubusercontent.com/JLBBARCO/random-generator/refs/heads/main/src/assets/img/thumbnail.webp",
-        "imageType": "image/webp",
-        "imageSource": "repository",
         "points": 1,
         "matchedTechnologies": [
           "Python"
@@ -535,6 +532,50 @@
       "failed": false
     }
   },
+  "projectImages": [
+    {
+      "repoName": "programs-manager",
+      "image": "https://api.microlink.io/?url=http%3A%2F%2Fprograms-manager-website-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
+      "imageMobile": "https://api.microlink.io/?url=http%3A%2F%2Fprograms-manager-website-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
+      "imageType": "",
+      "imageSource": "screenshot"
+    },
+    {
+      "repoName": "image-converter",
+      "image": "https://api.microlink.io/?url=http%3A%2F%2Fimage-converter-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
+      "imageMobile": "https://api.microlink.io/?url=http%3A%2F%2Fimage-converter-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
+      "imageType": "",
+      "imageSource": "screenshot"
+    },
+    {
+      "repoName": "jobs-finder",
+      "image": "https://api.microlink.io/?url=http%3A%2F%2Fjobs-finder-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
+      "imageMobile": "https://api.microlink.io/?url=http%3A%2F%2Fjobs-finder-jlbbarco.vercel.app%2F&screenshot=true&meta=false&embed=screenshot.url",
+      "imageType": "",
+      "imageSource": "screenshot"
+    },
+    {
+      "repoName": "passwords-manager",
+      "image": "",
+      "imageMobile": "",
+      "imageType": "",
+      "imageSource": ""
+    },
+    {
+      "repoName": "total-score",
+      "image": "",
+      "imageMobile": "",
+      "imageType": "",
+      "imageSource": ""
+    },
+    {
+      "repoName": "random-generator",
+      "image": "",
+      "imageMobile": "",
+      "imageType": "",
+      "imageSource": ""
+    }
+  ],
   "technologies": {
     "groups": [
       {

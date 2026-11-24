@@ -2,7 +2,6 @@
 // sections request the same data during one render cycle.
 const _projectsDataCache = new Map();
 const _projectCardTranslations = Object.create(null);
-const _projectCardImageOverrides = Object.create(null);
 let _projectTranslationsLoadPromise = null;
 
 // Translation dictionary for project cards, keyed by card id.
@@ -96,16 +95,6 @@ function loadProjectCardTranslations() {
             if (normalized) entry[field] = normalized;
           },
         );
-
-        const imageOverride =
-          typeof rawCard.img === "string"
-            ? rawCard.img
-            : typeof rawCard.image === "string"
-              ? rawCard.image
-              : "";
-        if (imageOverride) {
-          _projectCardImageOverrides[cardId] = imageOverride;
-        }
       });
     })
     .catch((err) => {
