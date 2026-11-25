@@ -3,346 +3,393 @@
 const _projectsDataCache = new Map();
 const _projectCardTranslations = Object.create(null);
 let _projectTranslationsLoadPromise = null;
+const _projectTopicTranslations = Object.create(null);
 
 // Translation dictionary for project cards, keyed by card id.
 // Each entry can define title/description/institution/descriptionImage.
 // If a field is missing, the renderer falls back to the card payload.
 function normalizeLocale(language) {
-  const normalized = String(language || "").toLowerCase();
-  return normalized.startsWith("pt") ? "pt-BR" : "en-US";
+    const normalized = String(language || '').toLowerCase();
+    return normalized.startsWith('pt') ? 'pt-BR' : 'en-US';
 }
 
 function slugifyCardId(value) {
-  return String(value || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+    return String(value || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
 }
 
 function normalizeGitHubLogin(value) {
-  return String(value || "")
-    .trim()
-    .toLowerCase();
+    return String(value || '')
+        .trim()
+        .toLowerCase();
 }
 
 function isOwnedRepositoryByOwner(repo, owner) {
-  if (!repo || typeof repo !== "object") return false;
-  const requestedOwner = normalizeGitHubLogin(owner);
-  const repoOwner = normalizeGitHubLogin(repo.owner && repo.owner.login);
+    if (!repo || typeof repo !== 'object') return false;
+    const requestedOwner = normalizeGitHubLogin(owner);
+    const repoOwner = normalizeGitHubLogin(repo.owner && repo.owner.login);
 
-  if (!requestedOwner || !repoOwner || repoOwner !== requestedOwner) {
-    return false;
-  }
+    if (!requestedOwner || !repoOwner || repoOwner !== requestedOwner) {
+        return false;
+    }
 
-  return Boolean(repo.name);
+    return Boolean(repo.name);
 }
 
 function isEligibleGitHubProjectRepo(repo, owner) {
-  if (!isOwnedRepositoryByOwner(repo, owner)) return false;
+    if (!isOwnedRepositoryByOwner(repo, owner)) return false;
 
-  const requestedOwner = normalizeGitHubLogin(owner);
-  const name = normalizeGitHubLogin(repo.name);
+    const requestedOwner = normalizeGitHubLogin(owner);
+    const name = normalizeGitHubLogin(repo.name);
 
-  if (!name) return false;
-  // Exclude special profile/pages repositories.
-  if (name === requestedOwner) return false;
-  if (name === `${requestedOwner}.github.io`) return false;
+    if (!name) return false;
+    // Exclude special profile/pages repositories.
+    if (name === requestedOwner) return false;
+    if (name === `${requestedOwner}.github.io`) return false;
 
-  // Destaques públicos: não incluir repositórios privados ou forks.
-  return repo.private !== true && repo.fork !== true;
+    // Destaques públicos: não incluir repositórios privados ou forks.
+    return repo.private !== true && repo.fork !== true;
 }
 
 function ensureProjectCardId(card) {
-  if (card && card.id) return card.id;
-  const idSource =
-    (card &&
-      (card.linkRepository ||
-        card.linkDemo ||
-        (typeof getLocalized === "function"
-          ? getLocalized(card.title, "en-US")
-          : card.title))) ||
-    "project";
+    if (card && card.id) return card.id;
+    const idSource =
+        (card &&
+            (card.linkRepository ||
+                card.linkDemo ||
+                (typeof getLocalized === 'function'
+                    ? getLocalized(card.title, 'en-US')
+                    : card.title))) ||
+        'project';
 
-  const id = slugifyCardId(idSource) || "project";
-  if (card) card.id = id;
-  return id;
+    const id = slugifyCardId(idSource) || 'project';
+    if (card) card.id = id;
+    return id;
 }
 
 function loadProjectCardTranslations() {
-  if (_projectTranslationsLoadPromise) {
+    if (_projectTranslationsLoadPromise) {
+        return _projectTranslationsLoadPromise;
+    }
+
+    _projectTranslationsLoadPromise = fetchJsonWithFallback('src/json/areas/projects.json')
+        .then((data) => {
+            if (!data || !data.cards || typeof data.cards !== 'object') return;
+
+            if (data.topicTranslations && typeof data.topicTranslations === 'object') {
+                Object.entries(data.topicTranslations).forEach(([rawTopic, rawLabels]) => {
+                    const topicId = slugifyCardId(rawTopic);
+                    const localizedLabels = normalizeLocalizedFieldValue(rawLabels);
+                    if (topicId && localizedLabels) {
+                        _projectTopicTranslations[topicId] = localizedLabels;
+                    }
+                });
+            }
+
+            Object.entries(data.cards).forEach(([rawId, rawCard]) => {
+                if (!rawCard || typeof rawCard !== 'object') return;
+                const cardId = slugifyCardId(rawId || rawCard.id) || 'project';
+                if (!_projectCardTranslations[cardId]) {
+                    _projectCardTranslations[cardId] = {};
+                }
+
+                const entry = _projectCardTranslations[cardId];
+                ['title', 'description', 'institution', 'descriptionImage'].forEach((field) => {
+                    const normalized = normalizeLocalizedFieldValue(rawCard[field]);
+                    if (normalized) entry[field] = normalized;
+                });
+                if (Array.isArray(rawCard.topics)) {
+                    entry.topics = rawCard.topics
+                        .map((t) => String(t || '').trim())
+                        .filter(Boolean);
+                }
+            });
+        })
+        .catch((err) => {
+            console.warn('[projects] Failed to preload card translations:', err);
+        });
+
     return _projectTranslationsLoadPromise;
-  }
-
-  _projectTranslationsLoadPromise = fetchJsonWithFallback(
-    "src/json/areas/projects.json",
-  )
-    .then((data) => {
-      if (!data || !data.cards || typeof data.cards !== "object") return;
-
-      Object.entries(data.cards).forEach(([rawId, rawCard]) => {
-        if (!rawCard || typeof rawCard !== "object") return;
-        const cardId = slugifyCardId(rawId || rawCard.id) || "project";
-        if (!_projectCardTranslations[cardId]) {
-          _projectCardTranslations[cardId] = {};
-        }
-
-        const entry = _projectCardTranslations[cardId];
-        ["title", "description", "institution", "descriptionImage"].forEach(
-          (field) => {
-            const normalized = normalizeLocalizedFieldValue(rawCard[field]);
-            if (normalized) entry[field] = normalized;
-          },
-        );
-      });
-    })
-    .catch((err) => {
-      console.warn("[projects] Failed to preload card translations:", err);
-    });
-
-  return _projectTranslationsLoadPromise;
 }
 
 function translationProjects() {
-  return loadProjectCardTranslations();
+    return loadProjectCardTranslations();
 }
 
 function getLocalizedCardFieldValue(value, locale) {
-  const normalized = normalizeLocalizedFieldValue(value);
-  if (!normalized) return "";
-  return normalized[locale] || normalized["en-US"] || normalized["pt-BR"] || "";
+    const normalized = normalizeLocalizedFieldValue(value);
+    if (!normalized) return '';
+    return normalized[locale] || normalized['en-US'] || normalized['pt-BR'] || '';
 }
 
 function getProjectCardTranslation(card, field, language) {
-  if (!card || !field) return "";
-  const locale = normalizeLocale(language);
-  const cardId = ensureProjectCardId(card);
+    if (!card || !field) return '';
+    const locale = normalizeLocale(language);
+    const cardId = ensureProjectCardId(card);
 
-  const dictionaryEntry = _projectCardTranslations[cardId];
-  if (dictionaryEntry && dictionaryEntry[field]) {
-    const value =
-      dictionaryEntry[field][locale] ||
-      dictionaryEntry[field]["en-US"] ||
-      dictionaryEntry[field]["pt-BR"] ||
-      "";
-    if (value) return value;
-  }
+    const dictionaryEntry = _projectCardTranslations[cardId];
+    if (dictionaryEntry && dictionaryEntry[field]) {
+        const value =
+            dictionaryEntry[field][locale] ||
+            dictionaryEntry[field]['en-US'] ||
+            dictionaryEntry[field]['pt-BR'] ||
+            '';
+        if (value) return value;
+    }
 
-  if (
-    card.githubFallbackTranslations &&
-    card.githubFallbackTranslations[field]
-  ) {
-    const value = getLocalizedCardFieldValue(
-      card.githubFallbackTranslations[field],
-      locale,
-    );
-    if (value) return value;
-  }
+    if (card.githubFallbackTranslations && card.githubFallbackTranslations[field]) {
+        const value = getLocalizedCardFieldValue(card.githubFallbackTranslations[field], locale);
+        if (value) return value;
+    }
 
-  return getLocalizedCardFieldValue(card[field], locale);
+    return getLocalizedCardFieldValue(card[field], locale);
 }
 
 function normalizeLocalizedFieldValue(value) {
-  if (!value) return null;
-  if (typeof value === "string") {
-    return { "pt-BR": value, "en-US": value };
-  }
-  if (typeof value === "object") {
-    const pt = value["pt-BR"] || value.pt || value["en-US"] || value.en || "";
-    const en = value["en-US"] || value.en || value["pt-BR"] || value.pt || "";
-    if (!pt && !en) return null;
-    return { "pt-BR": pt, "en-US": en };
-  }
-  return null;
+    if (!value) return null;
+    if (typeof value === 'string') {
+        return { 'pt-BR': value, 'en-US': value };
+    }
+    if (typeof value === 'object') {
+        const pt = value['pt-BR'] || value.pt || value['en-US'] || value.en || '';
+        const en = value['en-US'] || value.en || value['pt-BR'] || value.pt || '';
+        if (!pt && !en) return null;
+        return { 'pt-BR': pt, 'en-US': en };
+    }
+    return null;
 }
 
 function isLikelyVercelProjectMetadata(value) {
-  return Boolean(
-    value &&
-    typeof value === "object" &&
-    ("projectId" in value || "orgId" in value || "projectName" in value),
-  );
+    return Boolean(
+        value &&
+        typeof value === 'object' &&
+        ('projectId' in value || 'orgId' in value || 'projectName' in value),
+    );
 }
 
 function isValidProjectCard(card) {
-  if (!card || typeof card !== "object" || Array.isArray(card)) return false;
-  if (isLikelyVercelProjectMetadata(card)) return false;
+    if (!card || typeof card !== 'object' || Array.isArray(card)) return false;
+    if (isLikelyVercelProjectMetadata(card)) return false;
 
-  const hasIdentity = Boolean(card.id || card.title || card.linkRepository);
-  const hasContent = Boolean(
-    card.description ||
-    card.institution ||
-    card.linkDemo ||
-    card.iconTechnologies ||
-    card.image ||
-    card.dateInit ||
-    card.dateEnd,
-  );
-  return hasIdentity || hasContent;
+    const hasIdentity = Boolean(card.id || card.title || card.linkRepository);
+    const hasContent = Boolean(
+        card.description ||
+        card.institution ||
+        card.linkDemo ||
+        card.iconTechnologies ||
+        card.topics ||
+        card.image ||
+        card.dateInit ||
+        card.dateEnd,
+    );
+    return hasIdentity || hasContent;
 }
 
 function registerProjectCardTranslations(card) {
-  if (!isValidProjectCard(card)) return;
-  const cardId = ensureProjectCardId(card);
-  if (!cardId) return;
+    if (!isValidProjectCard(card)) return;
+    const cardId = ensureProjectCardId(card);
+    if (!cardId) return;
 
-  if (!_projectCardTranslations[cardId]) {
-    _projectCardTranslations[cardId] = {};
-  }
+    if (!_projectCardTranslations[cardId]) {
+        _projectCardTranslations[cardId] = {};
+    }
 
-  const entry = _projectCardTranslations[cardId];
-  ["title", "description", "institution", "descriptionImage"].forEach(
-    (field) => {
-      if (entry[field]) return;
-      const normalized = normalizeLocalizedFieldValue(card[field]);
-      if (normalized) entry[field] = normalized;
-    },
-  );
+    const entry = _projectCardTranslations[cardId];
+    ['title', 'description', 'institution', 'descriptionImage'].forEach((field) => {
+        if (entry[field]) return;
+        const normalized = normalizeLocalizedFieldValue(card[field]);
+        if (normalized) entry[field] = normalized;
+    });
+    if (Array.isArray(card.topics) && !entry.topics) {
+        entry.topics = card.topics.map((t) => String(t || '').trim()).filter(Boolean);
+    }
+}
+
+function getProjectCardTopics(card) {
+    const topicsSet = new Set();
+    if (card) {
+        if (Array.isArray(card.topics)) {
+            card.topics.forEach((t) => {
+                const topic = String(t || '').trim();
+                if (topic) topicsSet.add(topic);
+            });
+        } else if (typeof card.topics === 'string') {
+            card.topics.split(',').forEach((t) => {
+                const topic = String(t || '').trim();
+                if (topic) topicsSet.add(topic);
+            });
+        }
+    }
+
+    const cardId = ensureProjectCardId(card);
+    const dictionaryEntry = _projectCardTranslations[cardId];
+    if (dictionaryEntry && Array.isArray(dictionaryEntry.topics)) {
+        dictionaryEntry.topics.forEach((t) => {
+            const topic = String(t || '').trim();
+            if (topic) topicsSet.add(topic);
+        });
+    }
+    return Array.from(topicsSet);
+}
+
+function getProjectTopicLabel(topic, language) {
+    const rawTopic = String(topic || '').trim();
+    if (!rawTopic) return '';
+
+    const localizedLabels = _projectTopicTranslations[slugifyCardId(rawTopic)];
+    const translated = localizedLabels
+        ? getLocalizedCardFieldValue(localizedLabels, normalizeLocale(language))
+        : '';
+    if (translated) return translated;
+
+    const readableTopic = rawTopic.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!readableTopic) return rawTopic;
+    const locale = normalizeLocale(language);
+    return readableTopic.charAt(0).toLocaleUpperCase(locale) + readableTopic.slice(1);
 }
 
 function parseDateToTimestamp(value) {
-  if (!value) return 0;
-  const timestamp = Date.parse(value);
-  return Number.isNaN(timestamp) ? 0 : timestamp;
+    if (!value) return 0;
+    const timestamp = Date.parse(value);
+    return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
 function formatMonthYear(value) {
-  const timestamp = parseDateToTimestamp(value);
-  if (!timestamp) return "";
-  const date = new Date(timestamp);
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = String(date.getFullYear());
-  return `${month}/${year}`;
+    const timestamp = parseDateToTimestamp(value);
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear());
+    return `${month}/${year}`;
 }
 
 function getLatestOwnerMainMasterCommitTimestamp(card) {
-  if (!card) return 0;
-  return parseDateToTimestamp(card.latestOwnerMainMasterCommitAt);
+    if (!card) return 0;
+    return parseDateToTimestamp(card.latestOwnerMainMasterCommitAt);
 }
 
 function getLatestMainMasterActivityTimestamp(card) {
-  if (!card) return 0;
-  return parseDateToTimestamp(card.latestMainMasterActivityAt);
+    if (!card) return 0;
+    return parseDateToTimestamp(card.latestMainMasterActivityAt);
 }
 
 function getRepositoryCreationTimestamp(card) {
-  if (!card) return 0;
-  const fromIso = parseDateToTimestamp(card.repoCreatedAtIso);
-  if (fromIso) return fromIso;
-  return parseDate(card.dateInit);
+    if (!card) return 0;
+    const fromIso = parseDateToTimestamp(card.repoCreatedAtIso);
+    if (fromIso) return fromIso;
+    return parseDate(card.dateInit);
 }
 
 function hasOwnerMainMasterCommit(card) {
-  return Boolean(card && card.hasOwnerMainMasterCommit);
+    return Boolean(card && card.hasOwnerMainMasterCommit);
 }
 
 function hasMainMasterActivity(card) {
-  return Boolean(card && card.hasMainMasterActivity);
+    return Boolean(card && card.hasMainMasterActivity);
 }
 
 function getProjectCreationDisplayDate(card) {
-  if (!card) return "";
-  if (card.repoCreatedAtIso) {
-    const formatted = formatMonthYear(card.repoCreatedAtIso);
-    if (formatted) return formatted;
-  }
-  return card.dateInit || "";
+    if (!card) return '';
+    if (card.repoCreatedAtIso) {
+        const formatted = formatMonthYear(card.repoCreatedAtIso);
+        if (formatted) return formatted;
+    }
+    return card.dateInit || '';
 }
 
 function getProjectLatestOwnerUpdateDisplayDate(card) {
-  if (!card) return "";
-  const latestOwnerUpdate = formatMonthYear(card.latestOwnerMainMasterCommitAt);
-  if (latestOwnerUpdate) return latestOwnerUpdate;
+    if (!card) return '';
+    const latestOwnerUpdate = formatMonthYear(card.latestOwnerMainMasterCommitAt);
+    if (latestOwnerUpdate) return latestOwnerUpdate;
 
-  if (card.repoCreatedAtIso) {
-    return getProjectCreationDisplayDate(card);
-  }
+    if (card.repoCreatedAtIso) {
+        return getProjectCreationDisplayDate(card);
+    }
 
-  // Fallback for local/manual cards that may not carry GitHub metadata.
-  return card.dateEnd || getProjectCreationDisplayDate(card) || "";
+    // Fallback for local/manual cards that may not carry GitHub metadata.
+    return card.dateEnd || getProjectCreationDisplayDate(card) || '';
 }
 
 function getCardLastModifiedTimestamp(card) {
-  if (!card) return 0;
-  const iso =
-    card.latestOwnerMainMasterCommitAt ||
-    card.latestMainMasterActivityAt ||
-    card.pushedAtIso ||
-    card.updatedAtIso ||
-    "";
-  if (iso) {
-    const ts = Date.parse(iso);
-    if (Number.isFinite(ts) && ts > 0) return ts;
-  }
-  if (card.dateEnd) {
-    const parts = String(card.dateEnd).split("/");
-    if (parts.length === 2) {
-      const ts = Date.parse(`${parts[1]}-${parts[0]}-01`);
-      if (Number.isFinite(ts) && ts > 0) return ts;
+    if (!card) return 0;
+    const iso =
+        card.latestOwnerMainMasterCommitAt ||
+        card.latestMainMasterActivityAt ||
+        card.pushedAtIso ||
+        card.updatedAtIso ||
+        '';
+    if (iso) {
+        const ts = Date.parse(iso);
+        if (Number.isFinite(ts) && ts > 0) return ts;
     }
-  }
-  if (card.dateInit) {
-    const parts = String(card.dateInit).split("/");
-    if (parts.length === 2) {
-      const ts = Date.parse(`${parts[1]}-${parts[0]}-01`);
-      if (Number.isFinite(ts) && ts > 0) return ts;
+    if (card.dateEnd) {
+        const parts = String(card.dateEnd).split('/');
+        if (parts.length === 2) {
+            const ts = Date.parse(`${parts[1]}-${parts[0]}-01`);
+            if (Number.isFinite(ts) && ts > 0) return ts;
+        }
     }
-  }
-  return 0;
+    if (card.dateInit) {
+        const parts = String(card.dateInit).split('/');
+        if (parts.length === 2) {
+            const ts = Date.parse(`${parts[1]}-${parts[0]}-01`);
+            if (Number.isFinite(ts) && ts > 0) return ts;
+        }
+    }
+    return 0;
 }
 
 function compareProjectCards(a, b, repoStarsMap) {
-  // 1. Stars count (descending)
-  const starsA =
-    typeof a.stars === "number"
-      ? a.stars
-      : (repoStarsMap?.get(normalizeGitHubLogin(a.repoName || a.id)) ?? 0);
-  const starsB =
-    typeof b.stars === "number"
-      ? b.stars
-      : (repoStarsMap?.get(normalizeGitHubLogin(b.repoName || b.id)) ?? 0);
-  if (starsB !== starsA) {
-    return starsB - starsA; // descending
-  }
+    // 1. Stars count (descending)
+    const starsA =
+        typeof a.stars === 'number'
+            ? a.stars
+            : (repoStarsMap?.get(normalizeGitHubLogin(a.repoName || a.id)) ?? 0);
+    const starsB =
+        typeof b.stars === 'number'
+            ? b.stars
+            : (repoStarsMap?.get(normalizeGitHubLogin(b.repoName || b.id)) ?? 0);
+    if (starsB !== starsA) {
+        return starsB - starsA; // descending
+    }
 
-  // 2. Last modification date (descending)
-  const modA = getCardLastModifiedTimestamp(a);
-  const modB = getCardLastModifiedTimestamp(b);
-  if (modB !== modA) {
-    return modB - modA;
-  }
+    // 2. Last modification date (descending)
+    const modA = getCardLastModifiedTimestamp(a);
+    const modB = getCardLastModifiedTimestamp(b);
+    if (modB !== modA) {
+        return modB - modA;
+    }
 
-  // 3. Repository creation date (ascending)
-  const creationA = getRepositoryCreationTimestamp(a);
-  const creationB = getRepositoryCreationTimestamp(b);
-  if (creationA !== creationB) {
-    return creationA - creationB; // ascending
-  }
+    // 3. Repository creation date (ascending)
+    const creationA = getRepositoryCreationTimestamp(a);
+    const creationB = getRepositoryCreationTimestamp(b);
+    if (creationA !== creationB) {
+        return creationA - creationB; // ascending
+    }
 
-  // 4. Name (ascending)
-  const nameA = String(
-    a.repoName ||
-      (typeof a.title === "object"
-        ? a.title["pt-BR"] || a.title["en-US"]
-        : a.title) ||
-      a.id ||
-      "",
-  ).toLowerCase();
-  const nameB = String(
-    b.repoName ||
-      (typeof b.title === "object"
-        ? b.title["pt-BR"] || b.title["en-US"]
-        : b.title) ||
-      b.id ||
-      "",
-  ).toLowerCase();
+    // 4. Name (ascending)
+    const nameA = String(
+        a.repoName ||
+            (typeof a.title === 'object' ? a.title['pt-BR'] || a.title['en-US'] : a.title) ||
+            a.id ||
+            '',
+    ).toLowerCase();
+    const nameB = String(
+        b.repoName ||
+            (typeof b.title === 'object' ? b.title['pt-BR'] || b.title['en-US'] : b.title) ||
+            b.id ||
+            '',
+    ).toLowerCase();
 
-  return nameA.localeCompare(nameB);
+    return nameA.localeCompare(nameB);
 }
 
 function compareProjectCardsByMaintenance(a, b) {
-  return compareProjectCards(a, b);
+    return compareProjectCards(a, b);
 }
 
 /**
@@ -356,140 +403,178 @@ function compareProjectCardsByMaintenance(a, b) {
  *   - starCount: se numerico, exibe um selo com a quantidade de estrelas
  */
 function buildProjectCardElement(card, language, options) {
-  const opts = options || {};
-  const div = document.createElement("div");
-  div.className = "card card-projects";
-  if (opts.extraClassName) div.classList.add(opts.extraClassName);
-  if (opts.cardCounter !== undefined) {
-    div.dataset.index = opts.cardCounter; // for testing purposes
-  }
-  if (card.iconTechnologies) {
-    div.dataset.technologies = card.iconTechnologies
-      .map((t) => t.name)
-      .filter(Boolean)
-      .join(",");
-  }
-
-  let html = "";
-
-  if (typeof opts.starCount === "number" && Number.isFinite(opts.starCount)) {
-    html += `<div class="highlight-stars"><i class="fa-solid fa-star icon"></i><span>${opts.starCount}</span></div>`;
-  }
-
-  const translatedImageAlt =
-    getProjectCardTranslation(card, "descriptionImage", language) || "";
-  const translatedTitle =
-    getProjectCardTranslation(card, "title", language) || "";
-  const translatedInstitution =
-    getProjectCardTranslation(card, "institution", language) || "";
-  const translatedDescription =
-    getProjectCardTranslation(card, "description", language) || "";
-
-  if (card.image) {
-    html += `<picture>`;
-    if (card.imageMobile)
-      html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ""}>`;
-    html += `<img src="${card.image}" alt="${escapeHTML(translatedImageAlt)}" loading="lazy" onerror="var p=this.closest('picture'); if(p) p.remove();"></picture>`;
-  }
-  if (translatedTitle)
-    html += `<h3 class="title">${escapeHTML(translatedTitle)}</h3>`;
-  if (translatedInstitution)
-    html += `<p class="institution">${escapeHTML(translatedInstitution)}</p>`;
-  if (translatedDescription)
-    html += `<p class="description">${escapeHTML(translatedDescription)}</p>`;
-
-  if (card.iconTechnologies) {
-    const techTitle = language === "pt-BR" ? "Tecnologias" : "Technologies";
-    html += `<h4 class="title-technologies">${techTitle}</h4>`;
-    html += `<div class="technologies">`;
-    const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
-      (a.name || "").localeCompare(b.name || ""),
-    );
-    sortedTechs.forEach((tech) => {
-      const techName = tech.name || "";
-      const safeTechName = escapeHTML(techName);
-      const resolved = resolveIconSpec(tech, tech.name || "");
-      html += `<span class="project-tech-chip"><i class="${faClass(resolved.style, resolved.icon)} icon" aria-hidden="true"></i><span>${safeTechName}</span></span>`;
-    });
-    html += `</div>`;
-  }
-
-  if (card.linkRepository || card.linkDemo) {
-    const labels =
-      language === "pt-BR"
-        ? { heading: "Acessar projeto", repository: "Repositório", demo: "Demonstração" }
-        : { heading: "Explore this project", repository: "Repository", demo: "Live demo" };
-    html += `<h4 class="title-links">${labels.heading}</h4><div class="project-links">`;
-    if (card.linkRepository)
-      html += `<a class="project-link" href="${escapeHTML(card.linkRepository)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github icon" aria-hidden="true"></i><span>${labels.repository}</span></a>`;
-    if (card.linkDemo)
-      html += `<a class="project-link" href="${escapeHTML(card.linkDemo)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square icon" aria-hidden="true"></i><span>${labels.demo}</span></a>`;
-    html += `</div>`;
-  }
-
-  const createdDateLabel = getProjectCreationDisplayDate(card);
-  const latestOwnerUpdateLabel = getProjectLatestOwnerUpdateDisplayDate(card);
-  if (createdDateLabel) {
-    html += `<div class="date"><p>${createdDateLabel}`;
-    if (latestOwnerUpdateLabel) {
-      html += ` - ${latestOwnerUpdateLabel}`;
+    const opts = options || {};
+    const div = document.createElement('div');
+    div.className = 'card card-projects';
+    if (opts.extraClassName) div.classList.add(opts.extraClassName);
+    if (opts.cardCounter !== undefined) {
+        div.dataset.index = opts.cardCounter; // for testing purposes
     }
-    html += "</p></div>";
-  }
+    if (card.iconTechnologies) {
+        div.dataset.technologies = card.iconTechnologies
+            .map((t) => t.name)
+            .filter(Boolean)
+            .join(',');
+    }
+    const topics = getProjectCardTopics(card);
+    if (topics.length > 0) {
+        div.dataset.topics = topics.join(',');
+    }
 
-  if (translatedDescription || card.linkRepository || card.linkDemo) {
-    const isPortuguese = language === "pt-BR";
-    const labels = isPortuguese
-      ? {
-          summary: "Contexto, processo e evidências",
-          context: "Contexto",
-          process: "Desenvolvimento",
-          processBody: "Consulte o código, o README e o histórico público disponíveis no repositório para acompanhar a implementação.",
-          stars: "Estrelas no GitHub",
-          created: "Criado",
-          updated: "Atualização do autor",
-          repository: "Abrir repositório e documentação",
-          demo: "Ver demonstração",
+    let html = '';
+
+    if (typeof opts.starCount === 'number' && Number.isFinite(opts.starCount)) {
+        html += `<div class="highlight-stars"><i class="fa-solid fa-star icon"></i><span>${opts.starCount}</span></div>`;
+    }
+
+    const translatedImageAlt = getProjectCardTranslation(card, 'descriptionImage', language) || '';
+    const translatedTitle = getProjectCardTranslation(card, 'title', language) || '';
+    const translatedInstitution = getProjectCardTranslation(card, 'institution', language) || '';
+    const translatedDescription = getProjectCardTranslation(card, 'description', language) || '';
+
+    if (card.image) {
+        html += `<picture>`;
+        if (card.imageMobile)
+            html += `<source media="(max-width: 990px)" srcset="${card.imageMobile}" ${card.imageType ? `type="${card.imageType}"` : ''}>`;
+        html += `<img src="${card.image}" alt="${escapeHTML(translatedImageAlt)}" loading="lazy" onerror="var p=this.closest('picture'); if(p) p.remove();"></picture>`;
+    }
+    if (translatedTitle) html += `<h3 class="title">${escapeHTML(translatedTitle)}</h3>`;
+    if (translatedInstitution)
+        html += `<p class="institution">${escapeHTML(translatedInstitution)}</p>`;
+    if (translatedDescription)
+        html += `<p class="description">${escapeHTML(translatedDescription)}</p>`;
+
+    if (topics.length > 0) {
+        const topicsTitle = language === 'pt-BR' ? 'Tópicos' : 'Topics';
+        const localizedTopics = Array.from(
+            new Map(
+                topics
+                    .map((topic) => getProjectTopicLabel(topic, language))
+                    .filter(Boolean)
+                    .map((label) => [
+                        label
+                            .normalize('NFD')
+                            .replace(/[\u0300-\u036f]/g, '')
+                            .toLowerCase()
+                            .replace(/[-_]+/g, ' ')
+                            .replace(/\s+/g, ' ')
+                            .trim(),
+                        label,
+                    ]),
+            ).values(),
+        ).sort((a, b) => a.localeCompare(b, normalizeLocale(language)));
+
+        html += `<div class="project-topics-block"><h4 class="title-topics" data-i18n="project_topics_title">${topicsTitle}</h4>`;
+        html += `<ul class="project-topics" aria-label="${escapeHTML(topicsTitle)}">`;
+        localizedTopics.forEach((topicName) => {
+            html += `<li class="project-topic-tag">${escapeHTML(topicName)}</li>`;
+        });
+        html += `</ul></div>`;
+    }
+
+    if (card.iconTechnologies && card.iconTechnologies.length) {
+        const techTitle = language === 'pt-BR' ? 'Tecnologias' : 'Technologies';
+        html += `<h4 class="title-technologies">${techTitle}</h4>`;
+        html += `<div class="technologies">`;
+        const sortedTechs = [...card.iconTechnologies].sort((a, b) =>
+            (a.name || '').localeCompare(b.name || ''),
+        );
+        sortedTechs.forEach((tech) => {
+            const techName = tech.name || '';
+            const safeTechName = escapeHTML(techName);
+            const resolved = resolveIconSpec(tech, tech.name || '');
+            html += `<span class="project-tech-chip"><i class="${faClass(resolved.style, resolved.icon)} icon" aria-hidden="true"></i><span>${safeTechName}</span></span>`;
+        });
+        html += `</div>`;
+    }
+
+    if (card.linkRepository || card.linkDemo) {
+        const labels =
+            language === 'pt-BR'
+                ? {
+                      heading: 'Acessar projeto',
+                      repository: 'Repositório',
+                      demo: 'Demonstração',
+                  }
+                : {
+                      heading: 'Explore this project',
+                      repository: 'Repository',
+                      demo: 'Live demo',
+                  };
+        html += `<h4 class="title-links">${labels.heading}</h4><div class="project-links">`;
+        if (card.linkRepository)
+            html += `<a class="project-link" href="${escapeHTML(card.linkRepository)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github icon" aria-hidden="true"></i><span>${labels.repository}</span></a>`;
+        if (card.linkDemo)
+            html += `<a class="project-link" href="${escapeHTML(card.linkDemo)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square icon" aria-hidden="true"></i><span>${labels.demo}</span></a>`;
+        html += `</div>`;
+    }
+
+    const createdDateLabel = getProjectCreationDisplayDate(card);
+    const latestOwnerUpdateLabel = getProjectLatestOwnerUpdateDisplayDate(card);
+    if (createdDateLabel) {
+        html += `<div class="date"><p>${createdDateLabel}`;
+        if (latestOwnerUpdateLabel) {
+            html += ` - ${latestOwnerUpdateLabel}`;
         }
-      : {
-          summary: "Context, process & evidence",
-          context: "Context",
-          process: "Development",
-          processBody: "Explore the code, README, and public history available in the repository to follow the implementation.",
-          stars: "GitHub stars",
-          created: "Created",
-          updated: "Owner update",
-          repository: "Open repository and documentation",
-          demo: "View live demo",
-        };
-    html += `<details class="project-details"><summary>${labels.summary}</summary><div class="project-details-content">`;
-    if (translatedDescription) {
-      html += `<div class="project-detail-block"><h4>${labels.context}</h4><p>${escapeHTML(translatedDescription)}</p></div>`;
-    }
-    html += `<div class="project-detail-block"><h4>${labels.process}</h4><p>${labels.processBody}</p></div>`;
-
-    const publicFacts = [];
-    if (typeof opts.starCount === "number" && Number.isFinite(opts.starCount)) {
-      publicFacts.push(`${labels.stars}: ${opts.starCount}`);
-    }
-    if (createdDateLabel) publicFacts.push(`${labels.created}: ${createdDateLabel}`);
-    if (latestOwnerUpdateLabel) publicFacts.push(`${labels.updated}: ${latestOwnerUpdateLabel}`);
-    if (publicFacts.length) {
-      html += `<p class="project-detail-facts">${publicFacts.map(escapeHTML).join(" · ")}</p>`;
+        html += '</p></div>';
     }
 
-    html += `<div class="project-detail-links">`;
-    if (card.linkRepository) {
-      html += `<a href="${escapeHTML(card.linkRepository)}" target="_blank" rel="noopener noreferrer">${labels.repository}</a>`;
-    }
-    if (card.linkDemo) {
-      html += `<a href="${escapeHTML(card.linkDemo)}" target="_blank" rel="noopener noreferrer">${labels.demo}</a>`;
-    }
-    html += `</div></div></details>`;
-  }
+    if (translatedDescription || card.linkRepository || card.linkDemo) {
+        const isPortuguese = language === 'pt-BR';
+        const labels = isPortuguese
+            ? {
+                  summary: 'Contexto, processo e evidências',
+                  context: 'Contexto',
+                  process: 'Desenvolvimento',
+                  processBody:
+                      'Consulte o código, o README e o histórico público disponíveis no repositório para acompanhar a implementação.',
+                  stars: 'Estrelas no GitHub',
+                  created: 'Criado',
+                  updated: 'Atualização do autor',
+                  repository: 'Abrir repositório e documentação',
+                  demo: 'Ver demonstração',
+              }
+            : {
+                  summary: 'Context, process & evidence',
+                  context: 'Context',
+                  process: 'Development',
+                  processBody:
+                      'Explore the code, README, and public history available in the repository to follow the implementation.',
+                  stars: 'GitHub stars',
+                  created: 'Created',
+                  updated: 'Owner update',
+                  repository: 'Open repository and documentation',
+                  demo: 'View live demo',
+              };
+        html += `<details class="project-details"><summary>${labels.summary}</summary><div class="project-details-content">`;
+        if (translatedDescription) {
+            html += `<div class="project-detail-block"><h4>${labels.context}</h4><p>${escapeHTML(translatedDescription)}</p></div>`;
+        }
+        html += `<div class="project-detail-block"><h4>${labels.process}</h4><p>${labels.processBody}</p></div>`;
 
-  div.innerHTML = html;
-  return div;
+        const publicFacts = [];
+        if (typeof opts.starCount === 'number' && Number.isFinite(opts.starCount)) {
+            publicFacts.push(`${labels.stars}: ${opts.starCount}`);
+        }
+        if (createdDateLabel) publicFacts.push(`${labels.created}: ${createdDateLabel}`);
+        if (latestOwnerUpdateLabel)
+            publicFacts.push(`${labels.updated}: ${latestOwnerUpdateLabel}`);
+        if (publicFacts.length) {
+            html += `<p class="project-detail-facts">${publicFacts.map(escapeHTML).join(' · ')}</p>`;
+        }
+
+        html += `<div class="project-detail-links">`;
+        if (card.linkRepository) {
+            html += `<a href="${escapeHTML(card.linkRepository)}" target="_blank" rel="noopener noreferrer">${labels.repository}</a>`;
+        }
+        if (card.linkDemo) {
+            html += `<a href="${escapeHTML(card.linkDemo)}" target="_blank" rel="noopener noreferrer">${labels.demo}</a>`;
+        }
+        html += `</div></div></details>`;
+    }
+
+    div.innerHTML = html;
+    return div;
 }
 
 /**
@@ -500,38 +585,38 @@ function buildProjectCardElement(card, language, options) {
  * a contagem de estrelas, sem repetir nenhuma chamada a api.github.com.
  */
 function pickTopStarredProjectCards(cards, repos, owner, limit) {
-  if (!Array.isArray(cards) || !cards.length) return [];
-  if (!Array.isArray(repos) || !repos.length) return [];
+    if (!Array.isArray(cards) || !cards.length) return [];
+    if (!Array.isArray(repos) || !repos.length) return [];
 
-  const metricsByRepoName = new Map();
-  repos.forEach((repo) => {
-    if (!isEligibleGitHubProjectRepo(repo, owner)) return;
-    const repoName = normalizeGitHubLogin(repo.name);
-    if (!repoName) return;
-    metricsByRepoName.set(repoName, {
-      stars: Math.max(0, Number(repo.stargazers_count) || 0),
-      forks: Math.max(0, Number(repo.forks_count) || 0),
-      updatedAt: Date.parse(repo.updated_at || repo.pushed_at || "") || 0,
+    const metricsByRepoName = new Map();
+    repos.forEach((repo) => {
+        if (!isEligibleGitHubProjectRepo(repo, owner)) return;
+        const repoName = normalizeGitHubLogin(repo.name);
+        if (!repoName) return;
+        metricsByRepoName.set(repoName, {
+            stars: Math.max(0, Number(repo.stargazers_count) || 0),
+            forks: Math.max(0, Number(repo.forks_count) || 0),
+            updatedAt: Date.parse(repo.updated_at || repo.pushed_at || '') || 0,
+        });
     });
-  });
 
-  return cards
-    .map((card) => {
-      const repoKey = normalizeGitHubLogin(card.repoName || card.id);
-      const metrics = metricsByRepoName.get(repoKey);
-      if (!metrics) return null;
-      return { card, ...metrics };
-    })
-    .filter(Boolean)
-    .sort((a, b) => {
-      if (b.stars !== a.stars) return b.stars - a.stars;
-      if (b.forks !== a.forks) return b.forks - a.forks;
-      if (b.updatedAt !== a.updatedAt) return b.updatedAt - a.updatedAt;
-      return String(a.card.repoName || a.card.id || "").localeCompare(
-        String(b.card.repoName || b.card.id || ""),
-      );
-    })
-    .slice(0, limit);
+    return cards
+        .map((card) => {
+            const repoKey = normalizeGitHubLogin(card.repoName || card.id);
+            const metrics = metricsByRepoName.get(repoKey);
+            if (!metrics) return null;
+            return { card, ...metrics };
+        })
+        .filter(Boolean)
+        .sort((a, b) => {
+            if (b.stars !== a.stars) return b.stars - a.stars;
+            if (b.forks !== a.forks) return b.forks - a.forks;
+            if (b.updatedAt !== a.updatedAt) return b.updatedAt - a.updatedAt;
+            return String(a.card.repoName || a.card.id || '').localeCompare(
+                String(b.card.repoName || b.card.id || ''),
+            );
+        })
+        .slice(0, limit);
 }
 
 /**
@@ -541,213 +626,185 @@ function pickTopStarredProjectCards(cards, repos, owner, limit) {
  * SiteData, sem falar diretamente com api.github.com.
  */
 function loadRepositoryStars(source, owner) {
-  if (source !== "github") return Promise.resolve([]);
+    if (source !== 'github') return Promise.resolve([]);
 
-  const siteData = window.SiteData || null;
-  if (!siteData || typeof siteData.repos !== "function") {
-    return Promise.resolve([]);
-  }
+    const siteData = window.SiteData || null;
+    if (!siteData || typeof siteData.repos !== 'function') {
+        return Promise.resolve([]);
+    }
 
-  return siteData.repos().catch((error) => {
-    console.warn("[projects] Falha ao ler estrelas dos repositorios:", error);
-    return [];
-  });
+    return siteData.repos().catch((error) => {
+        console.warn('[projects] Falha ao ler estrelas dos repositorios:', error);
+        return [];
+    });
 }
 
 function setupProjects(source, language, owner, loadId) {
-  // when we start working with a container we tag it with the load id so
-  // stale async results know to bail out.  loadId is produced by
-  // loadDynamicContent and incremented on each invocation.
-  const main = document.querySelector("main");
-  const section = document.createElement("section");
-  section.id = "Projects";
-  section.dataset.dynamicSection = "true";
-  section.className = "portfolio";
+    // when we start working with a container we tag it with the load id so
+    // stale async results know to bail out.  loadId is produced by
+    // loadDynamicContent and incremented on each invocation.
+    const main = document.querySelector('main');
+    const section = document.createElement('section');
+    section.id = 'Projects';
+    section.dataset.dynamicSection = 'true';
+    section.className = 'portfolio';
 
-  const title = document.createElement("h2");
-  title.id = "projectsTitle";
-  title.setAttribute("data-i18n", "section_projects_title");
-  title.innerHTML = "Projects";
-  section.append(title);
+    const title = document.createElement('h2');
+    title.id = 'projectsTitle';
+    title.setAttribute('data-i18n', 'section_projects_title');
+    title.innerHTML = 'Projects';
+    section.append(title);
 
-  const container = document.createElement("article");
-  container.id = "projectsContainer";
-  container.className = "block semi-hidden";
+    const container = document.createElement('article');
+    container.id = 'projectsContainer';
+    container.className = 'block semi-hidden';
 
-  if (container && loadId !== undefined) {
-    container.dataset.loadId = loadId;
-  }
+    if (container && loadId !== undefined) {
+        container.dataset.loadId = loadId;
+    }
 
-  function renderProjectsMessage(message, variant) {
-    if (!container) return;
-    container.innerHTML = "";
-    const feedback = document.createElement("p");
-    feedback.className =
-      variant === "error" ? "projects-feedback error" : "projects-feedback";
-    feedback.textContent = message;
-    container.appendChild(feedback);
-  }
+    function renderProjectsMessage(message, variant) {
+        if (!container) return;
+        container.innerHTML = '';
+        const feedback = document.createElement('p');
+        feedback.className = variant === 'error' ? 'projects-feedback error' : 'projects-feedback';
+        feedback.textContent = message;
+        container.appendChild(feedback);
+    }
 
-  // source may be a local path or the literal string 'github' to indicate using
-  // the GitHub API for the given owner.
-  Promise.all([
-    loadProjectCardTranslations(),
-    loadProjectsData(source, owner),
-    loadRepositoryStars(source, owner),
-  ])
-    .then(([, data, repos]) => {
-      if (!container || !data.cards) return;
-      if (loadId !== undefined && container.dataset.loadId != loadId) {
-        // load was superseded by a newer one, nothing to do
-        return;
-      }
-      // deduplicate by repository link or title (covers mixed JSON/github sources)
-      let cards = Array.isArray(data.cards) ? data.cards : [];
-      cards = cards.filter(isValidProjectCard);
-
-      cards.forEach((card) => {
-        ensureProjectCardId(card);
-        registerProjectCardTranslations(card);
-      });
-      const seen = new Set();
-      cards = cards.filter((c) => {
-        const key =
-          c.linkRepository ||
-          c.id ||
-          getLocalized(c.title, language) ||
-          JSON.stringify(c);
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-
-      if (!cards.length && source === "github") {
-        const failed = Boolean(
-          data.githubFetchStatus && data.githubFetchStatus.failed,
-        );
-        renderProjectsMessage(
-          failed
-            ? language === "pt-BR"
-              ? "Nao foi possivel carregar os projetos do GitHub agora."
-              : "Unable to load GitHub projects right now."
-            : language === "pt-BR"
-              ? "Nenhum projeto encontrado para este perfil."
-              : "No projects found for this profile.",
-          failed ? "error" : "info",
-        );
-        return;
-      }
-      const techCount = {};
-      const techFilter = {};
-
-      cards.forEach((card) => {
-        if (card.iconTechnologies) {
-          card.iconTechnologies.forEach((tech) => {
-            if (!tech.name) return;
-            techCount[tech.name] = (techCount[tech.name] || 0) + 1;
-            if (tech.filter === "no") {
-              techFilter[tech.name] = true;
+    // source may be a local path or the literal string 'github' to indicate using
+    // the GitHub API for the given owner.
+    Promise.all([
+        loadProjectCardTranslations(),
+        loadProjectsData(source, owner),
+        loadRepositoryStars(source, owner),
+    ])
+        .then(([, data, repos]) => {
+            if (!container || !data.cards) return;
+            if (loadId !== undefined && container.dataset.loadId != loadId) {
+                // load was superseded by a newer one, nothing to do
+                return;
             }
-          });
-        }
-      });
+            // deduplicate by repository link or title (covers mixed JSON/github sources)
+            let cards = Array.isArray(data.cards) ? data.cards : [];
+            cards = cards.filter(isValidProjectCard);
 
-      if (Object.keys(techCount).length > 1) {
-        const filterContainer = document.createElement("div");
-        filterContainer.className = "filter-container";
-        const btnAll = document.createElement("button");
-        btnAll.className = "filter-button active";
-        btnAll.dataset.filter = "all";
-        btnAll.textContent = language === "pt-BR" ? "Todos" : "All";
-        btnAll.onclick = () => filterProjectsByTechnology("all");
-        filterContainer.appendChild(btnAll);
+            cards.forEach((card) => {
+                ensureProjectCardId(card);
+                registerProjectCardTranslations(card);
+            });
+            const seen = new Set();
+            cards = cards.filter((c) => {
+                const key =
+                    c.linkRepository ||
+                    c.id ||
+                    getLocalized(c.title, language) ||
+                    JSON.stringify(c);
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
 
-        const sortedTechs = Object.entries(techCount).sort(([nameA], [nameB]) =>
-          nameA.localeCompare(nameB),
-        );
+            if (!cards.length && source === 'github') {
+                const failed = Boolean(data.githubFetchStatus && data.githubFetchStatus.failed);
+                renderProjectsMessage(
+                    failed
+                        ? language === 'pt-BR'
+                            ? 'Nao foi possivel carregar os projetos do GitHub agora.'
+                            : 'Unable to load GitHub projects right now.'
+                        : language === 'pt-BR'
+                          ? 'Nenhum projeto encontrado para este perfil.'
+                          : 'No projects found for this profile.',
+                    failed ? 'error' : 'info',
+                );
+                return;
+            }
+            const techCount = {};
+            const techFilter = {};
 
-        sortedTechs.forEach(([name, count]) => {
-          if (techFilter[name]) return;
-          const btn = document.createElement("button");
-          btn.className = "filter-button";
-          btn.dataset.filter = name;
-          btn.textContent = `${name} (${count})`;
-          btn.onclick = () => filterProjectsByTechnology(name);
-          filterContainer.appendChild(btn);
+            cards.forEach((card) => {
+                if (card.iconTechnologies) {
+                    card.iconTechnologies.forEach((tech) => {
+                        if (!tech.name) return;
+                        techCount[tech.name] = (techCount[tech.name] || 0) + 1;
+                        if (tech.filter === 'no') {
+                            techFilter[tech.name] = true;
+                        }
+                    });
+                }
+            });
+
+            const repoStarsMap = new Map();
+            if (Array.isArray(repos)) {
+                repos.forEach((repo) => {
+                    if (!repo || !repo.name) return;
+                    repoStarsMap.set(
+                        normalizeGitHubLogin(repo.name),
+                        Math.max(0, Number(repo.stargazers_count) || 0),
+                    );
+                });
+            }
+
+            const fragment = document.createDocumentFragment();
+
+            // Ordenação dos projetos:
+            // 1. Data da última modificação (decrescente)
+            // 2. Estrelas (crescente)
+            // 3. Nome (crescente)
+            const sortedCards = [...cards].sort((a, b) => compareProjectCards(a, b, repoStarsMap));
+
+            let cardCounter = 0;
+
+            sortedCards.forEach((card) => {
+                cardCounter++;
+                // ignore stale loads that finished after a later one started
+                if (loadId !== undefined && container && container.dataset.loadId != loadId) {
+                    return;
+                }
+
+                const repoKey = normalizeGitHubLogin(card.repoName || card.id);
+                const repoObj = Array.isArray(repos)
+                    ? repos.find((r) => r && normalizeGitHubLogin(r.name) === repoKey)
+                    : null;
+                if (
+                    (!card.topics || !card.topics.length) &&
+                    repoObj &&
+                    Array.isArray(repoObj.topics) &&
+                    repoObj.topics.length
+                ) {
+                    card.topics = repoObj.topics;
+                }
+                const starCount =
+                    typeof card.stars === 'number' && Number.isFinite(card.stars)
+                        ? card.stars
+                        : typeof card.stargazers_count === 'number' &&
+                            Number.isFinite(card.stargazers_count)
+                          ? card.stargazers_count
+                          : (repoStarsMap.get(repoKey) ?? 0);
+
+                const div = buildProjectCardElement(card, language, {
+                    cardCounter,
+                    starCount,
+                });
+                fragment.appendChild(div);
+            });
+            container.appendChild(fragment);
+        })
+        .catch((err) => {
+            console.error('[projects] Failed to load projects:', err);
+            if (loadId !== undefined && container && container.dataset.loadId != loadId) {
+                return;
+            }
+            renderProjectsMessage(
+                language === 'pt-BR'
+                    ? 'Erro ao montar a secao de projetos. Tente novamente.'
+                    : 'Error rendering projects section. Please try again.',
+                'error',
+            );
         });
-        section.insertBefore(filterContainer, container);
-      }
 
-      const repoStarsMap = new Map();
-      if (Array.isArray(repos)) {
-        repos.forEach((repo) => {
-          if (!repo || !repo.name) return;
-          repoStarsMap.set(
-            normalizeGitHubLogin(repo.name),
-            Math.max(0, Number(repo.stargazers_count) || 0),
-          );
-        });
-      }
-
-      const fragment = document.createDocumentFragment();
-
-      // Ordenação dos projetos:
-      // 1. Data da última modificação (decrescente)
-      // 2. Estrelas (crescente)
-      // 3. Nome (crescente)
-      const sortedCards = [...cards].sort((a, b) =>
-        compareProjectCards(a, b, repoStarsMap),
-      );
-
-      let cardCounter = 0;
-
-      sortedCards.forEach((card) => {
-        cardCounter++;
-        // ignore stale loads that finished after a later one started
-        if (
-          loadId !== undefined &&
-          container &&
-          container.dataset.loadId != loadId
-        ) {
-          return;
-        }
-
-        const repoKey = normalizeGitHubLogin(card.repoName || card.id);
-        const starCount =
-          typeof card.stars === "number" && Number.isFinite(card.stars)
-            ? card.stars
-            : typeof card.stargazers_count === "number" &&
-                Number.isFinite(card.stargazers_count)
-              ? card.stargazers_count
-              : (repoStarsMap.get(repoKey) ?? 0);
-
-        const div = buildProjectCardElement(card, language, {
-          cardCounter,
-          starCount,
-        });
-        fragment.appendChild(div);
-      });
-      container.appendChild(fragment);
-    })
-    .catch((err) => {
-      console.error("[projects] Failed to load projects:", err);
-      if (
-        loadId !== undefined &&
-        container &&
-        container.dataset.loadId != loadId
-      ) {
-        return;
-      }
-      renderProjectsMessage(
-        language === "pt-BR"
-          ? "Erro ao montar a secao de projetos. Tente novamente."
-          : "Error rendering projects section. Please try again.",
-        "error",
-      );
-    });
-
-  section.appendChild(container);
-  main.appendChild(section);
+    section.appendChild(container);
+    main.appendChild(section);
 }
 
 /**
@@ -759,61 +816,58 @@ function setupProjects(source, language, owner, loadId) {
  *   * qualquer outro valor: arquivo JSON local (compatibilidade).
  */
 function loadProjectsData(source, owner) {
-  if (source === "github") {
-    const cacheKey = `${source}:${owner || ""}`;
-    if (_projectsDataCache.has(cacheKey)) {
-      return _projectsDataCache.get(cacheKey);
+    if (source === 'github') {
+        const cacheKey = `${source}:${owner || ''}`;
+        if (_projectsDataCache.has(cacheKey)) {
+            return _projectsDataCache.get(cacheKey);
+        }
+
+        const siteData = window.SiteData || null;
+        if (!siteData || typeof siteData.projects !== 'function') {
+            console.info('[projects] SiteData indisponivel; nenhum projeto carregado do snapshot.');
+            return Promise.resolve({
+                cards: [],
+                githubFetchStatus: { failed: true },
+            });
+        }
+
+        const resultPromise = siteData
+            .projects()
+            .then((projects) => {
+                const cards = Array.isArray(projects && projects.cards) ? projects.cards : [];
+                const status = (projects && projects.githubFetchStatus) || {
+                    failed: cards.length === 0,
+                };
+                return { cards, githubFetchStatus: status };
+            })
+            .catch((error) => {
+                console.warn('[projects] Falha ao ler o snapshot do site:', error);
+                return { cards: [], githubFetchStatus: { failed: true } };
+            });
+
+        _projectsDataCache.set(cacheKey, resultPromise);
+        return resultPromise;
     }
 
-    const siteData = window.SiteData || null;
-    if (!siteData || typeof siteData.projects !== "function") {
-      console.info(
-        "[projects] SiteData indisponivel; nenhum projeto carregado do snapshot.",
-      );
-      return Promise.resolve({
-        cards: [],
-        githubFetchStatus: { failed: true },
-      });
-    }
-
-    const resultPromise = siteData
-      .projects()
-      .then((projects) => {
-        const cards = Array.isArray(projects && projects.cards)
-          ? projects.cards
-          : [];
-        const status = (projects && projects.githubFetchStatus) || {
-          failed: cards.length === 0,
-        };
-        return { cards, githubFetchStatus: status };
-      })
-      .catch((error) => {
-        console.warn("[projects] Falha ao ler o snapshot do site:", error);
-        return { cards: [], githubFetchStatus: { failed: true } };
-      });
-
-    _projectsDataCache.set(cacheKey, resultPromise);
-    return resultPromise;
-  }
-
-  // arquivo JSON local
-  return fetchJsonWithFallback(source).then((data) => {
-    if (!data || !data.cards) return { cards: [] };
-    if (Array.isArray(data.cards)) return data;
-    if (typeof data.cards === "object") {
-      return {
-        cards: Object.entries(data.cards)
-          .map(([rawId, rawCard]) => {
-            if (!rawCard || typeof rawCard !== "object") return null;
+    // arquivo JSON local
+    return fetchJsonWithFallback(source).then((data) => {
+        if (!data || !data.cards) return { cards: [] };
+        if (Array.isArray(data.cards)) return data;
+        if (typeof data.cards === 'object') {
             return {
-              id: slugifyCardId(rawCard.id || rawId),
-              image: rawCard.image || rawCard.img || "",
-              ...rawCard,
+                cards: Object.entries(data.cards)
+                    .map(([rawId, rawCard]) => {
+                        if (!rawCard || typeof rawCard !== 'object') return null;
+                        return {
+                            id: slugifyCardId(rawCard.id || rawId),
+                            image: rawCard.image || rawCard.img || '',
+                            topics: Array.isArray(rawCard.topics) ? rawCard.topics : [],
+                            ...rawCard,
+                        };
+                    })
+                    .filter(Boolean),
             };
-          })
-          .filter(Boolean),
-      };
-    }
-    return { cards: [] };
-  });
+        }
+        return { cards: [] };
+    });
 }

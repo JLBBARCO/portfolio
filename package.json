@@ -4,10 +4,10 @@
     "node": ">=20 <23"
   },
   "dependencies": {
-    "i18next": "^25.6.3"
+    "i18next": "^26.3.4"
   },
   "devDependencies": {
-    "glob": "^10.3.10"
+    "glob": "^14.0.6"
   },
   "scripts": {
     "dev": "node scripts/dev-server.js",

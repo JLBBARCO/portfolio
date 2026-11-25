@@ -59,7 +59,9 @@
       "link_skip_to_main": "Pular para o conteúdo principal",
       "today": "Hoje",
       "section_projects_all_title": "Todos os projetos",
-      "section_projects_highlights_title": "Projetos em destaque"
+      "section_projects_highlights_title": "Projetos em destaque",
+      "project_topics_title": "Tópicos",
+      "project_technologies_title": "Tecnologias"
     },
     "en-us": {
       "nav_home": "Home",
@@ -103,7 +105,9 @@
       "footer_signature": "Personal portfolio · JLBBARCO",
       "today": "Today",
       "section_projects_all_title": "All Projects",
-      "section_projects_highlights_title": "Highlighted Projects"
+      "section_projects_highlights_title": "Highlighted Projects",
+      "project_topics_title": "Topics",
+      "project_technologies_title": "Technologies"
     }
   }
 }
