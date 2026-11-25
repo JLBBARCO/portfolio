@@ -59,9 +59,6 @@ function buildIconsFromRepositoryData(repoData, languagesData) {
   }
 
   if (repoData && repoData.language) names.add(repoData.language);
-  if (repoData && Array.isArray(repoData.topics)) {
-    repoData.topics.forEach((topic) => names.add(topic));
-  }
 
   return Array.from(names)
     .filter(Boolean)

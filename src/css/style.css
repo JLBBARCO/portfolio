@@ -654,7 +654,6 @@ svg.icon.svg-inline--fa,
 .icon svg line,
 .icon svg polygon,
 .icon svg ellipse {
-  fill: currentColor;
   transition: var(--transition);
 }
 
