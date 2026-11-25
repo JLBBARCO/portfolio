@@ -1,7 +1,7 @@
 {
   "schema": 3,
   "owner": "JLBBARCO",
-  "generatedAt": "2026-11-24T16:24:37.167Z",
+  "generatedAt": "2026-11-25T19:40:57.216Z",
   "refreshIntervalSeconds": 82800,
   "authenticated": false,
   "requestsUsed": 11,
@@ -10,7 +10,7 @@
     "GITHUB_TOKEN invalido ou expirado (401). Continuando sem autenticacao (limite de 60 requisicoes/hora). Gere um novo token em github.com/settings/tokens.",
     "Limite de requisicoes do GitHub quase esgotado; snapshot gerado parcialmente.",
     "Limite de requisicoes atingido (403) em /repos/JLBBARCO/JLBBARCO/commits?sha=main&per_page=30.",
-    "A imagem do tema nao esta em PNG; usando cor padrao no servidor."
+    "Nao foi possivel calcular a cor media: fetch failed"
   ],
   "profile": {
     "login": "JLBBARCO",
@@ -50,7 +50,7 @@
     },
     "source": "https://avatars.githubusercontent.com/u/159829462?v=4&s=200",
     "computed": false,
-    "warning": "A imagem do tema nao esta em PNG; usando cor padrao no servidor."
+    "warning": "Nao foi possivel calcular a cor media: fetch failed"
   },
   "images": {
     "schema": 1,
@@ -239,6 +239,12 @@
         "latestMainMasterActivityAt": "2026-08-26T18:36:22Z",
         "stars": 1,
         "forks": 0,
+        "topics": [
+          "windows",
+          "automacao",
+          "instalador",
+          "gerenciador-de-pacotes"
+        ],
         "iconTechnologies": [
           {
             "name": "TypeScript",
@@ -288,6 +294,12 @@
         "latestMainMasterActivityAt": "2026-07-03T14:48:49Z",
         "stars": 0,
         "forks": 0,
+        "topics": [
+          "imagens",
+          "conversor",
+          "multimidia",
+          "utilitario"
+        ],
         "iconTechnologies": [
           {
             "name": "TypeScript",
@@ -337,6 +349,12 @@
         "latestMainMasterActivityAt": "2026-07-03T14:47:30Z",
         "stars": 1,
         "forks": 0,
+        "topics": [
+          "vagas",
+          "empregos",
+          "agregador",
+          "carreira"
+        ],
         "iconTechnologies": [
           {
             "name": "TypeScript",
@@ -411,6 +429,12 @@
         "latestMainMasterActivityAt": "2026-07-03T00:05:47Z",
         "stars": 0,
         "forks": 0,
+        "topics": [
+          "seguranca",
+          "senhas",
+          "gerenciador",
+          "criptografia"
+        ],
         "iconTechnologies": [
           {
             "name": "Python",
@@ -456,6 +480,13 @@
         "latestMainMasterActivityAt": "2026-05-21T18:02:50Z",
         "stars": 0,
         "forks": 0,
+        "topics": [
+          "vestibular",
+          "somatoria",
+          "pontuacao",
+          "csv",
+          "tsv"
+        ],
         "iconTechnologies": [
           {
             "name": "Python",
@@ -501,6 +532,12 @@
         "latestMainMasterActivityAt": "2026-03-02T17:20:53Z",
         "stars": 0,
         "forks": 0,
+        "topics": [
+          "gerador",
+          "aleatorio",
+          "utilitario",
+          "sorteio"
+        ],
         "iconTechnologies": [
           {
             "name": "Python",

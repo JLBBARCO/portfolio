@@ -706,12 +706,54 @@ button .icon:hover {
 }
 
 /* Títulos reutilizáveis */
+.title-topics,
 .title-technologies,
 .title-links {
   font-family: var(--font3);
   font-size: 1.5rem;
   margin: 10px;
   text-align: center;
+}
+
+.card-projects .title-topics {
+  color: var(--accent);
+}
+
+.card-projects .project-topics {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 1rem;
+}
+
+.project-topic-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 6px;
+  background: var(--site-soft-accent, rgba(124, 77, 255, 0.08));
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  transition: all 180ms ease;
+  cursor: default;
+}
+
+.project-topic-tag .icon {
+  font-size: 0.65rem;
+  opacity: 0.85;
+}
+
+.project-topic-tag:hover {
+  background: var(--accent);
+  color: var(--primary-bg, #ffffff);
+  transform: translateY(-1px);
 }
 
 /* Carousel Buttons - MOSTRADOS */

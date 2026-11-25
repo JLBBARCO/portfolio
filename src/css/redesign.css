@@ -407,6 +407,56 @@ main>section:not(#Home)>h2::after {
   line-height: 1.7;
 }
 
+.card-projects .title-topics,
+.card-projects .title-technologies,
+.card-projects .title-links {
+  margin-top: 0.55rem;
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card-projects .title-topics {
+  color: var(--accent);
+}
+
+.card-projects .project-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.project-topic-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 6px;
+  background: var(--site-soft-accent);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  transition: all 180ms ease;
+  cursor: default;
+}
+
+.project-topic-tag .icon {
+  font-size: 0.65rem;
+  opacity: 0.85;
+}
+
+.project-topic-tag:hover {
+  background: var(--accent);
+  color: var(--primary-bg, #ffffff);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(124, 77, 255, 0.25);
+}
+
 .card-projects .technologies {
   display: flex;
   flex-wrap: wrap;
@@ -456,14 +506,6 @@ main>section:not(#Home)>h2::after {
   background: var(--site-soft-accent);
 }
 
-.card-projects .title-technologies,
-.card-projects .title-links {
-  margin-top: 0.45rem;
-  color: var(--text-primary);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
 
 .highlight-stars {
   position: absolute;
@@ -1371,5 +1413,79 @@ main>section {
 
   .card-projects picture img {
     height: 14rem;
+  }
+}
+
+
+/* Tópicos dos projetos: lista compacta com quebra natural em qualquer idioma. */
+.card-projects .project-topics-block {
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.2rem;
+}
+
+.card-projects .title-topics {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.15rem 0 0.2rem;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.card-projects .title-topics::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--site-line);
+}
+
+.card-projects .project-topics {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card-projects .project-topic-tag {
+  max-width: 100%;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.24rem 0.58rem;
+  border: 1px solid var(--site-line);
+  border-radius: 999px;
+  background: var(--secondary-bg);
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: normal;
+  overflow-wrap: anywhere;
+  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.card-projects .project-topic-tag:hover {
+  border-color: var(--accent);
+  background: var(--site-soft-accent);
+  color: var(--text-primary);
+}
+
+@media (max-width: 420px) {
+  .card-projects .project-topics {
+    gap: 0.35rem;
+  }
+
+  .card-projects .project-topic-tag {
+    font-size: 0.72rem;
   }
 }

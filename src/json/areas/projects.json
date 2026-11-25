@@ -1,11 +1,20 @@
 {
   "cards": {
     "agrinho2024": {
-      "title": { "pt-BR": "Agrinho 2024" },
+      "title": {
+        "pt-BR": "Agrinho 2024"
+      },
       "description": {
         "en-US": "Informative website about agribusiness. This site was created with the purpose of competing in the Paraná government program called Agrinho, in the 2024 edition.",
         "pt-BR": "Site informativo sobre o agronegócio. Este site foi criado com o propósito de concorrer ao programa governamental do Paraná chamado Agrinho, na edição de 2024."
-      }
+      },
+      "topics": [
+        "agronegocio",
+        "educacao",
+        "sustentabilidade",
+        "parana",
+        "competicao"
+      ]
     },
     "study": {
       "title": {
@@ -15,7 +24,13 @@
       "description": {
         "en-US": "This repository contains school projects related to programming studies.",
         "pt-BR": "Este repositório contém trabalhos escolares relacionados ao estudo de programação"
-      }
+      },
+      "topics": [
+        "estudos",
+        "programacao",
+        "aprendizado",
+        "exercicios"
+      ]
     },
     "unit-converter": {
       "title": {
@@ -25,14 +40,29 @@
       "description": {
         "en-US": "A tool to convert between different units of measurement",
         "pt-BR": "Uma ferramenta para converter entre diferentes unidades de medida"
-      }
+      },
+      "topics": [
+        "conversor",
+        "utilitario",
+        "ferramenta",
+        "calculadora"
+      ]
     },
     "random-generator": {
-      "title": { "en-US": "Random Generator", "pt-BR": "Gerador Aleatório" },
+      "title": {
+        "en-US": "Random Generator",
+        "pt-BR": "Gerador Aleatório"
+      },
       "description": {
         "en-US": "System that generates random names and numbers in the quantity defined by the user.",
         "pt-BR": "Sistema que gera nomes e números aleatórios com a quantidade informada pelo usuário"
-      }
+      },
+      "topics": [
+        "gerador",
+        "aleatorio",
+        "utilitario",
+        "sorteio"
+      ]
     },
     "total-score": {
       "title": {
@@ -42,14 +72,30 @@
       "description": {
         "en-US": "Repository with summation tests to discover your score based on your answers and the answer key. Only .csv and .tsv files are accepted.",
         "pt-BR": "Repositório de testes de somatória para descobrir a pontuação com base nas respostas e no gabarito. Os arquivos aceitos são .csv e .tsv"
-      }
+      },
+      "topics": [
+        "vestibular",
+        "somatoria",
+        "pontuacao",
+        "csv",
+        "tsv"
+      ]
     },
     "tecnoverde": {
-      "title": { "en-US": "GreenTech", "pt-BR": "TecnoVerde" },
+      "title": {
+        "en-US": "GreenTech",
+        "pt-BR": "TecnoVerde"
+      },
       "description": {
         "en-US": "A website for teaching the cultivation of Parsley",
         "pt-BR": "Um site para ensino de cultivo de salsa"
-      }
+      },
+      "topics": [
+        "agricultura",
+        "cultivo",
+        "horta",
+        "educativo"
+      ]
     },
     "receipt-generator": {
       "title": {
@@ -59,14 +105,29 @@
       "description": {
         "en-US": "System with a receipt generator where the user enters basic information.",
         "pt-BR": "Sistema com gerador de recibos no qual o usuário insere informações básicas"
-      }
+      },
+      "topics": [
+        "recibos",
+        "financeiro",
+        "documentos",
+        "gerador"
+      ]
     },
     "colegio-adolpho": {
-      "title": { "en-US": "Adolpho College", "pt-BR": "Colégio Adolpho" },
+      "title": {
+        "en-US": "Adolpho College",
+        "pt-BR": "Colégio Adolpho"
+      },
       "description": {
         "en-US": "Website for Adolpho de Oliveira Franco State School, showcasing information about the institution, courses, and news",
         "pt-BR": "Site da Escola Estadual Adolpho de Oliveira Franco com informações institucionais, cursos e notícias"
-      }
+      },
+      "topics": [
+        "institucional",
+        "escola",
+        "educacao",
+        "website"
+      ]
     },
     "image-converter": {
       "title": {
@@ -76,7 +137,13 @@
       "description": {
         "en-US": "A system that converts images to different formats, allowing users to easily change the format of their images.",
         "pt-BR": "Um sistema que converte imagens para diferentes formatos, permitindo aos usuários alterar facilmente o formato de suas imagens"
-      }
+      },
+      "topics": [
+        "imagens",
+        "conversor",
+        "multimidia",
+        "utilitario"
+      ]
     },
     "passwords-manager": {
       "title": {
@@ -86,7 +153,13 @@
       "description": {
         "en-US": "A system to save your passwords",
         "pt-BR": "Um sistema para salvar suas senhas"
-      }
+      },
+      "topics": [
+        "seguranca",
+        "senhas",
+        "gerenciador",
+        "criptografia"
+      ]
     },
     "programs-manager": {
       "title": {
@@ -96,7 +169,13 @@
       "description": {
         "en-US": "System that automatically installs and uninstalls programs, giving the user full control over program management.",
         "pt-BR": "Sistema que instala e desinstala programas automaticamente, no qual o usuário tem total controle do gerenciamento de programas"
-      }
+      },
+      "topics": [
+        "windows",
+        "automacao",
+        "instalador",
+        "gerenciador-de-pacotes"
+      ]
     },
     "orbit-games-archive": {
       "title": {
@@ -106,14 +185,29 @@
       "description": {
         "en-US": "Website that stores games, synopses, gameplay, community comments, and more.",
         "pt-BR": "Site que armazena jogos, sinopses, gameplay, comentários da comunidade, entre outros"
-      }
+      },
+      "topics": [
+        "jogos",
+        "arquivo",
+        "games",
+        "comunidade"
+      ]
     },
     "winget-pkgs": {
-      "title": { "en-US": "Winget Packages", "pt-BR": "Winget Packages" },
+      "title": {
+        "en-US": "Winget Packages",
+        "pt-BR": "Winget Packages"
+      },
       "description": {
         "en-US": "The Microsoft community Windows Package Manager manifest repository",
         "pt-BR": "Fork do repositório de manifestos do Windows Package Manager da comunidade Microsoft"
-      }
+      },
+      "topics": [
+        "windows",
+        "winget",
+        "manifestos",
+        "pacotes"
+      ]
     },
     "programs-manager-website": {
       "title": {
@@ -123,7 +217,13 @@
       "description": {
         "en-US": "Website for Auto Programs, a system that automatically installs and uninstalls programs, where users can see the programs that were installed, uninstalled, updated, those that had errors, among other information",
         "pt-BR": "Site para o Auto Programs, sistema que instala e desinstala programas automaticamente, no qual o usuário pode ver os programas que foram instalados, desinstalados, atualizados, os que deram erro, entre outras informações"
-      }
+      },
+      "topics": [
+        "dashboard",
+        "painel",
+        "web",
+        "automacao"
+      ]
     },
     "jobs-finder": {
       "title": {
@@ -133,7 +233,13 @@
       "description": {
         "en-US": "A website that aggregates job openings from various sources, providing users with a comprehensive platform to search and apply for job opportunities.",
         "pt-BR": "Um site que agrega vagas de emprego de várias fontes, oferecendo aos usuários uma plataforma abrangente para pesquisar e se candidatar a oportunidades de trabalho"
-      }
+      },
+      "topics": [
+        "vagas",
+        "empregos",
+        "agregador",
+        "carreira"
+      ]
     },
     "KampAgency": {
       "title": {
@@ -143,7 +249,13 @@
       "description": {
         "en-US": "A website for a digital marketing agency, showcasing their services, portfolio, and contact information.",
         "pt-BR": "Um site para uma agência de marketing digital, apresentando seus serviços, portfólio e informações de contato"
-      }
+      },
+      "topics": [
+        "marketing-digital",
+        "agencia",
+        "landing-page",
+        "institucional"
+      ]
     },
     "windows-optimizer": {
       "title": {
@@ -153,7 +265,13 @@
       "description": {
         "en-US": "A system that optimizes the performance of Windows operating systems, improving speed and efficiency.",
         "pt-BR": "Um sistema que otimiza o desempenho dos sistemas operacionais Windows, melhorando a velocidade e a eficiência"
-      }
+      },
+      "topics": [
+        "windows",
+        "otimizacao",
+        "performance",
+        "sistema"
+      ]
     },
     "mossview": {
       "title": {
@@ -163,7 +281,13 @@
       "description": {
         "en-US": "A website that provides information about the Mossview project, including its objectives, features, and updates.",
         "pt-BR": "Um site que fornece informações sobre o projeto Mossview, incluindo seus objetivos, recursos e atualizações"
-      }
+      },
+      "topics": [
+        "portfolio",
+        "showcase",
+        "projeto",
+        "web"
+      ]
     },
     "Wireless-Device-Battery-Monitor": {
       "title": {
@@ -173,7 +297,292 @@
       "description": {
         "en-US": "Show the battery level of wireless mice, headsets, keyboards and controllers on the Windows 10/11 taskbar. Lightweight tray app, no vendor software needed. Supports Logitech, Razer, SteelSeries, Corsair, HyperX, Glorious, PS4/PS5 DualSense, Xbox and Bluetooth devices.",
         "pt-BR": "Mostra o nível de bateria de mouses, headsets, teclados e controles sem fio na barra de tarefas do Windows 10/11. Aplicativo leve na bandeja, sem necessidade de software do fabricante. Suporta dispositivos Logitech, Razer, SteelSeries, Corsair, HyperX, Glorious, PS4/PS5 DualSense, Xbox e Bluetooth."
-      }
+      },
+      "topics": [
+        "hardware",
+        "bateria",
+        "bluetooth",
+        "windows-taskbar",
+        "tray-app"
+      ]
+    }
+  },
+  "topicTranslations": {
+    "agencia": {
+      "pt-BR": "Agência",
+      "en-US": "Agency"
+    },
+    "agregador": {
+      "pt-BR": "Agregador",
+      "en-US": "Aggregator"
+    },
+    "agricultura": {
+      "pt-BR": "Agricultura",
+      "en-US": "Agriculture"
+    },
+    "agronegocio": {
+      "pt-BR": "Agronegócio",
+      "en-US": "Agribusiness"
+    },
+    "aleatorio": {
+      "pt-BR": "Aleatório",
+      "en-US": "Random"
+    },
+    "aprendizado": {
+      "pt-BR": "Aprendizado",
+      "en-US": "Learning"
+    },
+    "arquivo": {
+      "pt-BR": "Arquivo",
+      "en-US": "Archive"
+    },
+    "automacao": {
+      "pt-BR": "Automação",
+      "en-US": "Automation"
+    },
+    "bateria": {
+      "pt-BR": "Bateria",
+      "en-US": "Battery"
+    },
+    "bluetooth": {
+      "pt-BR": "Bluetooth",
+      "en-US": "Bluetooth"
+    },
+    "calculadora": {
+      "pt-BR": "Calculadora",
+      "en-US": "Calculator"
+    },
+    "carreira": {
+      "pt-BR": "Carreira",
+      "en-US": "Career"
+    },
+    "competicao": {
+      "pt-BR": "Competição",
+      "en-US": "Competition"
+    },
+    "comunidade": {
+      "pt-BR": "Comunidade",
+      "en-US": "Community"
+    },
+    "conversor": {
+      "pt-BR": "Conversor",
+      "en-US": "Converter"
+    },
+    "criptografia": {
+      "pt-BR": "Criptografia",
+      "en-US": "Encryption"
+    },
+    "csv": {
+      "pt-BR": "CSV",
+      "en-US": "CSV"
+    },
+    "cultivo": {
+      "pt-BR": "Cultivo",
+      "en-US": "Cultivation"
+    },
+    "dashboard": {
+      "pt-BR": "Painel",
+      "en-US": "Dashboard"
+    },
+    "documentos": {
+      "pt-BR": "Documentos",
+      "en-US": "Documents"
+    },
+    "educacao": {
+      "pt-BR": "Educação",
+      "en-US": "Education"
+    },
+    "educativo": {
+      "pt-BR": "Educativo",
+      "en-US": "Educational"
+    },
+    "empregos": {
+      "pt-BR": "Empregos",
+      "en-US": "Jobs"
+    },
+    "escola": {
+      "pt-BR": "Escola",
+      "en-US": "School"
+    },
+    "estudos": {
+      "pt-BR": "Estudos",
+      "en-US": "Studies"
+    },
+    "exercicios": {
+      "pt-BR": "Exercícios",
+      "en-US": "Exercises"
+    },
+    "ferramenta": {
+      "pt-BR": "Ferramenta",
+      "en-US": "Tool"
+    },
+    "financeiro": {
+      "pt-BR": "Financeiro",
+      "en-US": "Finance"
+    },
+    "games": {
+      "pt-BR": "Games",
+      "en-US": "Games"
+    },
+    "gerador": {
+      "pt-BR": "Gerador",
+      "en-US": "Generator"
+    },
+    "gerenciador": {
+      "pt-BR": "Gerenciador",
+      "en-US": "Manager"
+    },
+    "gerenciador-de-pacotes": {
+      "pt-BR": "Gerenciador de Pacotes",
+      "en-US": "Package Manager"
+    },
+    "hardware": {
+      "pt-BR": "Hardware",
+      "en-US": "Hardware"
+    },
+    "horta": {
+      "pt-BR": "Horta",
+      "en-US": "Vegetable Garden"
+    },
+    "imagens": {
+      "pt-BR": "Imagens",
+      "en-US": "Images"
+    },
+    "instalador": {
+      "pt-BR": "Instalador",
+      "en-US": "Installer"
+    },
+    "institucional": {
+      "pt-BR": "Institucional",
+      "en-US": "Institutional"
+    },
+    "jogos": {
+      "pt-BR": "Jogos",
+      "en-US": "Games"
+    },
+    "landing-page": {
+      "pt-BR": "Landing Page",
+      "en-US": "Landing Page"
+    },
+    "manifestos": {
+      "pt-BR": "Manifestos",
+      "en-US": "Manifests"
+    },
+    "marketing-digital": {
+      "pt-BR": "Marketing Digital",
+      "en-US": "Digital Marketing"
+    },
+    "multimidia": {
+      "pt-BR": "Multimídia",
+      "en-US": "Multimedia"
+    },
+    "otimizacao": {
+      "pt-BR": "Otimização",
+      "en-US": "Optimization"
+    },
+    "pacotes": {
+      "pt-BR": "Pacotes",
+      "en-US": "Packages"
+    },
+    "painel": {
+      "pt-BR": "Painel",
+      "en-US": "Dashboard"
+    },
+    "parana": {
+      "pt-BR": "Paraná",
+      "en-US": "Paraná"
+    },
+    "performance": {
+      "pt-BR": "Desempenho",
+      "en-US": "Performance"
+    },
+    "pontuacao": {
+      "pt-BR": "Pontuação",
+      "en-US": "Score"
+    },
+    "portfolio": {
+      "pt-BR": "Portfólio",
+      "en-US": "Portfolio"
+    },
+    "programacao": {
+      "pt-BR": "Programação",
+      "en-US": "Programming"
+    },
+    "projeto": {
+      "pt-BR": "Projeto",
+      "en-US": "Project"
+    },
+    "recibos": {
+      "pt-BR": "Recibos",
+      "en-US": "Receipts"
+    },
+    "seguranca": {
+      "pt-BR": "Segurança",
+      "en-US": "Security"
+    },
+    "senhas": {
+      "pt-BR": "Senhas",
+      "en-US": "Passwords"
+    },
+    "showcase": {
+      "pt-BR": "Apresentação",
+      "en-US": "Showcase"
+    },
+    "sistema": {
+      "pt-BR": "Sistema",
+      "en-US": "System"
+    },
+    "somatoria": {
+      "pt-BR": "Somatória",
+      "en-US": "Summation"
+    },
+    "sorteio": {
+      "pt-BR": "Sorteio",
+      "en-US": "Random Draw"
+    },
+    "sustentabilidade": {
+      "pt-BR": "Sustentabilidade",
+      "en-US": "Sustainability"
+    },
+    "tray-app": {
+      "pt-BR": "Aplicativo de Bandeja",
+      "en-US": "System Tray App"
+    },
+    "tsv": {
+      "pt-BR": "TSV",
+      "en-US": "TSV"
+    },
+    "utilitario": {
+      "pt-BR": "Utilitário",
+      "en-US": "Utility"
+    },
+    "vagas": {
+      "pt-BR": "Vagas",
+      "en-US": "Job Openings"
+    },
+    "vestibular": {
+      "pt-BR": "Vestibular",
+      "en-US": "Entrance Exam"
+    },
+    "web": {
+      "pt-BR": "Web",
+      "en-US": "Web"
+    },
+    "website": {
+      "pt-BR": "Website",
+      "en-US": "Website"
+    },
+    "windows": {
+      "pt-BR": "Windows",
+      "en-US": "Windows"
+    },
+    "windows-taskbar": {
+      "pt-BR": "Barra de Tarefas do Windows",
+      "en-US": "Windows Taskbar"
+    },
+    "winget": {
+      "pt-BR": "WinGet",
+      "en-US": "WinGet"
     }
   }
 }
