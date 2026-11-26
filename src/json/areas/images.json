@@ -47,42 +47,6 @@
           "height": 32
         }
       ]
-    },
-    "flagPtBr": {
-      "country": "BR",
-      "alt": {
-        "pt-BR": "Bandeira do Brasil",
-        "en-US": "Brazilian flag"
-      },
-      "class": "flag-icon",
-      "loading": "lazy",
-      "decoding": "async",
-      "sources": [
-        {
-          "src": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.21/3x2/BR.svg",
-          "type": "image/svg+xml",
-          "width": 24,
-          "height": 16
-        }
-      ]
-    },
-    "flagEnUs": {
-      "country": "US",
-      "alt": {
-        "pt-BR": "Bandeira dos Estados Unidos",
-        "en-US": "United States flag"
-      },
-      "class": "flag-icon",
-      "loading": "lazy",
-      "decoding": "async",
-      "sources": [
-        {
-          "src": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.21/3x2/US.svg",
-          "type": "image/svg+xml",
-          "width": 24,
-          "height": 16
-        }
-      ]
     }
   }
 }

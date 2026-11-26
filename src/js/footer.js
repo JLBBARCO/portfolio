@@ -221,18 +221,7 @@ function loadMoreSection(state, owner, repo) {
     const icons = buildIconsFromRepositoryData(repoData, languagesData);
     if (icons.length) {
       appendTechIcons(state.techsContainer, icons);
-      return;
     }
-
-    return fetchJsonWithFallback("src/json/svg.json")
-      .then((data) => {
-        if (isStaleFooterState(state)) return;
-        if (!data || !Array.isArray(data.icons)) return;
-        appendTechIcons(state.techsContainer, data.icons);
-      })
-      .catch((err) =>
-        console.warn("[footer] Could not load fallback icons file:", err),
-      );
   });
 }
 

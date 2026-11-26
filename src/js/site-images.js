@@ -1,8 +1,8 @@
 /**
  * SiteImages - catalogo unico das imagens fixas do site.
  *
- * Todos os links e textos alternativos das imagens fixas (foto de perfil,
- * favicons, bandeiras de idioma...) ficam em src/json/areas/images.json.
+ * Links e textos alternativos de imagens fixas (foto de perfil e favicons)
+ * ficam em src/json/areas/images.json.
  * Para manter, basta editar esse arquivo.
  *
  * Regras de renderizacao (automaticas):
@@ -15,7 +15,6 @@
  * Uso:
  *   SiteImages.create("profilePicture", { id: "profile" }) -> elemento pronto
  *   SiteImages.src("faviconDark")   -> string com o link
- *   SiteImages.alt("flagPtBr")      -> texto alternativo no idioma atual
  *   <span data-image="logo"></span> -> substituido por SiteImages.render()
  */
 (function initSiteImages(global) {
@@ -90,7 +89,6 @@
         decoding: rawEntry.decoding || "",
         fetchPriority: rawEntry.fetchPriority || rawEntry.fetchpriority || "",
         className: rawEntry.class || rawEntry.className || "",
-        country: String(rawEntry.country || "").toUpperCase(),
         crossOrigin: rawEntry.crossOrigin || rawEntry.crossorigin || "",
         width: Number.isFinite(fallback.width) ? fallback.width : undefined,
         height: Number.isFinite(fallback.height) ? fallback.height : undefined,
@@ -147,32 +145,6 @@
 
   function getEntrySync(id) {
     return (catalogCache && catalogCache[id]) || null;
-  }
-
-  /**
-   * Bandeiras: procura no catalogo a entrada com o campo `country`
-   * correspondente. Se o idioma for novo e ainda nao estiver em images.json,
-   * o link e derivado do padrao de uma bandeira existente.
-   */
-  function findFlagEntry(images, countryCode) {
-    const code = String(countryCode || "").toUpperCase();
-    if (!code) return null;
-    return (
-      Object.values(images || {}).find((entry) => entry.country === code) ||
-      null
-    );
-  }
-
-  function resolveFlagSrc(images, countryCode) {
-    const entry = findFlagEntry(images, countryCode);
-    if (entry) return entry.fallback.src;
-
-    const template = (images && (images.flagEnUs || images.flagPtBr)) || null;
-    if (!template) return "";
-    return template.fallback.src.replace(
-      /[^/]+\.svg(\?.*)?$/i,
-      `${String(countryCode || "").toUpperCase()}.svg`,
-    );
   }
 
   function applyCommonAttributes(img, entry, options) {
@@ -369,24 +341,6 @@
           },
         );
       });
-    },
-
-    /** Link da bandeira de um pais (ex.: "BR", "US"). */
-    flagSrc(countryCode) {
-      return load().then((images) => resolveFlagSrc(images, countryCode));
-    },
-
-    flagSrcSync(countryCode) {
-      return resolveFlagSrc(catalogCache || {}, countryCode);
-    },
-
-    flagAltSync(countryCode, language) {
-      const entry = findFlagEntry(catalogCache || {}, countryCode);
-      if (!entry) return String(countryCode || "").toUpperCase();
-      return (
-        entry.alt[normalizeLocale(language)] ||
-        String(countryCode || "").toUpperCase()
-      );
     },
 
     normalizeCatalog,

@@ -129,7 +129,7 @@ height>` por fonte e a última como `<img>` de reserva.
 - `alt` aceita texto simples ou `{ "pt-BR": ..., "en-US": ... }` e é reaplicado
   na troca de idioma.
 - Campos opcionais: `class`, `loading`, `decoding`, `fetchPriority`,
-  `crossOrigin`, `country` (bandeiras), `dynamic` (recebe o avatar do GitHub).
+  `crossOrigin`, `dynamic` (recebe o avatar do GitHub).
 
 Formas de uso:
 
@@ -141,8 +141,10 @@ Formas de uso:
 ```js
 SiteImages.create("profilePicture", { id: "profile" }); // elemento pronto
 SiteImages.src("faviconDark"); // apenas o link
-SiteImages.flagSrc("BR"); // bandeira por código de país
 ```
+
+As bandeiras do seletor de idioma usam o SVG colorido padrão do TheSVG em
+`https://thesvg.org/icons/flag-{codigo}/default.svg`.
 
 ## Correção da troca de idioma
 

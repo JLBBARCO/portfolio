@@ -22,13 +22,15 @@ const insertHeader = [
 const _faAliasMap = {
     javascript: 'javascript',
     js: 'javascript',
-    html: 'html',
-    html5: 'html',
+    html: 'html5',
+    html5: 'html5',
     css: 'css',
     css3: 'css',
+    c: 'c',
     'c#': 'c-sharp',
     csharp: 'c-sharp',
     'c++': 'cplusplus',
+    cplusplus: 'cplusplus',
     node: 'node-js',
     nodejs: 'node-js',
     'vue-js': 'vue',
@@ -89,12 +91,19 @@ const _iconExceptionRules = {
 };
 
 function normalizeIconToken(value) {
-    return String(value || '')
+    const token = String(value || '')
         .toLowerCase()
         .trim()
         .replace(/^fa-/, '')
-        .replace(/[\s_]+/g, '-')
-        .replace(/[^a-z0-9\-]/g, '');
+        .replace(/[\s_]+/g, '-');
+    const compactToken = token.replace(/-/g, '');
+
+    // Preserve technology names whose punctuation is meaningful in the source.
+    if (compactToken === 'c++' || compactToken === 'cplusplus') return 'cplusplus';
+    if (compactToken === 'c#' || compactToken === 'csharp') return 'csharp';
+    if (compactToken === 'html5') return 'html5';
+
+    return token.replace(/[^a-z0-9\-]/g, '');
 }
 
 function getCustomSvgIcon(value) {
@@ -505,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 setupCarouselButtons();
-                addNewIcons('src/json/svg.json');
+                addNewIcons();
                 initializeProfileImage();
                 semiHiddenCards();
                 updateBackToTopVisibility();
@@ -679,10 +688,9 @@ function toggleShowAllButtonVisibility(sectionId, isAllFilterActive) {
 }
 
 const _theSvgMarkupCache = new Map();
-let _localSvgFallbackPromise = null;
 let _theSvgObserver = null;
 
-function addNewIcons(linkFile = 'src/json/svg.json') {
+function addNewIcons() {
     const styleClasses = new Set([
         'fa-solid', 'fa-regular', 'fa-brands', 'fa-light', 'fa-thin', 'fa-duotone',
         'fa-sharp', 'fa-sharp-solid', 'fa-sharp-regular', 'fa-sharp-light',
@@ -706,32 +714,6 @@ function addNewIcons(linkFile = 'src/json/svg.json') {
             .then((response) => response.ok ? response.text() : null)
             .then((markup) => markup && /<svg\b/i.test(markup) ? markup : null)
             .catch(() => null);
-    }
-
-    function loadLocalFallback() {
-        if (_localSvgFallbackPromise) return _localSvgFallbackPromise;
-        const fallbackPath = linkFile || 'src/json/svg.json';
-        const basename = String(fallbackPath).split('/').pop();
-        const absoluteUrl = /^https?:\/\//i.test(fallbackPath)
-            ? fallbackPath
-            : new URL(fallbackPath, document.baseURI).href;
-        _localSvgFallbackPromise = fetchAny(absoluteUrl, fallbackPath, basename)
-            .then((response) => response.ok ? response.json() : null)
-            .then((data) => {
-                const index = new Map();
-                (data && Array.isArray(data.icons) ? data.icons : []).forEach((icon) => {
-                    if (!icon || !icon.svg) return;
-                    [icon.class, icon.name, ...(Array.isArray(icon.aliases) ? icon.aliases : [])]
-                        .filter(Boolean)
-                        .forEach((key) => index.set(normalizeIconToken(key), icon.svg));
-                });
-                return index;
-            })
-            .catch((error) => {
-                console.warn('[icons] Não foi possível carregar src/json/svg.json:', error);
-                return new Map();
-            });
-        return _localSvgFallbackPromise;
     }
 
     async function getTheSvgMarkup(token) {
@@ -775,7 +757,7 @@ function addNewIcons(linkFile = 'src/json/svg.json') {
         });
     }
 
-    function parseMonochromeSvg(rawSvg) {
+    function parseTheSvgMarkup(rawSvg) {
         if (!rawSvg) return null;
         const parsed = new DOMParser().parseFromString(String(rawSvg), 'image/svg+xml');
         const svg = parsed.documentElement;
@@ -790,15 +772,9 @@ function addNewIcons(linkFile = 'src/json/svg.json') {
                 if ((name === 'href' || name === 'xlink:href') && value && !value.startsWith('#') && !value.startsWith('data:image/')) {
                     node.removeAttribute(attribute.name);
                 }
-                if (name === 'fill' && value.toLowerCase() !== 'none') node.setAttribute(attribute.name, 'currentColor');
-                if ((name === 'stroke' || name === 'stop-color') && value.toLowerCase() !== 'none') node.setAttribute(attribute.name, 'currentColor');
-                if (name === 'style') {
-                    node.setAttribute('style', value.replace(/(fill|stroke|stop-color)\s*:\s*[^;]+/gi, '$1:currentColor'));
-                }
             });
         });
 
-        svg.setAttribute('fill', 'currentColor');
         svg.removeAttribute('width');
         svg.removeAttribute('height');
         if (!svg.getAttribute('viewBox')) svg.setAttribute('viewBox', '0 0 24 24');
@@ -811,12 +787,7 @@ function addNewIcons(linkFile = 'src/json/svg.json') {
 
     function resolveMarkup(token) {
         if (_theSvgMarkupCache.has(token)) return _theSvgMarkupCache.get(token);
-        const promise = (async () => {
-            const fromTheSvg = await getTheSvgMarkup(token);
-            if (fromTheSvg) return fromTheSvg;
-            const fallbackIndex = await loadLocalFallback();
-            return fallbackIndex.get(token) || null;
-        })();
+        const promise = getTheSvgMarkup(token);
         _theSvgMarkupCache.set(token, promise);
         return promise;
     }
@@ -833,7 +804,7 @@ function addNewIcons(linkFile = 'src/json/svg.json') {
                 element.dataset.svgLookupDone = token;
                 return;
             }
-            const svg = parseMonochromeSvg(markup);
+            const svg = parseTheSvgMarkup(markup);
             if (!svg) return;
             element.replaceChildren(svg);
             element.dataset.svgResolvedName = token;
@@ -864,7 +835,7 @@ function addNewIcons(linkFile = 'src/json/svg.json') {
     }
 }
 
-addNewIcons('src/json/svg.json');
+addNewIcons();
 
 function prevProjects() {
     // dynamically compute scroll distance based on the width of a card
