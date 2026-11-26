@@ -1,0 +1,17 @@
+/* A variante mono é colorida por filtro SVG e herda currentColor do texto. */
+.icon.icon-monochrome {
+  color: inherit !important;
+}
+
+.icon.icon-monochrome:hover,
+a:hover .icon.icon-monochrome,
+button:hover .icon.icon-monochrome,
+.icon-container:hover .icon.icon-monochrome,
+.tech-cards:hover .icon.icon-monochrome,
+.project-topic-tag:hover .icon.icon-monochrome {
+  color: var(--accent) !important;
+}
+
+.icon.icon-monochrome > svg[data-icon-variant="mono"] {
+  color: inherit;
+}

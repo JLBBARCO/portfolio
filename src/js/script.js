@@ -719,18 +719,29 @@ function addNewIcons() {
     async function getTheSvgMarkup(token) {
         const urls = [];
         const uiSlug = _theSvgUiAliasMap[token];
-        if (uiSlug) urls.push(`https://thesvg.org/ui/${encodeURIComponent(uiSlug)}/outline.svg`);
+        if (uiSlug) {
+            urls.push({
+                url: `https://thesvg.org/ui/${encodeURIComponent(uiSlug)}/outline.svg`,
+                variant: 'mono',
+            });
+        }
 
         const brandSlug = _faAliasMap[token] || token;
         [...new Set([brandSlug, token])].forEach((slug) => {
             if (!slug) return;
-            urls.push(`https://thesvg.org/icons/${encodeURIComponent(slug)}/mono.svg`);
-            urls.push(`https://thesvg.org/icons/${encodeURIComponent(slug)}/default.svg`);
+            urls.push({
+                url: `https://thesvg.org/icons/${encodeURIComponent(slug)}/mono.svg`,
+                variant: 'mono',
+            });
+            urls.push({
+                url: `https://thesvg.org/icons/${encodeURIComponent(slug)}/default.svg`,
+                variant: 'default',
+            });
         });
 
-        for (const url of urls) {
+        for (const { url, variant } of urls) {
             const markup = await fetchSvg(url);
-            if (markup) return markup;
+            if (markup) return { markup, variant };
         }
         return null;
     }
@@ -785,6 +796,29 @@ function addNewIcons() {
         return document.importNode(svg, true);
     }
 
+    function applyMonochromeColorFilter(svgElement) {
+        const svgNamespace = 'http://www.w3.org/2000/svg';
+        const filterId = `theSvgMonoTint_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const defs = document.createElementNS(svgNamespace, 'defs');
+        const filter = document.createElementNS(svgNamespace, 'filter');
+        filter.setAttribute('id', filterId);
+        filter.setAttribute('color-interpolation-filters', 'sRGB');
+
+        const flood = document.createElementNS(svgNamespace, 'feFlood');
+        flood.setAttribute('flood-color', 'currentColor');
+        flood.setAttribute('result', 'mono-tint');
+
+        const composite = document.createElementNS(svgNamespace, 'feComposite');
+        composite.setAttribute('in', 'mono-tint');
+        composite.setAttribute('in2', 'SourceAlpha');
+        composite.setAttribute('operator', 'in');
+
+        filter.append(flood, composite);
+        defs.appendChild(filter);
+        svgElement.insertBefore(defs, svgElement.firstChild);
+        svgElement.setAttribute('filter', `url(#${filterId})`);
+    }
+
     function resolveMarkup(token) {
         if (_theSvgMarkupCache.has(token)) return _theSvgMarkupCache.get(token);
         const promise = getTheSvgMarkup(token);
@@ -797,15 +831,20 @@ function addNewIcons() {
         const token = getIconToken(element);
         if (!token || element.dataset.svgResolvedName === token || element.dataset.svgLookupPending === token) return;
         element.dataset.svgLookupPending = token;
-        resolveMarkup(token).then((markup) => {
+        resolveMarkup(token).then((result) => {
             if (!element.isConnected || getIconToken(element) !== token) return;
             delete element.dataset.svgLookupPending;
-            if (!markup) {
+            if (!result || !result.markup) {
                 element.dataset.svgLookupDone = token;
                 return;
             }
-            const svg = parseTheSvgMarkup(markup);
+            const svg = parseTheSvgMarkup(result.markup);
             if (!svg) return;
+            const isMonochrome = result.variant === 'mono';
+            element.classList.toggle('icon-monochrome', isMonochrome);
+            element.dataset.svgColorVariant = isMonochrome ? 'mono' : 'default';
+            svg.dataset.iconVariant = isMonochrome ? 'mono' : 'default';
+            if (isMonochrome) applyMonochromeColorFilter(svg);
             element.replaceChildren(svg);
             element.dataset.svgResolvedName = token;
             element.dataset.svgReplaced = 'true';
