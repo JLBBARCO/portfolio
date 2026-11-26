@@ -155,16 +155,13 @@ function header() {
   const languageCurrentFlag = document.createElement("img");
   languageCurrentFlag.id = "languageCurrentFlag";
   languageCurrentFlag.className = "language-flag";
-  // Link e texto alternativo vem de src/json/areas/images.json.
   if (typeof applyFlagIcon === "function") {
     applyFlagIcon(languageCurrentFlag, currentLanguageCountry);
   }
-  languageCurrentFlag.alt =
-    window.SiteImages && typeof window.SiteImages.flagAltSync === "function"
-      ? window.SiteImages.flagAltSync(currentLanguageCountry)
-      : currentLanguageCountry;
+  languageCurrentFlag.alt = "";
+  languageCurrentFlag.setAttribute("aria-hidden", "true");
   languageCurrentFlag.width = 24;
-  languageCurrentFlag.height = 16;
+  languageCurrentFlag.height = 18;
 
   const languageCurrentFallback = document.createElement("span");
   languageCurrentFallback.id = "languageCurrentFallback";

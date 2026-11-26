@@ -6,34 +6,17 @@ let supportedLanguageCodes = [];
 let defaultLanguage = "pt-br";
 // cache nodeLists for efficiency
 let _i18nElements = null;
-// Os links das bandeiras ficam em src/json/areas/images.json (SiteImages).
 function flagIconUrl(countryCode) {
-  const code = String(countryCode || "US").toUpperCase();
-  if (
-    window.SiteImages &&
-    typeof window.SiteImages.flagSrcSync === "function"
-  ) {
-    const fromCatalog = window.SiteImages.flagSrcSync(code);
-    if (fromCatalog) return fromCatalog;
-  }
-  return "";
+  const requestedCode = String(countryCode || "US").toUpperCase();
+  const code = /^[A-Z]{2}$/.test(requestedCode) ? requestedCode : "US";
+  return `https://thesvg.org/icons/flag-${code.toLowerCase()}/default.svg`;
 }
 
 function applyFlagIcon(imgElement, countryCode) {
   if (!imgElement) return;
-  const code = String(countryCode || "US").toUpperCase();
-  const immediate = flagIconUrl(code);
-  if (immediate) {
-    imgElement.src = immediate;
-    return;
-  }
-  if (window.SiteImages && typeof window.SiteImages.flagSrc === "function") {
-    window.SiteImages.flagSrc(code)
-      .then((src) => {
-        if (src) imgElement.src = src;
-      })
-      .catch(() => {});
-  }
+  imgElement.src = flagIconUrl(countryCode);
+  imgElement.alt = "";
+  imgElement.setAttribute("aria-hidden", "true");
 }
 
 function normalizeLanguageCode(language) {
@@ -532,7 +515,6 @@ function updateLanguageSelector() {
 
   if (currentFlag) {
     applyFlagIcon(currentFlag, option.country);
-    currentFlag.alt = option.country;
     currentFlag.classList.remove("is-hidden");
   }
 
@@ -625,9 +607,10 @@ function renderLanguageDropdown() {
     const optionFlag = document.createElement("img");
     optionFlag.className = "language-flag";
     applyFlagIcon(optionFlag, meta.country || "US");
-    optionFlag.alt = meta.country || languageCode;
+    optionFlag.alt = "";
+    optionFlag.setAttribute("aria-hidden", "true");
     optionFlag.width = 24;
-    optionFlag.height = 16;
+    optionFlag.height = 18;
 
     const optionFallback = document.createElement("span");
     optionFallback.className = "language-flag-fallback";
